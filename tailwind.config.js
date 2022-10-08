@@ -11,7 +11,17 @@ module.exports = {
         'secondary': '#1E5128',
         'dark': '#191A19',
         'light': '#D8E9A8',
-      }
+      },
+      container: {
+        padding: {
+          DEFAULT: '1rem',
+          sm: '2rem',
+          lg: '4rem',
+          xl: '2rem',
+          '2xl': '2rem',
+        },
+        center: true,
+      },
     },
   },
   plugins: [],

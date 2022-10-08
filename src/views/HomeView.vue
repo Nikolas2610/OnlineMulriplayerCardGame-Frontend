@@ -1,6 +1,6 @@
 <template>
   <section class="bg-dark" style="height: 93.3vh;">
-    <div class="container-sm h-full">
+    <div class="container h-full">
       <div class="grid grid-cols-2 h-full">
         <div class="col-span-1 h-100 flex items-center justify-center">
           <div class="box pl-48">

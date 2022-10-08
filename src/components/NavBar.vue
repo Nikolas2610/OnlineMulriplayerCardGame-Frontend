@@ -27,12 +27,12 @@
                     </svg>
                 </button>
             </div>
-            <div class="justify-between items-center w-full md:flex md:w-auto md:order-1 border-t mt-4 md:border-0 md:mt-0" id="navbar-menu">
+            <div class="hidden justify-between items-center w-full md:flex md:w-auto md:order-1 border-t border-b mt-4 md:border-0 md:ml-24 md:mt-0" id="navbar-menu">
                 <ul
-                    class="flex flex-col mt-4 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 bg-dark">
+                    class="flex flex-col my-4 md:my-0 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0">
                     <li v-for="{ id, title, path} in navbar_items" :key="id">
                         <RouterLink :to="{ name: path}"
-                            class="block py-2 pr-4 pl-3 text-white hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
+                            class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
                             aria-current="page">{{ title }}</RouterLink>
                     </li>
                 </ul>
