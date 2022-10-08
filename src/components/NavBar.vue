@@ -1,0 +1,64 @@
+<template>
+    <nav class="bg-dark border-gray-200 px-2 sm:px-4 py-2.5">
+        <div class="container flex flex-wrap justify-between items-center mx-auto">
+            <RouterLink :to="{ name: 'home'}" class="flex items-center">
+                <span class="self-center text-xl font-semibold whitespace-nowrap text-white hover:text-primary">OMCD</span>
+            </RouterLink>
+            <div class="flex md:order-2">
+                <RouterLink :to="{ name: 'login'}" type="button"
+                    class="text-white border-primary border hover:bg-primary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0">
+                    Login 
+                </RouterLink>
+                <RouterLink :to="{ name: 'register'}" type="button"
+                    class="text-white bg-primary hover:bg-secondary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 ml-2">
+                    Register
+                </RouterLink>
+
+                
+                <button data-collapse-toggle="navbar-cta" type="button" @click="openNavMenu"
+                    class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100"
+                    aria-controls="navbar-cta" aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="justify-between items-center w-full md:flex md:w-auto md:order-1 border-t mt-4 md:border-0 md:mt-0" id="navbar-menu">
+                <ul
+                    class="flex flex-col mt-4 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 bg-dark">
+                    <li v-for="{ id, title, path} in navbar_items" :key="id">
+                        <RouterLink :to="{ name: path}"
+                            class="block py-2 pr-4 pl-3 text-white hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
+                            aria-current="page">{{ title }}</RouterLink>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const navbar_items = ref([
+    {id: 1, title: 'About', path: 'about'},
+    {id: 2, title: 'Contact', path: 'contact'},
+])
+
+const openNavMenu = () => {
+    const navbarMenu: HTMLElement | null = document.getElementById('navbar-menu');
+    if (navbarMenu) {
+        navbarMenu.classList.toggle('hidden');
+    } 
+}
+
+</script>
+
+<style scoped>
+
+</style>
