@@ -3,13 +3,14 @@
     <div class="container h-full">
       <div class="grid grid-cols-2 h-full">
         <div class="col-span-1 h-100 flex items-center justify-center">
-          <div class="box pl-48">
-            <div class="text-white text-7xl">Online Multiplayer</div>
-            <div class="text-primary text-5xl">Card Game</div>
-            <p class="text-gray-400 text-xl">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nihil ea quasi
+          <div class="box pr-15">
+            <div class="text-white text-7xl mb-2">Online Multiplayer</div>
+            <div class="text-primary text-6xl mb-10">Card Game</div>
+            <p class="text-gray-400 text-xl mb-10">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nihil ea
+              quasi
               laboriosam
               aspernatur fugit voluptas. Tenetur nam, natus a!</p>
-            <div class="mt-10 sm:flex sm:justify-center lg:justify-start">
+            <div class="sm:flex sm:justify-center lg:justify-start">
               <div class="rounded-md shadow">
                 <a href="#"
                   class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-secondary md:py-4 md:px-10 md:text-lg">Get
