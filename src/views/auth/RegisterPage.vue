@@ -56,8 +56,7 @@
                             <label for="confirmPassword" class="block text-sm font-medium text-white">Confirm
                                 Password</label>
                             <div class="mt-1">
-                                <input id="confirmPassword" type="password"
-                                    v-model="registerUser.confirmPassword"
+                                <input id="confirmPassword" type="password" v-model="registerUser.confirmPassword"
                                     class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
                             </div>
                             <!-- Confirm Password error messages -->
@@ -69,7 +68,7 @@
                         <!-- Submit Form -->
                         <div>
                             <div @click="register()"
-                                class="mt-14 flex w-full justify-center rounded-md border border-transparent bg-dark py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary">
+                                class="mt-14 flex w-full justify-center rounded-md cursor-pointer border border-transparent bg-dark py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary">
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" v-if="loadingButton"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
@@ -93,7 +92,10 @@ import type UserRegister from '@/types/auth/UserRegister';
 import { computed } from '@vue/reactivity';
 import { defineComponent, reactive, ref } from 'vue'
 import { required, email, minLength, sameAs, helpers } from '@vuelidate/validators';
-import { useVuelidate } from '@vuelidate/core'
+import { useVuelidate } from '@vuelidate/core';
+import { useUserStore } from '@/stores/UserStore'
+const userStore = useUserStore();
+
 
 export default defineComponent({
     setup() {
@@ -138,14 +140,27 @@ export default defineComponent({
             // Check for error forms
             if (!v$.value.$error) {
                 // Success Form
-                // ***Import axios
-                console.log('Succesful')
+                const response = await userStore.register(registerUser);
+                if (response === 'success') {
+                    // Reset Register Form
+                    resetRegisterForm();
+                    // Reset Errors Form
+                    v$.value.$reset();
+                } else {
+                    // TODO: Error Notifications - Server error or email exists (messages from middleware)
+                }
             } else {
-                // Error Form
-                console.log('Fail')
+                // TODO: Error Notifications - Please complete correct the form
             }
             // Disable loading button
             loadingButton.value = false;
+        }
+
+        const resetRegisterForm = () => {
+            registerUser.username = '';
+            registerUser.email = '';
+            registerUser.password = '';
+            registerUser.confirmPassword = '';
         }
 
         return {

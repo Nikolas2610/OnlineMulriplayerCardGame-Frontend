@@ -80,6 +80,8 @@ import { defineComponent, reactive, ref } from 'vue'
 import { required, email } from '@vuelidate/validators';
 import { computed } from '@vue/reactivity';
 import { useVuelidate } from '@vuelidate/core'
+import { useUserStore } from '@/stores/UserStore'
+const userStore = useUserStore();
 
 export default defineComponent({
     setup() {
@@ -114,13 +116,27 @@ export default defineComponent({
                 // Get Remember Me checkbox value
                 loginUser.rememberMe = rememberMe.value;
                 // ***Import axios
-                console.log('Succesful')
+                const response: string = await userStore.login(loginUser);
+                // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error
+                if (response === 'success') {
+                    resetLoginForm();
+                    v$.value.$reset();
+                    alert('Success login')
+                }  else {
+                    // TODO: Error Notifications - Server error or credentials (messages from middleware)
+                    console.log(response)
+                }
             } else {
-                // Error Form
+                // TODO: Error Notifications - Please complete correct the form
                 console.log('Fail')
             }
             // Disable loading button
             loadingButton.value = false;
+        }
+
+        const resetLoginForm = () => {
+            loginUser.email = '';
+            loginUser.password = '';
         }
 
         return {
