@@ -4,7 +4,7 @@
             <!-- Title -->
             <div class="sm:mx-auto sm:w-full sm:max-w-lg">
                 <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-white">
-                    Sign in to our<br><span class="text-primary">Creative Gave</span>
+                    Forgot Password
                 </h2>
             </div>
             <!-- Login Form -->
@@ -15,7 +15,7 @@
                         <div>
                             <label for="email" class="block text-sm font-medium text-white">Email address</label>
                             <div class="mt-1">
-                                <input id="email" type="email" v-model="loginUser.email"
+                                <input id="email" type="email" v-model="forgotPassword.email"
                                     class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
                             </div>
                             <!-- Email error messages -->
@@ -24,37 +24,9 @@
                                 {{error.$message}}
                             </div>
                         </div>
-                        <!-- Password Input -->
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-white">Password</label>
-                            <div class="mt-1">
-                                <input id="password" v-model="loginUser.password" type="password"
-                                    class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                            </div>
-                            <!-- Password error messages -->
-                            <div v-for="error in v$.password.$errors" :key="error.$uid"
-                                class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
-                            </div>
-                        </div>
-                        <!-- Remember Me CheckBox -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center group">
-                                <input id="remember-me" type="checkbox" v-model="rememberMe"
-                                    class="h-4 w-4 rounded border-black text-black focus:ring-primary" />
-                                <label for="remember-me"
-                                    class="ml-2 block text-sm text-white group-hover:text-secondary">Remember me</label>
-                            </div>
-                            <!-- Forgot Password Link -->
-                            <div class="text-sm">
-                                <RouterLink :to="{ name: 'forgot-password'}"
-                                    class="font-medium text-white hover:text-secondary">Forgot your
-                                    password?</RouterLink>
-                            </div>
-                        </div>
                         <!-- Submit Form -->
                         <div>
-                            <div @click="login()"
+                            <div @click="submitForgotPassword()"
                                 class="mt-14 flex w-full justify-center rounded-md border border-transparent bg-dark py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary">
                                 <!-- Loading Animation -->
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" v-if="loadingButton"
@@ -65,7 +37,7 @@
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                     </path>
                                 </svg>
-                                <div v-else>Login</div>
+                                <div v-else>Submit</div>
                             </div>
                         </div>
                     </form>
@@ -76,38 +48,32 @@
 </template>
 
 <script lang="ts">
-import type UserLogin from '@/types/auth/UserLogin';
 import { defineComponent, reactive, ref } from 'vue'
 import { required, email } from '@vuelidate/validators';
 import { computed } from '@vue/reactivity';
 import { useVuelidate } from '@vuelidate/core'
 import { useUserStore } from '@/stores/UserStore'
 import router from '@/router';
+import type UserForgotPassword from '@/types/auth/UserForgotPassword';
 const userStore = useUserStore();
 
 export default defineComponent({
     setup() {
-        const rememberMe = ref(false);
         // User Object
-        const loginUser = reactive<UserLogin>({
+        const forgotPassword = reactive<UserForgotPassword>({
             email: '',
-            password: '',
-            rememberMe: false
         })
         // Loading Button
         const loadingButton = ref<Boolean>(false);
         const rules = computed(() => {
             return {
                 email: { required, email },
-                password: {
-                    required
-                }
             }
         });
         // Create Validation with rules
-        const v$ = useVuelidate(rules, loginUser);
+        const v$ = useVuelidate(rules, forgotPassword);
         // Submit Form 
-        const login = async () => {
+        const submitForgotPassword = async () => {
             // Set Loading Button 
             loadingButton.value = true;
             // Validate Form 
@@ -115,16 +81,13 @@ export default defineComponent({
             // Check for error forms
             if (!v$.value.$error) {
                 // Success Form
-                // Get Remember Me checkbox value
-                loginUser.rememberMe = rememberMe.value;
                 // ***Import axios
-                const response: string = await userStore.login(loginUser);
+                const response: string = await userStore.forgotPassword(forgotPassword);
                 // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error
                 if (response === 'success') {
-                    resetLoginForm();
+                    resetForgotPasswordForm();
                     v$.value.$reset();
-                    router.push({ name: 'lobby' })
-                    console.log('Success login')
+                    console.log('Send Email Forgot Password Success')
                 } else {
                     // TODO: Error Notifications - Server error or credentials (messages from middleware)
                     console.log(response)
@@ -137,13 +100,12 @@ export default defineComponent({
             loadingButton.value = false;
         }
 
-        const resetLoginForm = () => {
-            loginUser.email = '';
-            loginUser.password = '';
+        const resetForgotPasswordForm = () => {
+            forgotPassword.email = '';
         }
 
         return {
-            v$, login, loginUser, loadingButton, rememberMe
+            v$, submitForgotPassword, loadingButton, forgotPassword
         }
     }
 })

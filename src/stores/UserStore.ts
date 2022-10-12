@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 import type UserRegister from '@/types/auth/UserRegister';
+import type UserForgotPassword from '@/types/auth/UserForgotPassword';
 import axios from 'axios'
 import type UserLogin from "@/types/auth/UserLogin";
 import router from "@/router";
@@ -67,7 +68,26 @@ export const useUserStore = defineStore("UserStore", {
             this.$state.user.token = '';
             this.$state.user.username = '';
             router.push({ name: 'home' });
-        }
+        },
+        async forgotPassword(user: UserForgotPassword) {
+            const { email } = user;
+            let message = '';
+            await axios
+                .post(`${url}auth/forgot-password`, {
+                    email
+                }, {
+                    headers: { "Content-Type": "application/json" }
+                })
+                .then((response) => {
+                    if (response.status === 201) {
+                        message = 'success'
+                    }
+                })
+                .catch((err) => {
+                    message = err.response.data.error
+                })
+            return message;
+        },
     }
 })
 // Update Store without refresh page
