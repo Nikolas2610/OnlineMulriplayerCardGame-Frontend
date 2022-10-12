@@ -5,14 +5,18 @@
                 <span class="self-center text-xl font-semibold whitespace-nowrap text-white hover:text-primary">OMCD</span>
             </RouterLink>
             <div class="flex md:order-2">
-                <RouterLink :to="{ name: 'login'}" type="button"
+                <RouterLink :to="{ name: 'login'}" type="button" v-if="!userStore.authToken"
                     class="text-white border-primary border hover:bg-primary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0">
                     Login 
                 </RouterLink>
-                <RouterLink :to="{ name: 'register'}" type="button"
+                <RouterLink :to="{ name: 'register'}" type="button" v-if="!userStore.authToken"
                     class="text-white bg-primary hover:bg-secondary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 ml-2">
                     Register
                 </RouterLink>
+                <div type="button" v-if="userStore.$state.user.token" @click="userStore.logout"
+                    class="text-white cursor-pointer bg-primary hover:bg-secondary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 ml-2">
+                    Logout
+                </div>
 
                 
                 <button data-collapse-toggle="navbar-cta" type="button" @click="openNavMenu"
@@ -30,8 +34,8 @@
             <div class="hidden justify-between items-center w-full md:flex md:w-auto md:order-1 border-t border-b mt-4 md:border-0 md:ml-24 md:mt-0" id="navbar-menu">
                 <ul
                     class="flex flex-col my-4 md:my-0 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0">
-                    <li v-for="{ id, title, path} in navbar_items" :key="id">
-                        <RouterLink :to="{ name: path}"
+                    <li v-for="{ id, title, path, registerUser } in navbar_items" :key="id">
+                        <RouterLink :to="{ name: path}" v-if="registerUser ? (userStore.authToken ? true : false) : true"
                             class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
                             aria-current="page">{{ title }}</RouterLink>
                     </li>
@@ -44,10 +48,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useUserStore } from '@/stores/UserStore'
+const userStore = useUserStore();
 
 const navbar_items = ref([
-    {id: 1, title: 'About', path: 'about'},
-    {id: 2, title: 'Contact', path: 'contact'},
+    {id: 1, title: 'About', path: 'about', registerUser: false},
+    {id: 2, title: 'Contact', path: 'contact', registerUser: false},
+    {id: 3, title: 'Lobby', path: 'lobby', registerUser: true},
 ])
 
 const openNavMenu = () => {
