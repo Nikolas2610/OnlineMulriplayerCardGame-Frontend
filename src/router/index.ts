@@ -29,7 +29,40 @@ const router = createRouter({
       name: 'register',
       component: () => import('../views/auth/RegisterPage.vue')
     },
+    {
+      path: '/lobby',
+      name: 'lobby',
+      component: () => import('../views/LobbyPage.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  // if route requires authentication - requiresAuth is true
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+      if (localStorage.getItem('token') == null) {
+          next({name: 'home'});
+      } else {
+          next();
+      }
+  }
+  // if route can be accessed without authentication - guest is true 
+  // but we redirect back to dashboard if already logged in 
+  else if(to.matched.some((record) => record.meta.guest)){
+    if (localStorage.getItem('token')) {
+        next({name: 'lobby'});
+    } else {
+        next();
+    }
+  }
+  // if not guest or requiresAuth continue
+  // e.g. about us page 
+  else {
+      next();
+  }
+});
 
 export default router

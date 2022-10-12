@@ -81,6 +81,7 @@ import { required, email } from '@vuelidate/validators';
 import { computed } from '@vue/reactivity';
 import { useVuelidate } from '@vuelidate/core'
 import { useUserStore } from '@/stores/UserStore'
+import router from '@/router';
 const userStore = useUserStore();
 
 export default defineComponent({
@@ -121,8 +122,9 @@ export default defineComponent({
                 if (response === 'success') {
                     resetLoginForm();
                     v$.value.$reset();
-                    alert('Success login')
-                }  else {
+                    router.push({ name: 'lobby' })
+                    console.log('Success login')
+                } else {
                     // TODO: Error Notifications - Server error or credentials (messages from middleware)
                     console.log(response)
                 }

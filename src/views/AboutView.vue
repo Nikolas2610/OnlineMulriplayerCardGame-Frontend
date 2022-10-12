@@ -1,6 +1,6 @@
 <template>
-  <div class="flex h-full items-center justify-center">
-    <h1 class="text-black text-7xl">This is an about page</h1>
+  <div class="text-7xl text-center my-10">
+    This is an about page
   </div>
 </template>
 

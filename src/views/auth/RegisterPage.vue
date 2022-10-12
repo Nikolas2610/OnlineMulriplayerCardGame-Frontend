@@ -146,6 +146,8 @@ export default defineComponent({
                     resetRegisterForm();
                     // Reset Errors Form
                     v$.value.$reset();
+                    // TODO: Success Notification and message: Check your email to activate your account
+                    console.log('Success Register')
                 } else {
                     // TODO: Error Notifications - Server error or email exists (messages from middleware)
                 }
