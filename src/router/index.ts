@@ -20,19 +20,34 @@ const router = createRouter({
       component: () => import('../views/contact/ContactPage.vue')
     },
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('../views/auth/LoginPage.vue')
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: () => import('../views/auth/RegisterPage.vue')
-    },
-    {
-      path: '/forgot-password',
-      name: 'forgot-password',
-      component: () => import('../views/auth/ForgotPasswordPage.vue')
+      path: '/auth',
+      children: [
+        {
+          path: 'login',
+          name: 'login',
+          component: () => import('../views/auth/LoginPage.vue')
+        },
+        {
+          path: 'register',
+          name: 'register',
+          component: () => import('../views/auth/RegisterPage.vue')
+        },
+        {
+          path: 'forgot-password',
+          name: 'forgot-password',
+          component: () => import('../views/auth/ForgotPasswordPage.vue')
+        },
+        {
+          path: 'email-confirmation',
+          children: [
+            {
+              path: 'user-registration',
+              name: 'user-registration',
+              component: () => import('../views/auth/email-confirmation/UserRegistrationPage.vue')
+            }
+          ]
+        }
+      ]
     },
     {
       path: '/lobby',
@@ -48,25 +63,25 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // if route requires authentication - requiresAuth is true
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-      if (localStorage.getItem('token') == null) {
-          next({name: 'home'});
-      } else {
-          next();
-      }
+    if (localStorage.getItem('token') == null) {
+      next({ name: 'home' });
+    } else {
+      next();
+    }
   }
   // if route can be accessed without authentication - guest is true 
   // but we redirect back to dashboard if already logged in 
-  else if(to.matched.some((record) => record.meta.guest)){
+  else if (to.matched.some((record) => record.meta.guest)) {
     if (localStorage.getItem('token')) {
-        next({name: 'lobby'});
+      next({ name: 'lobby' });
     } else {
-        next();
+      next();
     }
   }
   // if not guest or requiresAuth continue
   // e.g. about us page 
   else {
-      next();
+    next();
   }
 });
 
