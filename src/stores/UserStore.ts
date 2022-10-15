@@ -88,6 +88,24 @@ export const useUserStore = defineStore("UserStore", {
                 })
             return message;
         },
+        async userVerify(token: string) {
+            let message = '';
+            await axios
+                .post(`${url}email-confirmation/confirm`, {
+                    token
+                }, {
+                    headers: { "Content-Type": "application/json" }
+                })
+                .then((response) => {
+                    if (response.status === 201) {
+                        message = 'success'
+                    }
+                })
+                .catch((err) => {
+                    message = err.response.data.message
+                })
+            return message;
+        },
     }
 })
 // Update Store without refresh page

@@ -46,7 +46,16 @@ const router = createRouter({
               component: () => import('../views/auth/email-confirmation/UserRegistrationPage.vue')
             }
           ]
-        }
+        },
+        {
+          path: '/404',
+          name: '404',
+          component: () => import('../views/PageNotFound.vue'),
+        },
+        {
+          path: '/:pathMatch(.*)*',
+          redirect: { name: '404' }
+        },
       ]
     },
     {

@@ -12,13 +12,16 @@
               aspernatur fugit voluptas. Tenetur nam, natus a!</p>
             <div class="sm:flex sm:justify-center lg:justify-start">
               <div class="rounded-md shadow">
-                <a href="#"
-                  class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-secondary md:py-4 md:px-10 md:text-lg">Get
-                  started</a>
+                <RouterLink :to="{ name: 'register' }"
+                  class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-secondary md:py-4 md:px-10 md:text-lg">
+                  Get started
+                </RouterLink>
               </div>
               <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                <a href="#"
-                  class="flex w-full items-center justify-center rounded-md border border-transparent bg-white px-8 py-3 text-base font-medium text-primary hover:bg-secondary hover:text-white md:py-4 md:px-10 md:text-lg">Play</a>
+                <RouterLink :to="{ name: 'login' }"
+                  class="flex w-full items-center justify-center rounded-md border border-transparent bg-white px-8 py-3 text-base font-medium text-primary hover:bg-secondary hover:text-white md:py-4 md:px-10 md:text-lg">
+                  Play
+                </RouterLink>
               </div>
             </div>
           </div>
