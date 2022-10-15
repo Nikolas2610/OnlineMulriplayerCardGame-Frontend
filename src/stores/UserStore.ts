@@ -10,14 +10,14 @@ export const useUserStore = defineStore("UserStore", {
     state: () => {
         return {
             user: {
-                username: '' as String | null,
-                email: '' as String | null,
-                token: '' as String | null
-            }
+                username: null as String | null,
+                token: null as String | null
+            },
+            forgotPasswordToken: null as JsonWebKey | null
         }
     },
     getters: {
-        authToken: (state) => state.user.token === '' ? false : true,
+        authToken: (state) => state.user.token === null ? false : true,
     },
     actions: {
         async register(user: UserRegister) {
@@ -65,8 +65,8 @@ export const useUserStore = defineStore("UserStore", {
         logout() {
             localStorage.removeItem('token');
             localStorage.removeItem('username');
-            this.$state.user.token = '';
-            this.$state.user.username = '';
+            this.$state.user.token = null;
+            this.$state.user.username = null;
             router.push({ name: 'home' });
         },
         async forgotPassword(user: UserForgotPassword) {
@@ -98,6 +98,48 @@ export const useUserStore = defineStore("UserStore", {
                 })
                 .then((response) => {
                     if (response.status === 201) {
+                        message = 'success'
+                    }
+                })
+                .catch((err) => {
+                    message = err.response.data.message
+                })
+            return message;
+        },
+        async forgotPasswordVerify(token: string) {
+            let message = '';
+            await axios
+                .post(`${url}email-confirmation/confirm-forgot-password`, {
+                    token
+                }, {
+                    headers: { "Content-Type": "application/json" }
+                })
+                .then((response) => {
+                    if (response.status === 201) {
+                        this.$state.forgotPasswordToken = response.data.token;
+                        message = 'success'
+                    }
+                })
+                .catch((err) => {
+                    message = err.response.data.message
+                })
+            return message;
+        },
+        async resetPassword(password: string) {
+            const token = this.$state.forgotPasswordToken;
+            if (!token) {
+                return 'Token not exists. Please request again for reset password.'
+            }
+            let message = '';
+            await axios
+                .post(`${url}auth/update-password`, {
+                    password, token
+                }, {
+                    headers: { "Content-Type": "application/json" }
+                })
+                .then((response) => {
+                    if (response.status === 201) {
+                        this.$state.forgotPasswordToken = null;
                         message = 'success'
                     }
                 })
