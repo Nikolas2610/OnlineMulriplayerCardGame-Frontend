@@ -22,6 +22,10 @@
                   class="flex w-full items-center justify-center rounded-md border border-transparent bg-white px-8 py-3 text-base font-medium text-primary hover:bg-secondary hover:text-white md:py-4 md:px-10 md:text-lg">
                   Play
                 </RouterLink>
+                <button @click="$emit('openModal', true)"
+                  class="flex w-full items-center justify-center rounded-md border border-transparent bg-white px-8 py-3 text-base font-medium text-primary hover:bg-secondary hover:text-white md:py-4 md:px-10 md:text-lg">
+                  Open
+                </button>
               </div>
             </div>
           </div>
@@ -35,7 +39,9 @@
 </template>
 
 <script lang="ts" setup>
-
+const test = () => {
+  console.log('test')
+}
 </script>
 
 <style lang="scss" scoped>

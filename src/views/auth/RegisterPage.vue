@@ -94,8 +94,9 @@ import { defineComponent, reactive, ref } from 'vue'
 import { required, email, minLength, sameAs, helpers } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { useUserStore } from '@/stores/UserStore'
+import { useToast } from "vue-toastification";
 const userStore = useUserStore();
-
+const toast = useToast();
 
 export default defineComponent({
     setup() {
@@ -142,17 +143,21 @@ export default defineComponent({
                 // Success Form
                 const response = await userStore.register(registerUser);
                 if (response === 'success') {
-                    // Reset Register Form
-                    resetRegisterForm();
                     // Reset Errors Form
                     v$.value.$reset();
                     // TODO: Success Notification and message: Check your email to activate your account
-                    console.log('Success Register')
+                    toast.success(`Registration has been created successfully. We have send an email to ${registerUser.email} to verify your email address and activate your account.`,{
+                        timeout: 10000
+                    })
+                    // Reset Register Form
+                    resetRegisterForm();
                 } else {
                     // TODO: Error Notifications - Server error or email exists (messages from middleware)
+                    toast.error(`Registation fail. \n${response}`);
                 }
             } else {
                 // TODO: Error Notifications - Please complete correct the form
+                toast.error(`Please complete correct the form`);
             }
             // Disable loading button
             loadingButton.value = false;
