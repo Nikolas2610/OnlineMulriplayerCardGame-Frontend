@@ -83,6 +83,8 @@ import { computed } from '@vue/reactivity';
 import { useVuelidate } from '@vuelidate/core'
 import { useUserStore } from '@/stores/UserStore'
 import router from '@/router';
+import { useToast } from "vue-toastification";
+const toast = useToast();
 const userStore = useUserStore();
 
 export default defineComponent({
@@ -124,14 +126,14 @@ export default defineComponent({
                     resetLoginForm();
                     v$.value.$reset();
                     router.push({ name: 'lobby' })
-                    console.log('Success login')
+                    toast.success(`You have been succesfully login!`)
                 } else {
                     // TODO: Error Notifications - Server error or credentials (messages from middleware)
-                    console.log(response)
+                    toast.error(`Login error!\n${response}`)
                 }
             } else {
                 // TODO: Error Notifications - Please complete correct the form
-                console.log('Fail')
+                toast.error(`Login error!\nPlease complete correct the form`)
             }
             // Disable loading button
             loadingButton.value = false;

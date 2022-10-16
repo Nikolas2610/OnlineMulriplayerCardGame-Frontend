@@ -1,21 +1,38 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import NavBar from '@/components/NavBar.vue'
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useUserStore } from './stores/UserStore'
-import type { Store } from 'pinia';
+import Modal from '@/components/Modal.vue'
+
 const userStore = useUserStore();
+const isModalOpen = ref<Boolean>(false);
+
+// Get the JWT token from localstage if user close the browser 
 onMounted(() => {
   if (localStorage.getItem('token')) {
     userStore.$state.user.token = localStorage.getItem('token');
     userStore.$state.user.username = localStorage.getItem('username');
   }
 })
+
+// Open Modal
+const activeModal = () => {
+  isModalOpen.value = true;
+}
+
+// Close modal
+const deactiveteModal = () => {
+  isModalOpen.value = false;
+}
 </script>
 
 <template>
-  <NavBar/>
-  <RouterView />
+  <NavBar />
+  <RouterView @openModal="activeModal()" />
+  <Teleport to="#modal">
+    <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal" />
+  </Teleport>
 </template>
 
 <style scoped>

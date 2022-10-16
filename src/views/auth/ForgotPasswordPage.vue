@@ -53,7 +53,8 @@ import { required, email } from '@vuelidate/validators';
 import { computed } from '@vue/reactivity';
 import { useVuelidate } from '@vuelidate/core'
 import { useUserStore } from '@/stores/UserStore'
-import router from '@/router';
+import { useToast } from "vue-toastification";
+const toast = useToast();
 import type UserForgotPassword from '@/types/auth/UserForgotPassword';
 const userStore = useUserStore();
 
@@ -85,16 +86,16 @@ export default defineComponent({
                 const response: string = await userStore.forgotPassword(forgotPassword);
                 // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error
                 if (response === 'success') {
-                    resetForgotPasswordForm();
                     v$.value.$reset();
-                    console.log('Send Email Forgot Password Success')
+                    toast.success(`An email has been send to ${forgotPassword.email} to reset your password`)
+                    resetForgotPasswordForm();
                 } else {
                     // TODO: Error Notifications - Server error or credentials (messages from middleware)
-                    console.log(response)
+                    toast.error(`${response}`)
                 }
             } else {
                 // TODO: Error Notifications - Please complete correct the form
-                console.log('Fail')
+                toast.error(`Please complete correct the form`)
             }
             // Disable loading button
             loadingButton.value = false;

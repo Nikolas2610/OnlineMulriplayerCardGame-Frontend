@@ -35,7 +35,7 @@ export const useUserStore = defineStore("UserStore", {
                     }
                 })
                 .catch((err) => {
-                    message = err.response.data.error
+                    err.response ? message = err.response.data.error : message = err.message;
                 })
             return message;
         },
@@ -58,7 +58,7 @@ export const useUserStore = defineStore("UserStore", {
                     }
                 })
                 .catch(async (err) => {
-                    message = err.response.data.error;
+                    err.response ? message = err.response.data.error : message = err.message;
                 })
             return message;
         },
@@ -72,6 +72,7 @@ export const useUserStore = defineStore("UserStore", {
         async forgotPassword(user: UserForgotPassword) {
             const { email } = user;
             let message = '';
+            console.log('1')
             await axios
                 .post(`${url}auth/forgot-password`, {
                     email
@@ -83,9 +84,10 @@ export const useUserStore = defineStore("UserStore", {
                         message = 'success'
                     }
                 })
-                .catch((err) => {
-                    message = err.response.data.error
+                .catch((err) => {     
+                    err.response ? message = err.response.data.error : message = err.message;
                 })
+                console.log('2')
             return message;
         },
         async userVerify(token: string) {
@@ -121,7 +123,7 @@ export const useUserStore = defineStore("UserStore", {
                     }
                 })
                 .catch((err) => {
-                    message = err.response.data.message
+                    err.response ? message = err.response.data.message : message = err.message;
                 })
             return message;
         },
@@ -144,7 +146,7 @@ export const useUserStore = defineStore("UserStore", {
                     }
                 })
                 .catch((err) => {
-                    message = err.response.data.message
+                    err.response ? message = err.response.data.message : message = err.message;
                 })
             return message;
         },
