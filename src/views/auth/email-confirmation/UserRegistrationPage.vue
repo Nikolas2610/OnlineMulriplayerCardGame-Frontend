@@ -1,22 +1,5 @@
 <template>
-    <section class="bg-dark" v-if="state.loading">
-        <div class="container py-40">
-            <div>
-                <!-- Success Email confirmation -->
-                <SuccessMessage v-if="state.message === 1" />
-
-                <!-- Email not exists | Wrong Token -->
-                <TokenNotExists v-if="state.message === 2" />
-
-                <!-- Token Expire -->
-                <TokenExpireMessage v-if="state.message === 3" />
-
-                <!-- Server error -->
-                <ServerErrorMessage v-if="state.message === 4" />
-            </div>
-        </div>
-    </section>
-    <div class="container" v-else>
+    <div class="container">
         <PreLoader />
     </div>
 </template>
@@ -24,15 +7,13 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { useUserStore } from '@/stores/UserStore'
-import SuccessMessage from './messages/SuccessMessage.vue'
-import ServerErrorMessage from './messages/ServerErrorMessage.vue'
-import TokenExpireMessage from './messages/TokenExpireMessage.vue'
-import TokenNotExists from './messages/TokenNotExists.vue'
 import PreLoader from '@/components/PreLoader.vue'
 import router from '@/router';
+import { useToast } from "vue-toastification";
 
 const userStore = useUserStore();
 const state = ref({ message: 0, loading: false });
+const toast = useToast();
 
 onMounted(async () => {
     // Get token from URL
@@ -54,20 +35,21 @@ onMounted(async () => {
 const selectNotification = (response: string): void => {
     switch (response) {
         case 'success':
-            state.value.message = 1
+            toast.success('Your registration is complete. \nAre you ready to create your own game?')
+            router.push({ name: 'login' });
             break;
         case 'Bad confirmation token':
         case 'Bad Request':
-            state.value.message = 2
+            toast.error('This token is not exists. If you want to login, please create an account!')
+            router.push({ name: 'register' });
             break;
         case 'Email confirmation token expired':
-            state.value.message = 3
-            break;
-        case 'Internal server error':
-            state.value.message = 4
+            toast.error('Your Token has expired. A new email has send to your email activate your account.')
+            router.push({ name: 'login' });
             break;
         default:
-            state.value.message = 2
+            toast.error('Something went wrong. Please try again in a few minutes.')
+            router.push({ name: 'login' });
             break;
     }
 }
