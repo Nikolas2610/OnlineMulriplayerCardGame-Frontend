@@ -6,6 +6,7 @@ import type UserState from '@/types/auth/UserState';
 import router from "@/router";
 import axiosClient from "@/plugins/axios";
 import type { AxiosResponse } from 'axios';
+import jwtDecode from "jwt-decode";
 
 export const useUserStore = defineStore("UserStore", {
     state: () => {
@@ -32,14 +33,23 @@ export const useUserStore = defineStore("UserStore", {
         },
         async login(user: UserLogin) {
             try {
-                const { email, password, rememberMe } = user;
-                const response: AxiosResponse = await axiosClient.post(`auth/login`, { email, password, rememberMe });
+                const { email, password } = user;
+                const response: AxiosResponse = await axiosClient.post(`auth/login`, { email, password });
                 if (response.status === 201) {
-                    console.log(response.data);
-                    this.$state.user.token = response.data.token;
-                    this.$state.user.username = response.data.username;
-                    localStorage.setItem('token', response.data.token);
-                    localStorage.setItem('username', response.data.username);
+                    try {
+                        const decodedToken = jwtDecode(response.data.token);
+                        console.log(decodedToken);
+                        this.$state.user.token = decodedToken.token;
+                        this.$state.user.username = decodedToken.user.username;
+                        localStorage.setItem('token', response.data.token);
+                        localStorage.setItem('username', response.data.username);
+                    } catch (error) {
+                        if (process.env.NODE_ENV === 'development') {
+                            return error.message
+                        } else {
+                            return 'Something went wrong. Please try again later!'
+                        }
+                    }
                 }
                 return 'success';
             } catch (err: any) {
