@@ -32,21 +32,36 @@
                     </svg>
                 </button>
             </div>
-            <div class="hidden justify-between items-center w-full md:flex md:w-auto md:order-1 border-t border-b mt-4 md:border-0 md:ml-24 md:mt-0"
-                id="navbar-menu">
+            <div
+                class="hidden justify-between items-center w-full md:flex md:w-auto md:order-1 border-t border-b mt-4 md:border-0 md:ml-24 md:mt-0 z-20 bg-dark">
                 <ul
                     class="flex flex-col my-4 md:my-0 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0">
-                    <li v-for="{ id, title, path, registerUser } in navbar_items" :key="id">
+                    <li v-for="{ id, title, path, registerUser } in navbar_items" :key="id" class="cursor-pointer">
                         <RouterLink :to="{ name: path }"
                             v-if="registerUser ? (userStore.authToken ? true : false) : true"
                             class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
-                            aria-current="page">{{ title }}</RouterLink>
+                            aria-current="page">
+                            {{ title }}
+                        </RouterLink>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-
+    <div class="hidden justify-between items-center w-full md:hidden md:w-auto md:order-1 border-t border-b md:border-0 md:ml-24 md:mt-0 z-20 bg-dark"
+        id="navbar-menu">
+        <ul
+            class="flex flex-col my-4 md:my-0 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0">
+            <li v-for="{ id, title, path, registerUser } in navbar_items" :key="id" class="cursor-pointer"
+                @click="closeNavbar()">
+                <RouterLink :to="{ name: path }" v-if="registerUser ? (userStore.authToken ? true : false) : true"
+                    class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
+                    aria-current="page">
+                    {{ title }}
+                </RouterLink>
+            </li>
+        </ul>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -57,16 +72,21 @@ const userStore = useUserStore();
 const navbar_items = ref([
     { id: 1, title: 'About', path: 'about', registerUser: false },
     { id: 2, title: 'Contact', path: 'contact', registerUser: false },
-    { id: 3, title: 'Lobby', path: 'lobby', registerUser: true },
+    { id: 3, title: 'Lobby', path: 'lobby', registerUser: false },
+    { id: 4, title: 'Dashboard', path: 'dashboard', registerUser: true },
 ])
 
 const openNavMenu = () => {
     const navbarMenu: HTMLElement | null = document.getElementById('navbar-menu');
     if (navbarMenu) {
+        console.log('test');
         navbarMenu.classList.toggle('hidden');
     }
 }
 
+const closeNavbar = () => {
+    openNavMenu();
+}
 </script>
 
 <style scoped>

@@ -12,6 +12,7 @@ const isModalOpen = ref<Boolean>(false);
 onMounted(() => {
   if (localStorage.getItem('token')) {
     userStore.$state.user.token = localStorage.getItem('token');
+    userStore.$state.user.email = localStorage.getItem('email');
     userStore.$state.user.username = localStorage.getItem('username');
   }
 })

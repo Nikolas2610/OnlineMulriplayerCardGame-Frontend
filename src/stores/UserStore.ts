@@ -13,6 +13,7 @@ export const useUserStore = defineStore("UserStore", {
         return {
             user: {
                 username: null,
+                email: null,
                 token: null,
                 forgotPasswordToken: null
             } as UserState
@@ -37,13 +38,14 @@ export const useUserStore = defineStore("UserStore", {
                 const response: AxiosResponse = await axiosClient.post(`auth/login`, { email, password });
                 if (response.status === 201) {
                     try {
-                        const decodedToken = jwtDecode(response.data.token);
-                        console.log(decodedToken);
-                        this.$state.user.token = decodedToken.token;
+                        const decodedToken: any = jwtDecode(response.data.token);
+                        this.$state.user.token = response.data.token;
                         this.$state.user.username = decodedToken.user.username;
+                        this.$state.user.email = decodedToken.user.email;
                         localStorage.setItem('token', response.data.token);
-                        localStorage.setItem('username', response.data.username);
-                    } catch (error) {
+                        localStorage.setItem('username', decodedToken.user.username);
+                        localStorage.setItem('email', decodedToken.user.email);
+                    } catch (error: any) {
                         if (process.env.NODE_ENV === 'development') {
                             return error.message
                         } else {
