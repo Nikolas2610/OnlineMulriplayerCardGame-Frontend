@@ -39,9 +39,10 @@
 </template>
 
 <script lang="ts" setup>
-const test = () => {
-  console.log('test')
-}
+// import { defineEmits } from 'vue';
+
+// const emit = defineEmits(['openModal'])
+// emit('openModal', true);
 </script>
 
 <style lang="scss" scoped>

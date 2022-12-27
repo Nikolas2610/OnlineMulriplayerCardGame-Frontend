@@ -37,15 +37,8 @@
                                 {{error.$message}}
                             </div>
                         </div>
-                        <!-- Remember Me CheckBox -->
+                        <!-- Forgot Password Link -->
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center group">
-                                <input id="remember-me" type="checkbox" v-model="rememberMe"
-                                    class="h-4 w-4 rounded border-black text-black focus:ring-primary" />
-                                <label for="remember-me"
-                                    class="ml-2 block text-sm text-white group-hover:text-secondary">Remember me</label>
-                            </div>
-                            <!-- Forgot Password Link -->
                             <div class="text-sm">
                                 <RouterLink :to="{ name: 'forgot-password'}"
                                     class="font-medium text-white hover:text-secondary">Forgot your
@@ -89,12 +82,10 @@ const userStore = useUserStore();
 
 export default defineComponent({
     setup() {
-        const rememberMe = ref(false);
         // User Object
         const loginUser = reactive<UserLogin>({
-            email: '',
-            password: '',
-            rememberMe: false
+            email: 'psillovits@gmail.com',
+            password: 'Nikolas-0',
         })
         // Loading Button
         const loadingButton = ref<Boolean>(false);
@@ -117,8 +108,6 @@ export default defineComponent({
             // Check for error forms
             if (!v$.value.$error) {
                 // Success Form
-                // Get Remember Me checkbox value
-                loginUser.rememberMe = rememberMe.value;
                 // ***Import axios
                 const response: string = await userStore.login(loginUser);
                 // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error
@@ -145,7 +134,7 @@ export default defineComponent({
         }
 
         return {
-            v$, login, loginUser, loadingButton, rememberMe
+            v$, login, loginUser, loadingButton
         }
     }
 })

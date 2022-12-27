@@ -104,9 +104,75 @@ const router = createRouter({
       name: 'lobby',
       component: () => import('../views/LobbyPage.vue'),
       meta: {
-        requiresAuth: true,
+        requiresAuth: false,
         title: `${appName} | Game Lobby`
       }
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('../views/Dashboard.vue'),
+      redirect: { name: 'overview' },
+      meta: {
+        requiresAuth: true,
+        title: `${appName} | Dashboard`
+      },
+      children: [
+        {
+          path: 'games',
+          name: 'games',
+          component: () => import('../views/dashboard/GamesView.vue'),
+          meta: {
+            requiresAuth: false,
+            title: `${appName} | Dashboard`
+          }
+        },
+        {
+          path: 'tables',
+          name: 'tables',
+          component: () => import('../views/dashboard/TablesView.vue'),
+          meta: {
+            requiresAuth: false,
+            title: `${appName} | Dashboard`
+          }
+        },
+        {
+          path: 'overview',
+          name: 'overview',
+          component: () => import('../views/dashboard/OverviewView.vue'),
+          meta: {
+            requiresAuth: false,
+            title: `${appName} | Dashboard`
+          }
+        },
+        {
+          path: 'decks',
+          name: 'decks',
+          component: () => import('../views/dashboard/DecksView.vue'),
+          meta: {
+            requiresAuth: false,
+            title: `${appName} | Dashboard`
+          }
+        },
+        {
+          path: 'cards',
+          name: 'cards',
+          component: () => import('../views/dashboard/CardsView.vue'),
+          meta: {
+            requiresAuth: false,
+            title: `${appName} | Dashboard`
+          }
+        },
+        {
+          path: 'settings',
+          name: 'settings',
+          component: () => import('../views/dashboard/SettingsView.vue'),
+          meta: {
+            requiresAuth: false,
+            title: `${appName} | Dashboard`
+          }
+        },
+      ]
     },
   ]
 })

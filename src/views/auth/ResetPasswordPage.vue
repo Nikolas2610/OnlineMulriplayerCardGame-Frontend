@@ -21,7 +21,7 @@
                             <!-- Password Error Messages -->
                             <div v-for="error in v$.password.$errors" :key="error.$uid"
                                 class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
+                                {{ error.$message }}
                             </div>
                         </div>
                         <!-- Confirm Password Input -->
@@ -35,7 +35,7 @@
                             <!-- Confirm Password error messages -->
                             <div v-for="error in v$.confirmPassword.$errors" :key="error.$uid"
                                 class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
+                                {{ error.$message }}
                             </div>
                         </div>
                         <!-- Submit Form -->
@@ -77,7 +77,7 @@ export default defineComponent({
     setup() {
         onMounted(() => {
             // if user store does not have forgot password token it means the user didn't come from forgot password validation
-            if (!userStore.forgotPasswordToken) {
+            if (!userStore.user.forgotPasswordToken) {
                 router.push({ name: 'home' });
             }
         })

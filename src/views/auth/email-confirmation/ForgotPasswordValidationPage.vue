@@ -1,19 +1,5 @@
 <template>
-    <section class="bg-dark" v-if="state.loading">
-        <div class="container py-40">
-            <div>
-                <!-- Email not exists | Wrong Token -->
-                <TokenNotExists v-if="state.message === 2" />
-
-                <!-- Token Expire -->
-                <TokenExpireMessage v-if="state.message === 3" />
-
-                <!-- Server error -->
-                <ServerErrorMessage v-if="state.message === 4" />
-            </div>
-        </div>
-    </section>
-    <div class="container" v-else>
+    <div class="container">
         <PreLoader />
     </div>
 </template>
@@ -21,16 +7,16 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { useUserStore } from '@/stores/UserStore'
-import ServerErrorMessage from './messages/ServerErrorMessage.vue'
-import TokenExpireMessage from './messages/TokenExpireMessage.vue'
-import TokenNotExists from './messages/TokenNotExists.vue'
 import PreLoader from '@/components/PreLoader.vue'
 import router from '@/router';
+import { useToast } from "vue-toastification";
 
 const userStore = useUserStore();
 const state = ref({ message: 0, loading: false });
+const toast = useToast();
 
 onMounted(async () => {
+    state.value.loading = true;
     // Get token from URL
     const token = getToken();
     if (!token) {
@@ -40,31 +26,30 @@ onMounted(async () => {
     }
     // Verify user with token and return response
     const response = await userStore.forgotPasswordVerify(token);
-    // If response success redirect user to reset the password
-    if (response === 'success') {
-        router.push({ name: 'reset-password' });
-    }
     // Check response message to print to the user the correct message
     selectNotification(response);
     // Load the page
-    state.value.loading = true;
+    state.value.loading = false;
 });
 
 // Select correct message for the user
 const selectNotification = (response: string): void => {
     switch (response) {
+        case 'success':
+            router.push({ name: 'reset-password' });
+            break;
         case 'Bad confirmation token':
         case 'Bad Request':
-            state.value.message = 2
+            toast.error('This token is not exists. If you want to login, please create an account!')
+            router.push({ name: 'register' });
             break;
         case 'Forgot password token expired':
-            state.value.message = 3
-            break;
-        case 'Internal server error':
-            state.value.message = 4
+            toast.error('Your Token has expired. A new email has send to your email activate your account.')
+            router.push({ name: 'login' });
             break;
         default:
-            state.value.message = 2
+            toast.error('Something went wrong. Please try again in a few minutes.')
+            router.push({ name: 'login' });
             break;
     }
 }
