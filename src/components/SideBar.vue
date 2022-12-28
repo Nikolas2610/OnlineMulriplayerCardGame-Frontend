@@ -83,15 +83,14 @@ import { useRouter } from 'vue-router';
 const userStore = useUserStore();
 
 const router = useRouter();
-console.log(router.currentRoute.value.name);
 
 const user = computed(() => userStore.$state.user);
 
 // Menu list items
 const menuItems = ref([
     { name: 'Dashboard', icon: '/src/assets/icons/sidebar/dashboard.svg', router: 'overview' },
-    { name: 'Games', icon: '/src/assets/icons/sidebar/games.svg', router: 'games' },
     { name: 'Tables', icon: '/src/assets/icons/sidebar/tables.svg', router: 'tables' },
+    { name: 'Games', icon: '/src/assets/icons/sidebar/games.svg', router: 'games' },
     { name: 'Decks', icon: '/src/assets/icons/sidebar/decks.svg', router: 'decks' },
     { name: 'Cards', icon: '/src/assets/icons/sidebar/cards.svg', router: 'cards' },
     { name: 'Settings', icon: '/src/assets/icons/sidebar/settings.svg', router: 'settings' },

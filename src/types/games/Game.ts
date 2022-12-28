@@ -10,6 +10,6 @@ export default interface Game {
     private: boolean;
     rank: boolean;
     status_player: boolean;
-    created_at: boolean;
-    updated_at: boolean;
+    created_at: Date;
+    updated_at: Date;
 }

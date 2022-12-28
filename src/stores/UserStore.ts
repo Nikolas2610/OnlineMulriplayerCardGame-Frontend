@@ -110,6 +110,15 @@ export const useUserStore = defineStore("UserStore", {
                 return err.response ? err.response.data.message : err.message;
             }
         },
+        decodeToken(response: any) {
+            const decodedToken: any = jwtDecode(response.data.token);
+            this.$state.user.token = response.data.token;
+            this.$state.user.username = decodedToken.user.username;
+            this.$state.user.email = decodedToken.user.email;
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('username', decodedToken.user.username);
+            localStorage.setItem('email', decodedToken.user.email);
+        },
     }
 })
 // Update Store without refresh page
