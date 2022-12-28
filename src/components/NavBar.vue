@@ -79,7 +79,6 @@ const navbar_items = ref([
 const openNavMenu = () => {
     const navbarMenu: HTMLElement | null = document.getElementById('navbar-menu');
     if (navbarMenu) {
-        console.log('test');
         navbarMenu.classList.toggle('hidden');
     }
 }

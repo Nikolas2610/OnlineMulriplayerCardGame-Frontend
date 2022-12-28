@@ -83,7 +83,6 @@ import { useRouter } from 'vue-router';
 const userStore = useUserStore();
 
 const router = useRouter();
-console.log(router.currentRoute.value.name);
 
 const user = computed(() => userStore.$state.user);
 
