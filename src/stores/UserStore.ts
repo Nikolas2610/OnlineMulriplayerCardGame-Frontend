@@ -15,12 +15,14 @@ export const useUserStore = defineStore("UserStore", {
                 username: null,
                 email: null,
                 token: null,
-                forgotPasswordToken: null
+                forgotPasswordToken: null,
+                role: null
             } as UserState
         }
     },
     getters: {
         authToken: (state) => state.user.token === null ? false : true,
+        isAdmin: (state) => state.user.role === 'admin'
     },
     actions: {
         async register(user: UserRegister) {
@@ -37,21 +39,22 @@ export const useUserStore = defineStore("UserStore", {
                 const { email, password } = user;
                 const response: AxiosResponse = await axiosClient.post(`auth/login`, { email, password });
                 if (response.status === 201) {
-                    try {
-                        const decodedToken: any = jwtDecode(response.data.token);
-                        this.$state.user.token = response.data.token;
-                        this.$state.user.username = decodedToken.user.username;
-                        this.$state.user.email = decodedToken.user.email;
-                        localStorage.setItem('token', response.data.token);
-                        localStorage.setItem('username', decodedToken.user.username);
-                        localStorage.setItem('email', decodedToken.user.email);
-                    } catch (error: any) {
-                        if (process.env.NODE_ENV === 'development') {
-                            return error.message
-                        } else {
-                            return 'Something went wrong. Please try again later!'
-                        }
-                    }
+                    this.decodeToken(response.data.token);
+                    // try {
+                    //     const decodedToken: any = jwtDecode(response.data.token);
+                    //     this.$state.user.token = response.data.token;
+                    //     this.$state.user.username = decodedToken.user.username;
+                    //     this.$state.user.email = decodedToken.user.email;
+                    //     localStorage.setItem('token', response.data.token);
+                    //     localStorage.setItem('username', decodedToken.user.username);
+                    //     localStorage.setItem('email', decodedToken.user.email);
+                    // } catch (error: any) {
+                    //     if (process.env.NODE_ENV === 'development') {
+                    //         return error.message
+                    //     } else {
+                    //         return 'Something went wrong. Please try again later!'
+                    //     }
+                    // }
                 }
                 return 'success';
             } catch (err: any) {
@@ -60,9 +63,10 @@ export const useUserStore = defineStore("UserStore", {
         },
         async logout() {
             localStorage.removeItem('token');
-            localStorage.removeItem('username');
             this.$state.user.token = null;
             this.$state.user.username = null;
+            this.$state.user.email = null;
+            this.$state.user.role = null;
             await router.push({ name: 'home' });
         },
         async forgotPassword(user: UserForgotPassword) {
@@ -110,14 +114,13 @@ export const useUserStore = defineStore("UserStore", {
                 return err.response ? err.response.data.message : err.message;
             }
         },
-        decodeToken(response: any) {
-            const decodedToken: any = jwtDecode(response.data.token);
-            this.$state.user.token = response.data.token;
+        decodeToken(token: string) {
+            const decodedToken: any = jwtDecode(token);
+            this.$state.user.token = token;
             this.$state.user.username = decodedToken.user.username;
             this.$state.user.email = decodedToken.user.email;
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('username', decodedToken.user.username);
-            localStorage.setItem('email', decodedToken.user.email);
+            this.$state.user.role = decodedToken.user.role;
+            localStorage.setItem('token', token);
         },
     }
 })

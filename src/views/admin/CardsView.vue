@@ -2,12 +2,12 @@
     <div class="container w-full overflow-x-auto px-2">
         <div class="w-1/6">
             <div class="text-2xl border-b-4 border-primary py-4 px-2">
-                My Games
+                My Cards
             </div>
         </div>
 
         <!-- Table -->
-        <div class="mx-auto mt-4">
+        <div class="mx-auto my-4">
             <div class="flex flex-col">
                 <div class="overflow-x-auto shadow-md sm:rounded-lg">
                     <div class="inline-block min-w-full align-middle">
@@ -25,24 +25,19 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y bg-dark divide-gray-700">
-                                    <tr class="hover:bg-gray-700" v-for="(game, index) in games"
-                                        :key="`gamme_${game.id}`">
+                                    <tr class="hover:bg-gray-700" v-for="(card, index) in cards"
+                                        :key="`gamme_${card.id}`">
                                         <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                             {{ index + 1 }}
                                         </td>
                                         <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                            {{ game.name }}
+                                            {{ card.name }}
                                         </td>
                                         <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                            {{ game.min_players }} - {{ game.max_players }}
+                                            <img :src="card.image" :alt="card.name" class="w-32 h-32">
                                         </td>
                                         <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                            {{ game.grid_rows }}
-                                            <span class="text-primary">X</span>
-                                            {{ game.grid_cols }}
-                                        </td>
-                                        <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                            {{ game.private ? 'YES' : 'NO' }}
+                                            {{ card.private ? 'YES' : 'NO' }}
                                         </td>
                                         <td class="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
                                             <button class="text-blue-500 hover:underline"
@@ -68,85 +63,34 @@
     <!-- Modal Edit Game -->
     <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal">
         <template v-slot:modal_header>
-            Game Info
+            Deck Info
         </template>
 
         <template v-slot:body>
-            <div class="grid grid-cols-2 gap-2" v-if="modalGame">
+            <div class="grid grid-cols-2 gap-2" v-if="modalCard">
                 <div class="col-span-2">
                     <div class="mb-3">
                         <label for="name" class="block text-sm font-medium">Name</label>
                         <div class="mt-1">
-                            <input id="name" type="text" v-model="modalGame.name"
-                                class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-span-1">
-                    <div class="mb-3">
-                        <label for="min_players" class="block text-sm font-medium">Min Players</label>
-                        <div class="mt-1">
-                            <input id="min_players" type="number" max="10" min="1" v-model="modalGame.min_players"
-                                class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-span-1">
-                    <div class="mb-3">
-                        <label for="max_players" class="block text-sm font-medium">Max Players</label>
-                        <div class="mt-1">
-                            <input id="max_players" type="number" max="10" min="1" v-model="modalGame.max_players"
-                                class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-span-1">
-                    <div class="mb-3">
-                        <label for="grid_rows" class="block text-sm font-medium">Grid Rows</label>
-                        <div class="mt-1">
-                            <input id="grid_rows" type="number" max="6" min="1" v-model="modalGame.grid_rows"
-                                class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-span-1">
-                    <div class="mb-3">
-                        <label for="grid_cols" class="block text-sm font-medium">Grid Columns</label>
-                        <div class="mt-1">
-                            <input id="grid_cols" type="number" max="6" min="1" v-model="modalGame.grid_cols"
+                            <input id="name" type="text" v-model="modalCard.name"
                                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
                         </div>
                     </div>
                 </div>
                 <div class="col-span-2">
-                    <div class="mb-3">
-                        <label for="description" class="block text-sm font-medium">Description</label>
-                        <textarea name="" id="description" v-model="modalGame.description" rows="4"
-                            class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm"></textarea>
+                    <div class="mb-3 relative">
+                        <label for="min_players" class="block text-sm font-medium">Image</label>
+                        <div class="mt-1">
+                            <input id="min_players" type="file" @change="onImageChoose"
+                                class="rounded-md border border-gray-300" />
+                            <img :src="imageFile" class="w-28 h-28 mt-4">
+                        </div>
                     </div>
                 </div>
                 <div class="col-span-2">
                     <div class="mt-1 flex">
                         <label for="private" class="block text-sm font-medium mr-2">Private</label>
-                        <input id="private" type="checkbox" v-model="modalGame.private" class="" />
-                    </div>
-                </div>
-                <div class="col-span-2">
-                    <div class="mt-1 flex">
-                        <label for="status_player" class="block text-sm font-medium mr-2">Status Player</label>
-                        <input id="status_player" type="checkbox" v-model="modalGame.status_player" class="" />
-                    </div>
-                </div>
-                <div class="col-span-2">
-                    <div class="mt-1 flex">
-                        <label for="rank" class="block text-sm font-medium mr-2">Rank Game</label>
-                        <input id="rank" type="checkbox" v-model="modalGame.rank" class="" />
-                    </div>
-                </div>
-                <div class="col-span-2">
-                    <div class="mt-1 flex">
-                        <label for="dealer" class="block text-sm font-medium mr-2">Dealer</label>
-                        <input id="dealer" type="checkbox" v-model="modalGame.dealer" class="" />
+                        <input id="private" type="checkbox" v-model="modalCard.private" class="" />
                     </div>
                 </div>
             </div>
@@ -155,7 +99,7 @@
         </template>
 
         <template v-slot:modal_footer>
-            <button @click="saveGameChanges()"
+            <button @click="saveCardChanges()" disabled
                 class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
                 Save Changes
             </button>
@@ -174,16 +118,16 @@
         </template>
         <template v-slot:body>
             <div>
-                Do you really want to delete this game? This process cannot be undone
+                Do you really want to delete this card? This process cannot be undone
             </div>
         </template>
         <template v-slot:modal_footer>
-            <button @click="deleteGame"
+            <button @click="deleteCard" disabled
                 class="flex w-full items-center justify-center rounded-md border border-transparent bg-red-500 text-white px-8 py-3 text-base font-medium hover:bg-red-600 hover:text-white md:py-3 md:px-10 md:text-lg">
                 Delete
             </button>
-            <button @click="deactiveteDeleteModal" class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 
-font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
+            <button @click="deactiveteDeleteModal"
+                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
                 Cancel
             </button>
         </template>
@@ -194,32 +138,24 @@ font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:te
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { onMounted, ref } from 'vue';
-import type Game from '@/types/games/Game'
+import type Card from '@/types/cards/Card'
 import Modal from '@/components/Modal.vue';
 import { useToast } from "vue-toastification";
-import { useUserStore } from '@/stores/UserStore';
-import { useRoute } from 'vue-router';
 
-const route = useRoute()
-const userStore = useUserStore();
 const toast = useToast();
-const role = ref<string | null>('user');
 const isModalOpen = ref<Boolean>(false);
 const isDeleteModalOpen = ref<Boolean>(false);
-const games = ref<Game[]>([]);
-const modalGame = ref<Game>();
-const selectedGameId = ref<number | null>(null)
+const cards = ref<Card[]>([]);
+const modalCard = ref<Card>();
+const selectedCardId = ref<number | null>(null)
+const imageFile = ref();
 const tablesFields = ref([
-    'No', 'NAME', 'PLAYERS', 'GRID', 'PRIVATE'
+    'No', 'NAME', 'IMAGE', 'PRIVATE'
 ]);
 
 // Get game data when component add to the DOM
 onMounted(async () => {
-    // Admin Router APIs calls
-    if (route.meta.admin) {
-        role.value = userStore.$state.user.role;    // user or admin
-    }
-    getGamesList();
+    getCardsList();
 })
 // Close view details modal
 const deactiveteModal = () => {
@@ -230,39 +166,41 @@ const deactiveteDeleteModal = () => {
     isDeleteModalOpen.value = false;
 }
 // Axios call to get game list data
-const getGamesList = async () => {
+const getCardsList = async () => {
     try {
-        const response: AxiosResponse = await axiosUser.get(`${role.value}/games`);
-        games.value = response.data;
+        const response: AxiosResponse = await axiosUser.get('user/cards');
+        cards.value = response.data;
+        console.log(cards.value);
     } catch (error) {
         console.log(error);
     }
 }
 // Open view details modal
 const openDetailsModal = (id: number) => {
-    modalGame.value = { ...games.value[id] };   // Copy by value the game
-    selectedGameId.value = games.value[id].id;  // Save the ID of the game to a variable
+    modalCard.value = { ...cards.value[id] };   // Copy by value the game
+    imageFile.value = modalCard.value.image // Load Card image
+    selectedCardId.value = cards.value[id].id;  // Save the ID of the game to a variable
     isModalOpen.value = true;   // Open Modal
 }
 // Open Delete modal confirmation
 const openDeleteModal = (id: number) => {
-    selectedGameId.value = games.value[id].id;  // Save the ID of the game to a variable
+    selectedCardId.value = cards.value[id].id;  // Save the ID of the game to a variable
     isDeleteModalOpen.value = true; // Open Modal
 }
 // Axios call to delete a game to database
-const deleteGame = async () => {
+const deleteCard = async () => {
     try {
-        if (selectedGameId.value) { // Typescript checks
+        if (selectedCardId.value) { // Typescript checks
             // Pass the ID of the game
-            const response: AxiosResponse = await axiosUser.delete(`${role.value}/delete/game`, {
+            const response: AxiosResponse = await axiosUser.delete('user/delete/game', {
                 data: {
-                    game_id: selectedGameId.value
+                    game_id: selectedCardId.value
                 }
             });
             if (response.data.affected === 1) { // Success delete
                 toast.success('Game deleted succesfully');
                 isDeleteModalOpen.value = false;
-                getGamesList(); // Refresh game list
+                getCardsList(); // Refresh game list
                 return
             }
             // Capture the errors
@@ -274,14 +212,15 @@ const deleteGame = async () => {
     }
 }
 // Axios call to update the game to database
-const saveGameChanges = async () => {
+// TODO: Function didn't add yet
+const saveCardChanges = async () => {
     try {
         // Pass the edit game object
-        const response: AxiosResponse = await axiosUser.patch(`${role.value}/edit/game`, modalGame.value);
+        const response: AxiosResponse = await axiosUser.patch('user/edit/game', modalCard.value);
         if (response.data.affected === 1) { // Success response from axios
             toast.success('Game updated succesfully');
             isModalOpen.value = false;
-            getGamesList(); // Refresh game list
+            getCardsList(); // Refresh game list
             return
         }
         // Capture the errors
@@ -290,5 +229,16 @@ const saveGameChanges = async () => {
         // Capture the errors
         toast.error('Something went wrong. Please try again later', error);
     }
+}
+// TODO: Do after implement save image to the backend
+const onImageChoose = (ev: any) => {
+    const file = ev.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+        imageFile.value = reader.result;
+        // modalCard.value?.image = reader.result as string;
+    }
+
+    reader.readAsDataURL(file);
 }
 </script>

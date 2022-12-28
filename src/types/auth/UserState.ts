@@ -3,4 +3,5 @@ export default interface UserState {
     token: string | null;
     email: string | null;
     forgotPasswordToken: JsonWebKey | null;
+    role: string | null;
 }

@@ -44,6 +44,13 @@
                             {{ title }}
                         </RouterLink>
                     </li>
+                    <li class="cursor-pointer">
+                        <RouterLink :to="{ name: 'admin' }" v-if="userStore.isAdmin"
+                            class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
+                            aria-current="page">
+                            Admin
+                        </RouterLink>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -58,6 +65,13 @@
                     class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
                     aria-current="page">
                     {{ title }}
+                </RouterLink>
+            </li>
+            <li class="cursor-pointer">
+                <RouterLink :to="{ name: 'admin' }" v-if="userStore.isAdmin"
+                    class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white md:hover:bg-transparent bg-dark rounded md:bg-transparent md:p-0"
+                    aria-current="page">
+                    Admin
                 </RouterLink>
             </li>
         </ul>
@@ -86,6 +100,7 @@ const openNavMenu = () => {
 const closeNavbar = () => {
     openNavMenu();
 }
+
 </script>
 
 <style scoped>

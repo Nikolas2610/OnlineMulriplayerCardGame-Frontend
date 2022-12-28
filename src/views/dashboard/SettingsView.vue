@@ -164,7 +164,7 @@ const updateUsername = async () => {
                 username: tempUsername.value.username
             })
             if (response.status === 200) {
-                userStore.decodeToken(response);
+                userStore.decodeToken(response.data.token);
                 toast.success('Username updated succesfully');
                 deactiveteChangeUsernameModal();
                 return

@@ -2,10 +2,10 @@
     <div class="flex flex-no-wrap" style="height: calc(100vh - 3.8rem)">
         <div class="w-64 absolute sm:relative bg-dark shadow md:h-full flex-col justify-between hidden sm:flex">
             <div class="px-8">
-                <div class="w-full flex items-center text-white text-lg mt-12">
+                <div class="w-full flex items-center text-white text-lg mt-12 capitalize">
                     {{ user.username }}
                 </div>
-                <div class="w-full flex items-center text-white text-base mt-1">
+                <div class="w-full flex items-center text-white text-xs mt-1">
                     {{ user.email }}
                 </div>
                 <ul class="mt-12">
@@ -78,6 +78,7 @@
 
 <script lang="ts" setup>
 import { useUserStore } from '@/stores/UserStore'
+import type MenuItem from '@/types/MenuItem';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 const userStore = useUserStore();
@@ -87,14 +88,17 @@ const router = useRouter();
 const user = computed(() => userStore.$state.user);
 
 // Menu list items
-const menuItems = ref([
-    { name: 'Dashboard', icon: '/src/assets/icons/sidebar/dashboard.svg', router: 'overview' },
-    { name: 'Tables', icon: '/src/assets/icons/sidebar/tables.svg', router: 'tables' },
-    { name: 'Games', icon: '/src/assets/icons/sidebar/games.svg', router: 'games' },
-    { name: 'Decks', icon: '/src/assets/icons/sidebar/decks.svg', router: 'decks' },
-    { name: 'Cards', icon: '/src/assets/icons/sidebar/cards.svg', router: 'cards' },
-    { name: 'Settings', icon: '/src/assets/icons/sidebar/settings.svg', router: 'settings' },
-])
+const props = defineProps<{
+    menuItems: MenuItem[]
+}>()
+// const menuItems = ref([
+//     { name: 'Dashboard', icon: '/src/assets/icons/sidebar/dashboard.svg', router: 'overview' },
+//     { name: 'Tables', icon: '/src/assets/icons/sidebar/tables.svg', router: 'tables' },
+//     { name: 'Games', icon: '/src/assets/icons/sidebar/games.svg', router: 'games' },
+//     { name: 'Decks', icon: '/src/assets/icons/sidebar/decks.svg', router: 'decks' },
+//     { name: 'Cards', icon: '/src/assets/icons/sidebar/cards.svg', router: 'cards' },
+//     { name: 'Settings', icon: '/src/assets/icons/sidebar/settings.svg', router: 'settings' },
+// ])
 
 // Open Sidebar at mobile
 const sidebarHandler = (flag: any) => {

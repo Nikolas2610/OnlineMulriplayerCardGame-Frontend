@@ -32,7 +32,12 @@
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { onMounted, ref } from 'vue';
+import { useUserStore } from '@/stores/UserStore';
+import { useRoute } from 'vue-router';
 
+const route = useRoute()
+const userStore = useUserStore();
+const role = ref<string | null>('user');
 const data = ref<{ tables: number, cards: number, games: number, decks: number }>({
     tables: 0,
     cards: 0,
@@ -41,12 +46,16 @@ const data = ref<{ tables: number, cards: number, games: number, decks: number }
 })
 
 onMounted(async () => {
+    // Admin Router APIs calls
+    if (route.meta.admin) {
+        role.value = userStore.$state.user.role;    // user or admin
+    }
     getData();
 })
 
 const getData = async () => {
     try {
-        const response: AxiosResponse = await axiosUser.get('user/dashboard');
+        const response: AxiosResponse = await axiosUser.get(`${role.value}/dashboard`);
         data.value = response.data;
     } catch (error) {
         console.log(error);

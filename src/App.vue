@@ -11,9 +11,10 @@ const isModalOpen = ref<Boolean>(false);
 // Get the JWT token from localstage if user close the browser 
 onMounted(() => {
   if (localStorage.getItem('token')) {
-    userStore.$state.user.token = localStorage.getItem('token');
-    userStore.$state.user.email = localStorage.getItem('email');
-    userStore.$state.user.username = localStorage.getItem('username');
+    const token = localStorage.getItem('token');
+    if (token) {
+      userStore.decodeToken(token);
+    }
   }
 })
 
