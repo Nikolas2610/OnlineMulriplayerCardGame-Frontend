@@ -62,12 +62,21 @@ export const useUserStore = defineStore("UserStore", {
             }
         },
         async logout() {
-            localStorage.removeItem('token');
-            this.$state.user.token = null;
-            this.$state.user.username = null;
-            this.$state.user.email = null;
-            this.$state.user.role = null;
-            await router.push({ name: 'home' });
+            try {
+                const response: AxiosResponse = await axiosClient.post('auth/logout', {
+                    email: this.$state.user.email
+                })
+                if (response.data.affected === 1) {
+                    localStorage.removeItem('token');
+                    this.$state.user.token = null;
+                    this.$state.user.username = null;
+                    this.$state.user.email = null;
+                    this.$state.user.role = null;
+                    await router.push({ name: 'home' });
+                }
+            } catch (error) {
+                console.log(error);
+            }
         },
         async forgotPassword(user: UserForgotPassword) {
             try {
