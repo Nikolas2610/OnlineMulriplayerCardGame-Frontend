@@ -31,10 +31,7 @@ const deactiveteModal = () => {
 
 <template>
   <NavBar />
-  <RouterView @openModal="activeModal()" />
-  <Teleport to="#modal">
-    <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal" />
-  </Teleport>
+  <RouterView />
 </template>
 
 <style scoped>

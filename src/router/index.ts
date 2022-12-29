@@ -106,7 +106,34 @@ const router = createRouter({
       meta: {
         requiresAuth: false,
         title: `${appName} | Game Lobby`
-      }
+      }, 
+    },
+    {
+      path: '/lobby/create-game',
+      name: 'create-game',
+      component: () => import('../views/lobby/CreateGameView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: `${appName} | Create Game`
+      }, 
+    },
+    {
+      path: '/lobby/create-deck',
+      name: 'create-deck',
+      component: () => import('../views/lobby/CreateDeckView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: `${appName} | Create Deck`
+      }, 
+    },
+    {
+      path: '/lobby/create-table',
+      name: 'create-table',
+      component: () => import('../views/lobby/CreateTableView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: `${appName} | Create Table`
+      }, 
     },
     {
       path: '/dashboard',

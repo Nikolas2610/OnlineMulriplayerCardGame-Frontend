@@ -48,7 +48,7 @@
                         <!-- Submit Form -->
                         <div>
                             <div @click="login()"
-                                class="mt-14 flex w-full justify-center rounded-md border border-transparent bg-dark py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary">
+                                class="mt-14 btn-black">
                                 <!-- Loading Animation -->
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" v-if="loadingButton"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

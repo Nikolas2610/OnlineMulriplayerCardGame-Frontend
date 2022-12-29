@@ -156,11 +156,11 @@
 
         <template v-slot:modal_footer>
             <button @click="saveGameChanges()"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
+                class="btn-primary">
                 Save Changes
             </button>
             <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
+                class="btn-grey ml-2"
                 @click="deactiveteModal">
                 Close
             </button>
