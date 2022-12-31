@@ -8,7 +8,7 @@ export const axiosUser: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${userStore.$state.user.token}`
+        Authorization: `Bearer ${userStore.getToken}`
     }
 });
 

@@ -22,7 +22,8 @@ export const useUserStore = defineStore("UserStore", {
     },
     getters: {
         authToken: (state) => state.user.token === null ? false : true,
-        isAdmin: (state) => state.user.role === 'admin'
+        isAdmin: (state) => state.user.role === 'admin',
+        getToken: (state) => state.user.token,
     },
     actions: {
         async register(user: UserRegister) {
@@ -40,21 +41,6 @@ export const useUserStore = defineStore("UserStore", {
                 const response: AxiosResponse = await axiosClient.post(`auth/login`, { email, password });
                 if (response.status === 201) {
                     this.decodeToken(response.data.token);
-                    // try {
-                    //     const decodedToken: any = jwtDecode(response.data.token);
-                    //     this.$state.user.token = response.data.token;
-                    //     this.$state.user.username = decodedToken.user.username;
-                    //     this.$state.user.email = decodedToken.user.email;
-                    //     localStorage.setItem('token', response.data.token);
-                    //     localStorage.setItem('username', decodedToken.user.username);
-                    //     localStorage.setItem('email', decodedToken.user.email);
-                    // } catch (error: any) {
-                    //     if (process.env.NODE_ENV === 'development') {
-                    //         return error.message
-                    //     } else {
-                    //         return 'Something went wrong. Please try again later!'
-                    //     }
-                    // }
                 }
                 return 'success';
             } catch (err: any) {
@@ -73,6 +59,7 @@ export const useUserStore = defineStore("UserStore", {
                     this.$state.user.email = null;
                     this.$state.user.role = null;
                     await router.push({ name: 'home' });
+                    window.location.reload()
                 }
             } catch (error) {
                 console.log(error);

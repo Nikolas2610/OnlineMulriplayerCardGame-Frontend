@@ -6,7 +6,7 @@
             </div>
         </div>
 
-        <div class="mt-10 px-4 py-8" v-if="deck">
+        <form class="mt-10 px-4 py-8" v-if="deck" @submit.prevent="saveDeck">
             <div>
                 <label for="name" class="block text-lg font-medium">Name</label>
                 <div class="mt-1">
@@ -21,19 +21,21 @@
             </div>
 
             <div class="flex justify-center">
-                <button class="mt-4 btn-outline-green" @click="openModal">Add Card</button>
-                <button class="mt-4 ml-2 btn-green">Submit</button>
+                <button class="mt-4 btn-outline-green" @click="openModal" type="button">Add Card</button>
+                <button class="mt-4 ml-2 btn-green" type="submit">Submit</button>
             </div>
-            <!-- TODO: Fix this images src error -->
             <h1 class="mt-4 text-lg font-medium">Card List:</h1>
             <div class="mt-4 grid grid-cols-8 gap-2 px-4 py-8 border rounded-lg shadow-lg">
-                <div class="col-span-1 flex justify-center items-center flex-col gap-2" v-for="num in selectedCards"
-                    :key="num" v-if="cards">
-                    <img :src="cards[num].image" class="w-32 max-h-52">
-                    <div>{{ cards[num].name }}</div>
+                <div class="col-span-1 flex justify-center items-center flex-col gap-2" v-for="card in deck.cards"
+                    :key="`sel-${card.id}`" v-if="cards">
+                    <img :src="card.image" class="w-32 max-h-52">
+                    <div>{{ card.name }}</div>
                 </div>
             </div>
-        </div>
+        </form>
+
+
+
     </div>
 
     <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal">
@@ -50,11 +52,11 @@
                 </select>
             </div>
             <div class="grid grid-cols-4 mt-4 gap-2 max-h-96 overflow-y-scroll" v-if="cards">
-                <div class="col-span-1 flex justify-center items-center flex-col cursor-pointer hover:bg-primary rounded-lg p-2"
-                    @click="addSelectedCards(card.id)" :class="isSelectedCard(card.id) ? 'bg-primary' : ''"
+                <div class="col-span-1 flex justify-center items-center flex-col cursor-pointer hover:bg-secondary hover:text-white rounded-lg p-2  transition duration-300"
+                    @click="addSelectedCards(card)" :class="isSelectedCard(card.id) ? 'bg-primary' : ''"
                     v-for="card in cards" :key="card.id">
                     <img :src="card.image" class="w-32 max-h-52">
-                    <div class="pt-2">{{ card.name }}</div>
+                    <div class="pt-2" :class="isSelectedCard(card.id) ? 'text-white' : ''">{{ card.name }}</div>
                 </div>
             </div>
         </template>
@@ -78,8 +80,10 @@ import Modal from '@/components/Modal.vue';
 import { ref, watch } from 'vue';
 import type Card from '@/types/cards/Card';
 import axiosUser from '@/plugins/axiosUser';
+import type { AxiosResponse } from 'axios';
+import { useToast } from "vue-toastification";
 
-const count = ref(1);
+const toast = useToast();
 const cardsPublic = ref('user');
 const isModalOpen = ref<Boolean>(false);
 const cards = ref<Card[]>();
@@ -87,7 +91,8 @@ const selectedCards = ref<number[]>([]);
 
 const deck = ref<CreateDeck>({
     name: '',
-    private: false
+    private: false,
+    cards: []
 })
 
 // Close view details modal
@@ -103,7 +108,7 @@ const openModal = async () => {
 
 const getCards = async () => {
     try {
-        const response = await axiosUser.get(`card/${cardsPublic.value}`);
+        const response: AxiosResponse = await axiosUser.get(`card/${cardsPublic.value}`);
         cards.value = response.data;
         console.log(cards.value);
     } catch (error) {
@@ -115,25 +120,50 @@ const isSelectedCard = (id: number) => {
     return selectedCards.value.includes(id);
 }
 
-const addSelectedCards = (id: number) => {
-    if (selectedCards.value.includes(id)) {
-        // Remove the value from the array if it exists
-        selectedCards.value = selectedCards.value.filter((number) => number !== id);
+const addSelectedCards = (card: Card) => {
+    const index = deck.value.cards.findIndex(c => c.id === card.id);
+    if (index >= 0) {
+        // Remove the object from the array if it exists
+        selectedCards.value = selectedCards.value.filter((number) => number !== card.id);
+        deck.value.cards.splice(index, 1);
     } else {
-        // Add the value to the array if it does not exist
-        selectedCards.value.push(id);
+        // Add the object to the array if it does not exist
+        selectedCards.value.push(card.id);
+        deck.value.cards.push(card);
     }
 }
 
-const addCardsToDeck = () => {
+const addCardsToDeck = async () => {
     console.log(selectedCards.value);
     isModalOpen.value = false;
+}
+
+const saveDeck = async () => {
+    try {
+        const response: AxiosResponse = await axiosUser.post('deck', deck.value);
+        if (response.status === 201) {
+            toast.success('Deck save succesfully');
+            resetDeck();
+            return
+        }
+        toast.error('Something went wrong. Please try again later');
+    } catch (error) {
+        toast.error('Something went wrong. Please try again later');
+    }
+}
+
+const resetDeck = () => {
+    deck.value.name = '';
+    deck.value.private = false;
+    deck.value.cards = [];
+    selectedCards.value = [];
 }
 
 watch(() => cardsPublic.value,
     (newVal) => {
         getCards();
-    });
+    }
+);
 
 
 

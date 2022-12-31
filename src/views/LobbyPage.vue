@@ -1,40 +1,48 @@
 <template>
-    <section class="bg-dark" style="height: calc(100vh - 3.8rem)">
+    <div class="border-y border-gray-200 bg-dark">
         <div class="container">
-            <button id="dropdownDefault" data-dropdown-toggle="dropdown" class="btn-green flex items-center"
-                type="button" @mouseover="dropmenuOpen = true" @mouseleave="dropmenuOpen = false">
-                Create
-                <svg class="ml-2 w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-            </button>
-            <!-- Dropdown menu -->
-            <div id="dropdown" v-bind:class="{ 'block': dropmenuOpen, 'hidden': !dropmenuOpen }"
-                @mouseover="dropmenuOpen = true" @mouseleave="dropmenuOpen = false"
-                class="absolute z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow">
-                <ul class="py-1 text-sm text-gray-700" aria-labelledby="dropdownDefault">
-                    <li v-for="({ name, router }, index) in dropmenuItems" :key="index">
-                        <RouterLink :to="{ name: router }" class="block py-2 px-4 hover:bg-gray-100">
-                            {{ name }}
-                        </RouterLink>
-                    </li>
-                </ul>
-            </div>
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-white">
+                <li class="mr-2" v-for="item in items" :key="item.id" @click="activeItem = item.id">
+                    <a href="#"
+                        class="inline-flex p-4 rounded-t-lg border-b-4 border-transparent transition duration-300 group"
+                        :class="activeItem === item.id ? 'border-primary text-primary' : 'hover:border-gray-300 hover:text-gray-600'">
+                        <img :src="item.icon" class="mr-2">
+                        {{ item.name }}
+                    </a>
+                </li>
+            </ul>
         </div>
-    </section>
+    </div>
+
+    <LobbyRoom v-if="activeItem === 1" />
+    <CreateTableView v-if="activeItem === 2" />
+    <CreateGameView v-if="activeItem === 3" />
+    <CreateDeckView v-if="activeItem === 4" />
+    <CreateCardView v-if="activeItem === 5" />
+
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { RouterLink } from 'vue-router';
+import CreateDeckView from './lobby/CreateDeckView.vue';
+import CreateCardView from './lobby/CreateCardView.vue';
+import CreateTableView from './lobby/CreateTableView.vue';
+import CreateGameView from './lobby/CreateGameView.vue';
+import LobbyRoom from './lobby/LobbyRoom.vue';
 
-const dropmenuOpen = ref(false);
-const dropmenuItems = ref([
-    { router: 'create-table', name: 'Create Table' },
-    { router: 'create-game', name: 'Create Game' },
-    { router: 'create-deck', name: 'Create Deck' },
+import { ref } from 'vue';
+
+const activeItem = ref(1);
+const items = ref([
+    { id: 1, name: 'Lobby', icon: '/src/assets/icons/sidebar/joystick.svg' },
+    { id: 2, name: 'Create Table', icon: '/src/assets/icons/sidebar/tables.svg' },
+    { id: 3, name: 'Create Game', icon: '/src/assets/icons/sidebar/games.svg' },
+    { id: 4, name: 'Create Deck', icon: '/src/assets/icons/sidebar/decks.svg' },
+    { id: 5, name: 'Create Card', icon: '/src/assets/icons/sidebar/cards.svg' },
 ])
+
+const setActiveItem = (index: number) => {
+    activeItem.value = index;
+}
 </script>
 
 <style lang="scss" scoped>

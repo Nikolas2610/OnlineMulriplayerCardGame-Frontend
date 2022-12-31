@@ -1,6 +1,7 @@
 <template>
-    <div>
-        Create Table
+    <!-- TODO: -->
+    <div class="text-7xl text-center my-10">
+        Create Table - Not Ready yet
     </div>
 </template>
 
