@@ -2,14 +2,14 @@
     <div class="container">
         <MyTitle>Create Card</MyTitle>
 
-        <CreateCardComponent @sendData="saveCard" :successResponse="successResponse" :cardData="undefined"
+        <CardForm @sendData="saveCard" :successResponse="successResponse" :cardData="undefined"
             :imageFile="undefined" />
     </div>
 </template>
 
 <script setup lang="ts">
 import MyTitle from '@/components/MyTitle.vue';
-import CreateCardComponent from '@/components/forms/CreateCardComponent.vue';
+import CardForm from '@/components/forms/CardForm.vue';
 import { ref } from 'vue';
 import type CreateCard from '@/types/cards/CreateCard'
 import axiosUser from '@/plugins/axiosUser';

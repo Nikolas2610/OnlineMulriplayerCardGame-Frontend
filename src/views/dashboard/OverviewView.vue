@@ -1,11 +1,7 @@
 <template>
     <div class="container w-full overflow-x-auto px-2">
         <!-- Title -->
-        <div class="w-3/12">
-            <div class="text-2xl border-b-4 border-primary py-4 px-2">
-                Dashboard
-            </div>
-        </div>
+        <MyTitle>Dashboard</MyTitle>
 
         <div class="grid grid-cols-2 gap-8 mt-10 mx-20">
             <div class="col-span-1 border bg-primary rounded-xl px-4 py-8 text-center">
@@ -29,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import MyTitle from '@/components/MyTitle.vue';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { onMounted, ref } from 'vue';

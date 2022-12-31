@@ -57,7 +57,7 @@
         </div>
         <div v-else>
             <MyTitle>Edit Card</MyTitle>
-            <CreateCardComponent @sendData="saveCardChanges" :successResponse="successResponse" :cardData="modalCard"
+            <CardForm @sendData="saveCardChanges" :successResponse="successResponse" :cardData="modalCard"
                 :imageFile="imageFile" :edit="true" @closeEditMode="deactiveteCard" />
         </div>
     </div>
@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import CreateCardComponent from '@/components/forms/CreateCardComponent.vue';
+import CardForm from '@/components/forms/CardForm.vue';
 import MyTitle from '@/components/MyTitle.vue';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';

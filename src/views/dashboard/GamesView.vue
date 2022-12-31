@@ -1,10 +1,6 @@
 <template>
     <div class="container w-full overflow-x-auto px-2">
-        <div class="w-1/6">
-            <div class="text-2xl border-b-4 border-primary py-4 px-2">
-                My Games
-            </div>
-        </div>
+        <MyTitle>My Games</MyTitle>
 
         <!-- Table -->
         <div class="mx-auto mt-4">
@@ -191,6 +187,7 @@ font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:te
 </template>
 
 <script setup lang="ts">
+import MyTitle from '@/components/MyTitle.vue';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { onMounted, ref } from 'vue';

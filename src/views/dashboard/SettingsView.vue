@@ -1,11 +1,7 @@
 <template>
     <div class="container w-full overflow-x-auto px-2">
         <!-- Title -->
-        <div class="w-3/12">
-            <div class="text-2xl border-b-4 border-primary py-4 px-2">
-                My Personal Info
-            </div>
-        </div>
+        <MyTitle>My Personal Info</MyTitle>
 
         <!-- Username -->
         <div class="flex justify-center mt-10">
@@ -124,6 +120,7 @@
 </template>
 
 <script setup lang="ts">
+import MyTitle from '@/components/MyTitle.vue';
 import { useUserStore } from '@/stores/UserStore';
 import { computed, ref } from 'vue';
 import Modal from '@/components/Modal.vue';
@@ -142,9 +139,9 @@ const tempUsername = ref({
     username: '' as string | null
 });
 const changePassword = ref({
-    old_password: 'Nikolas-9',
-    new_password: 'Nikolas-0',
-    confirm_password: 'Nikolas-0'
+    old_password: '',
+    new_password: '',
+    confirm_password: ''
 })
 
 const deactiveteChangeUsernameModal = () => {
