@@ -103,11 +103,60 @@ const router = createRouter({
       path: '/lobby',
       name: 'lobby',
       component: () => import('../views/LobbyPage.vue'),
+      redirect: { name: 'lobby-room' },
       meta: {
         requiresAuth: false,
         title: `${appName} | Game Lobby`
-      }
+      },
+      children: [
+        {
+          path: '/room',
+          name: 'lobby-room',
+          component: () => import('../views/lobby/LobbyRoom.vue'),
+          meta: {
+            requiresAuth: false,
+            title: `${appName} | Lobby`
+          },
+        },
+        {
+          path: '/create-game',
+          name: 'create-game',
+          component: () => import('../views/lobby/CreateGameView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: `${appName} | Create Game`
+          },
+        },
+        {
+          path: '/create-deck',
+          name: 'create-deck',
+          component: () => import('../views/lobby/CreateDeckView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: `${appName} | Create Deck`
+          },
+        },
+        {
+          path: '/create-table',
+          name: 'create-table',
+          component: () => import('../views/lobby/CreateTableView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: `${appName} | Create Table`
+          },
+        },
+        {
+          path: '/create-card',
+          name: 'create-card',
+          component: () => import('../views/lobby/CreateCardView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: `${appName} | Create Card`
+          },
+        },
+      ]
     },
+
     {
       path: '/dashboard',
       name: 'dashboard',
@@ -123,7 +172,7 @@ const router = createRouter({
           name: 'games',
           component: () => import('../views/dashboard/GamesView.vue'),
           meta: {
-            requiresAuth: false,
+            requiresAuth: true,
             title: `${appName} | Dashboard`
           }
         },
@@ -132,7 +181,7 @@ const router = createRouter({
           name: 'tables',
           component: () => import('../views/dashboard/TablesView.vue'),
           meta: {
-            requiresAuth: false,
+            requiresAuth: true,
             title: `${appName} | Dashboard`
           }
         },
@@ -141,7 +190,7 @@ const router = createRouter({
           name: 'overview',
           component: () => import('../views/dashboard/OverviewView.vue'),
           meta: {
-            requiresAuth: false,
+            requiresAuth: true,
             title: `${appName} | Dashboard`
           }
         },
@@ -150,7 +199,7 @@ const router = createRouter({
           name: 'decks',
           component: () => import('../views/dashboard/DecksView.vue'),
           meta: {
-            requiresAuth: false,
+            requiresAuth: true,
             title: `${appName} | Dashboard`
           }
         },
@@ -159,7 +208,7 @@ const router = createRouter({
           name: 'cards',
           component: () => import('../views/dashboard/CardsView.vue'),
           meta: {
-            requiresAuth: false,
+            requiresAuth: true,
             title: `${appName} | Dashboard`
           }
         },
@@ -168,12 +217,85 @@ const router = createRouter({
           name: 'settings',
           component: () => import('../views/dashboard/SettingsView.vue'),
           meta: {
-            requiresAuth: false,
+            requiresAuth: true,
             title: `${appName} | Dashboard`
           }
         },
       ]
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/admin/Dashboard.vue'),
+      redirect: { name: 'admin-overview' },
+      meta: {
+        admin: true,
+        requiresAuth: true,
+        title: `${appName} | Admin`
+      },
+      children: [
+        {
+          path: 'games',
+          name: 'admin-games',
+          component: () => import('../views/admin/GamesView.vue'),
+          meta: {
+            admin: true,
+            requiresAuth: true,
+            title: `${appName} | Admin`
+          }
+        },
+        {
+          path: 'tables',
+          name: 'admin-tables',
+          component: () => import('../views/admin/TablesView.vue'),
+          meta: {
+            admin: true,
+            requiresAuth: true,
+            title: `${appName} | Admin`
+          }
+        },
+        {
+          path: 'overview',
+          name: 'admin-overview',
+          component: () => import('../views/admin/OverviewView.vue'),
+          meta: {
+            admin: true,
+            requiresAuth: true,
+            title: `${appName} | Admin`
+          }
+        },
+        {
+          path: 'decks',
+          name: 'admin-decks',
+          component: () => import('../views/admin/DecksView.vue'),
+          meta: {
+            admin: true,
+            requiresAuth: true,
+            title: `${appName} | Admin`
+          }
+        },
+        {
+          path: 'cards',
+          name: 'admin-cards',
+          component: () => import('../views/admin/CardsView.vue'),
+          meta: {
+            admin: true,
+            requiresAuth: true,
+            title: `${appName} | Admin`
+          }
+        },
+        {
+          path: 'users',
+          name: 'admin-users',
+          component: () => import('../views/admin/UsersView.vue'),
+          meta: {
+            admin: true,
+            requiresAuth: true,
+            title: `${appName} | Admin`
+          }
+        },
+      ]
+    }
   ]
 })
 
@@ -183,24 +305,14 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (localStorage.getItem('token') == null) {
       next({ name: 'home' });
+      return
     } else {
       next();
+      return
     }
   }
-  // if route can be accessed without authentication - guest is true 
-  // but we redirect back to dashboard if already logged in 
-  else if (to.matched.some((record) => record.meta.guest)) {
-    if (localStorage.getItem('token')) {
-      next({ name: 'lobby' });
-    } else {
-      next();
-    }
-  }
-  // if not guest or requiresAuth continue
-  // e.g. about us page 
-  else {
-    next();
-  }
+  // if not requiresAuth continue
+  next();
 });
 
 export default router

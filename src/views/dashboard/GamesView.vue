@@ -1,10 +1,6 @@
 <template>
     <div class="container w-full overflow-x-auto px-2">
-        <div class="w-1/6">
-            <div class="text-2xl border-b-4 border-primary py-4 px-2">
-                My Games
-            </div>
-        </div>
+        <MyTitle>My Games</MyTitle>
 
         <!-- Table -->
         <div class="mx-auto mt-4">
@@ -156,11 +152,11 @@
 
         <template v-slot:modal_footer>
             <button @click="saveGameChanges()"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
+                class="btn-primary">
                 Save Changes
             </button>
             <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
+                class="btn-grey ml-2"
                 @click="deactiveteModal">
                 Close
             </button>
@@ -182,8 +178,8 @@
                 class="flex w-full items-center justify-center rounded-md border border-transparent bg-red-500 text-white px-8 py-3 text-base font-medium hover:bg-red-600 hover:text-white md:py-3 md:px-10 md:text-lg">
                 Delete
             </button>
-            <button @click="deactiveteDeleteModal"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
+            <button @click="deactiveteDeleteModal" class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 
+font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
                 Cancel
             </button>
         </template>
@@ -191,14 +187,20 @@
 </template>
 
 <script setup lang="ts">
+import MyTitle from '@/components/MyTitle.vue';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { onMounted, ref } from 'vue';
 import type Game from '@/types/games/Game'
 import Modal from '@/components/Modal.vue';
 import { useToast } from "vue-toastification";
+import { useUserStore } from '@/stores/UserStore';
+import { useRoute } from 'vue-router';
 
+const route = useRoute()
+const userStore = useUserStore();
 const toast = useToast();
+const role = ref<string | null>('user');
 const isModalOpen = ref<Boolean>(false);
 const isDeleteModalOpen = ref<Boolean>(false);
 const games = ref<Game[]>([]);
@@ -210,6 +212,10 @@ const tablesFields = ref([
 
 // Get game data when component add to the DOM
 onMounted(async () => {
+    // Admin Router APIs calls
+    if (route.meta.admin) {
+        role.value = userStore.$state.user.role;    // user or admin
+    }
     getGamesList();
 })
 // Close view details modal
@@ -223,7 +229,7 @@ const deactiveteDeleteModal = () => {
 // Axios call to get game list data
 const getGamesList = async () => {
     try {
-        const response: AxiosResponse = await axiosUser.get('user/games');
+        const response: AxiosResponse = await axiosUser.get(`${role.value}/games`);
         games.value = response.data;
     } catch (error) {
         console.log(error);
@@ -245,7 +251,7 @@ const deleteGame = async () => {
     try {
         if (selectedGameId.value) { // Typescript checks
             // Pass the ID of the game
-            const response: AxiosResponse = await axiosUser.delete('user/delete/game', {
+            const response: AxiosResponse = await axiosUser.delete(`${role.value}/delete/game`, {
                 data: {
                     game_id: selectedGameId.value
                 }
@@ -268,7 +274,7 @@ const deleteGame = async () => {
 const saveGameChanges = async () => {
     try {
         // Pass the edit game object
-        const response: AxiosResponse = await axiosUser.patch('user/edit/game', modalGame.value);
+        const response: AxiosResponse = await axiosUser.patch(`${role.value}/edit/game`, modalGame.value);
         if (response.data.affected === 1) { // Success response from axios
             toast.success('Game updated succesfully');
             isModalOpen.value = false;

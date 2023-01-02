@@ -1,13 +1,9 @@
 <template>
     <div class="container w-full overflow-x-auto px-2">
         <!-- Title -->
-        <div class="w-3/12">
-            <div class="text-2xl border-b-4 border-primary py-4 px-2">
-                Dashboard
-            </div>
-        </div>
+        <MyTitle>Dashboard</MyTitle>
 
-        <div class="grid grid-cols-2 gap-8 mt-10 mx-20">
+        <div class="grid lg:grid-cols-2 grid-cols-1 gap-8 mt-10 mx-20">
             <div class="col-span-1 border bg-primary rounded-xl px-4 py-8 text-center">
                 <div class="text-white text-xl">Tables create</div>
                 <div class="text-white text-7xl">{{ data.tables }}</div>
@@ -29,10 +25,16 @@
 </template>
 
 <script setup lang="ts">
+import MyTitle from '@/components/MyTitle.vue';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { onMounted, ref } from 'vue';
+import { useUserStore } from '@/stores/UserStore';
+import { useRoute } from 'vue-router';
 
+const route = useRoute()
+const userStore = useUserStore();
+const role = ref<string | null>('user');
 const data = ref<{ tables: number, cards: number, games: number, decks: number }>({
     tables: 0,
     cards: 0,
@@ -41,12 +43,16 @@ const data = ref<{ tables: number, cards: number, games: number, decks: number }
 })
 
 onMounted(async () => {
+    // Admin Router APIs calls
+    if (route.meta.admin) {
+        role.value = userStore.$state.user.role;    // user or admin
+    }
     getData();
 })
 
 const getData = async () => {
     try {
-        const response: AxiosResponse = await axiosUser.get('user/dashboard');
+        const response: AxiosResponse = await axiosUser.get(`${role.value}/dashboard`);
         data.value = response.data;
     } catch (error) {
         console.log(error);

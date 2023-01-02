@@ -15,12 +15,15 @@ export const useUserStore = defineStore("UserStore", {
                 username: null,
                 email: null,
                 token: null,
-                forgotPasswordToken: null
+                forgotPasswordToken: null,
+                role: null
             } as UserState
         }
     },
     getters: {
         authToken: (state) => state.user.token === null ? false : true,
+        isAdmin: (state) => state.user.role === 'admin',
+        getToken: (state) => state.user.token,
     },
     actions: {
         async register(user: UserRegister) {
@@ -37,21 +40,7 @@ export const useUserStore = defineStore("UserStore", {
                 const { email, password } = user;
                 const response: AxiosResponse = await axiosClient.post(`auth/login`, { email, password });
                 if (response.status === 201) {
-                    try {
-                        const decodedToken: any = jwtDecode(response.data.token);
-                        this.$state.user.token = response.data.token;
-                        this.$state.user.username = decodedToken.user.username;
-                        this.$state.user.email = decodedToken.user.email;
-                        localStorage.setItem('token', response.data.token);
-                        localStorage.setItem('username', decodedToken.user.username);
-                        localStorage.setItem('email', decodedToken.user.email);
-                    } catch (error: any) {
-                        if (process.env.NODE_ENV === 'development') {
-                            return error.message
-                        } else {
-                            return 'Something went wrong. Please try again later!'
-                        }
-                    }
+                    this.decodeToken(response.data.token);
                 }
                 return 'success';
             } catch (err: any) {
@@ -59,11 +48,18 @@ export const useUserStore = defineStore("UserStore", {
             }
         },
         async logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('username');
-            this.$state.user.token = null;
-            this.$state.user.username = null;
-            await router.push({ name: 'home' });
+            try {
+                const response: AxiosResponse = await axiosClient.post('auth/logout', {
+                    email: this.$state.user.email
+                })
+                if (response.data.affected === 1) {
+                    this.resetValues();
+                    await router.push({ name: 'home' });
+                    window.location.reload()
+                }
+            } catch (error) {
+                console.log(error);
+            }
         },
         async forgotPassword(user: UserForgotPassword) {
             try {
@@ -110,15 +106,21 @@ export const useUserStore = defineStore("UserStore", {
                 return err.response ? err.response.data.message : err.message;
             }
         },
-        decodeToken(response: any) {
-            const decodedToken: any = jwtDecode(response.data.token);
-            this.$state.user.token = response.data.token;
+        decodeToken(token: string) {
+            const decodedToken: any = jwtDecode(token);
+            this.$state.user.token = token;
             this.$state.user.username = decodedToken.user.username;
             this.$state.user.email = decodedToken.user.email;
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('username', decodedToken.user.username);
-            localStorage.setItem('email', decodedToken.user.email);
+            this.$state.user.role = decodedToken.user.role;
+            localStorage.setItem('token', token);
         },
+        resetValues() {
+            localStorage.removeItem('token');
+            this.$state.user.token = null;
+            this.$state.user.username = null;
+            this.$state.user.email = null;
+            this.$state.user.role = null;
+        }
     }
 })
 // Update Store without refresh page

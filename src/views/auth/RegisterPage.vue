@@ -1,5 +1,6 @@
 <template>
-    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 bg-dark">
+    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 bg-dark"
+        style="height: calc(100vh - 3.8rem)">
         <div class="container py-20">
             <!-- Title -->
             <div class="sm:mx-auto sm:w-full sm:max-w-lg">
@@ -22,7 +23,7 @@
                             <!-- Username error messages -->
                             <div v-for="error in v$.username.$errors" :key="error.$uid"
                                 class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
+                                {{ error.$message }}
                             </div>
                         </div>
                         <!-- Email Input -->
@@ -35,7 +36,7 @@
                             <!-- Email error messages -->
                             <div v-for="error in v$.email.$errors" :key="error.$uid"
                                 class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
+                                {{ error.$message }}
                             </div>
                         </div>
                         <!-- Password Input  -->
@@ -48,7 +49,7 @@
                             <!-- Password Error Messages -->
                             <div v-for="error in v$.password.$errors" :key="error.$uid"
                                 class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
+                                {{ error.$message }}
                             </div>
                         </div>
                         <!-- Confirm Password Input -->
@@ -62,7 +63,7 @@
                             <!-- Confirm Password error messages -->
                             <div v-for="error in v$.confirmPassword.$errors" :key="error.$uid"
                                 class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
+                                {{ error.$message }}
                             </div>
                         </div>
                         <!-- Submit Form -->
@@ -90,16 +91,24 @@
 <script lang="ts">
 import type UserRegister from '@/types/auth/UserRegister';
 import { computed } from '@vue/reactivity';
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, reactive, ref, onMounted } from 'vue'
 import { required, email, minLength, sameAs, helpers } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { useUserStore } from '@/stores/UserStore'
 import { useToast } from "vue-toastification";
+import router from '@/router';
+
 const userStore = useUserStore();
 const toast = useToast();
 
 export default defineComponent({
     setup() {
+        // Redirect to home page if the user has login
+        onMounted(() => {
+            if (userStore.authToken) {
+                router.push({ name: 'home' })
+            }
+        })
         // User Object
         const registerUser = reactive<UserRegister>({
             username: '',
@@ -146,7 +155,7 @@ export default defineComponent({
                     // Reset Errors Form
                     v$.value.$reset();
                     // TODO: Success Notification and message: Check your email to activate your account
-                    toast.success(`Registration has been created successfully. We have send an email to ${registerUser.email} to verify your email address and activate your account.`,{
+                    toast.success(`Registration has been created successfully. We have send an email to ${registerUser.email} to verify your email address and activate your account.`, {
                         timeout: 10000
                     })
                     // Reset Register Form

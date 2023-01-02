@@ -1,5 +1,6 @@
 <template>
-    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 bg-dark">
+    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 bg-dark"
+        style="height: calc(100vh - 3.8rem)">
         <div class="container py-20">
             <!-- Title -->
             <div class="sm:mx-auto sm:w-full sm:max-w-lg">
@@ -21,7 +22,7 @@
                             <!-- Email error messages -->
                             <div v-for="error in v$.email.$errors" :key="error.$uid"
                                 class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
+                                {{ error.$message }}
                             </div>
                         </div>
                         <!-- Password Input -->
@@ -34,21 +35,20 @@
                             <!-- Password error messages -->
                             <div v-for="error in v$.password.$errors" :key="error.$uid"
                                 class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{error.$message}}
+                                {{ error.$message }}
                             </div>
                         </div>
                         <!-- Forgot Password Link -->
                         <div class="flex items-center justify-between">
                             <div class="text-sm">
-                                <RouterLink :to="{ name: 'forgot-password'}"
+                                <RouterLink :to="{ name: 'forgot-password' }"
                                     class="font-medium text-white hover:text-secondary">Forgot your
                                     password?</RouterLink>
                             </div>
                         </div>
                         <!-- Submit Form -->
                         <div>
-                            <div @click="login()"
-                                class="mt-14 flex w-full justify-center rounded-md border border-transparent bg-dark py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary">
+                            <div @click="login()" class="mt-14 btn-black">
                                 <!-- Loading Animation -->
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" v-if="loadingButton"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -70,7 +70,7 @@
 
 <script lang="ts">
 import type UserLogin from '@/types/auth/UserLogin';
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, reactive, ref, onMounted } from 'vue'
 import { required, email } from '@vuelidate/validators';
 import { computed } from '@vue/reactivity';
 import { useVuelidate } from '@vuelidate/core'
@@ -82,10 +82,16 @@ const userStore = useUserStore();
 
 export default defineComponent({
     setup() {
+        // Redirect to home page if the user has login
+        onMounted(() => {
+            if (userStore.authToken) {
+                router.push({ name: 'home' })
+            }
+        })
         // User Object
         const loginUser = reactive<UserLogin>({
-            email: 'psillovits@gmail.com',
-            password: 'Nikolas-0',
+            email: 'admin@omcg.com',
+            password: 'CardGame-0',
         })
         // Loading Button
         const loadingButton = ref<Boolean>(false);
