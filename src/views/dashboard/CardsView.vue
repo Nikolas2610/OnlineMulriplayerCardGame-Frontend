@@ -30,7 +30,7 @@
                                                 {{ card.name }}
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                                <img :src="card.image" :alt="card.name" class="w-32 h-32">
+                                                <img :src="loadImage(card.image)" :alt="card.name" class="w-32 h-32">
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                                 {{ card.private ? 'YES' : 'NO' }}
@@ -95,7 +95,12 @@ import type Card from '@/types/cards/Card'
 import Modal from '@/components/Modal.vue';
 import { useToast } from "vue-toastification";
 import type CreateCard from '@/types/cards/CreateCard';
+import { useUserStore } from '@/stores/UserStore';
+import { useRoute } from 'vue-router';
 
+const userStore = useUserStore();
+const route = useRoute()
+const role = ref<string | null>('user');
 const toast = useToast();
 const isDeleteModalOpen = ref<Boolean>(false);
 const cards = ref<Card[]>([]);
@@ -110,6 +115,10 @@ const tablesFields = ref([
 
 // Get game data when component add to the DOM
 onMounted(async () => {
+    // Admin Router APIs calls
+    if (route.meta.admin) {
+        role.value = userStore.$state.user.role;    // user or admin
+    }
     getCardsList();
 })
 // Close view details card
@@ -123,7 +132,7 @@ const deactiveteDeleteModal = () => {
 // Axios call to get game list data
 const getCardsList = async () => {
     try {
-        const response: AxiosResponse = await axiosUser.get('user/cards');
+        const response: AxiosResponse = await axiosUser.get(`${role.value}/cards`);
         cards.value = response.data;
     } catch (error) {
         console.log(error);
@@ -146,7 +155,7 @@ const deleteCard = async () => {
     try {
         if (selectedCardId.value) { // Typescript checks
             // Pass the ID of the game
-            const response: AxiosResponse = await axiosUser.delete('card', {
+            const response: AxiosResponse = await axiosUser.delete(role.value === 'admin' ? 'admin/card' : 'card', {
                 data: {
                     card_id: selectedCardId.value
                 }
@@ -179,7 +188,7 @@ const saveCardChanges = async (card: CreateCard, image: any, cardData: Card) => 
         formData.append('name', card.name)
         formData.append('private', card.private.toString());
         // Pass the edit game object
-        const response: AxiosResponse = await axiosUser.patch(`card${path}`, formData, {
+        const response: AxiosResponse = await axiosUser.patch(role.value === 'admin' ? `admin/card${path}` : `card${path}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -195,6 +204,14 @@ const saveCardChanges = async (card: CreateCard, image: any, cardData: Card) => 
     } catch (error: any) {
         // Capture the errors
         toast.error('Something went wrong. Please try again later', error);
+    }
+}
+// These function is to load the image and from the upload images and from the fake data images
+const loadImage = (image: string) => {
+    if (image.substring(0, 4) === 'http') {
+        return image;
+    } else {
+        return import.meta.env.VITE_BACNEND_IMAGE_URL + image;
     }
 }
 </script>

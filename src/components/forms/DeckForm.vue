@@ -14,20 +14,20 @@
         </div>
 
         <div class="flex justify-center">
-            <button class="mt-4 mr-2 btn-grey" type="button" v-if="edit"  @click="$emit('closeEditMode')">Back</button>
+            <button class="mt-4 mr-2 btn-grey" type="button" v-if="edit" @click="$emit('closeEditMode')">Back</button>
             <button class="mt-4 btn-outline-green" @click="openModal" type="button">Add Card</button>
             <button class="mt-4 ml-2 btn-green" type="submit">Submit</button>
         </div>
         <h1 class="mt-4 text-lg font-medium">Card List:</h1>
         <div class="mt-4 grid grid-cols-8 gap-2 px-4 py-8 border rounded-lg shadow-lg">
             <div class="col-span-1 flex justify-center items-center flex-col gap-2" v-for="card in deck.cards"
-                :key="`sel-${card.id}`" v-if="cards">
-                <img :src="card.image" class="w-32 max-h-52">
+                :key="`sel-${card.id}`">
+                <img :src="loadImage(card.image)" class="w-32 max-h-52">
                 <div>{{ card.name }}</div>
             </div>
         </div>
 
-        
+
     </form>
 
     <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal">
@@ -47,7 +47,7 @@
                 <div class="col-span-1 flex justify-center items-center flex-col cursor-pointer hover:bg-secondary hover:text-white rounded-lg p-2  transition duration-300"
                     @click="addSelectedCards(card)" :class="isSelectedCard(card.id) ? 'bg-primary' : ''"
                     v-for="card in cards" :key="card.id">
-                    <img :src="card.image" class="w-32 max-h-52">
+                    <img :src="loadImage(card.image)" class="w-32 max-h-52">
                     <div class="pt-2" :class="isSelectedCard(card.id) ? 'text-white' : ''">{{ card.name }}</div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
 <script setup lang="ts">
 import type CreateDeck from '@/types/decks/CreateDeck'
 import Modal from '@/components/Modal.vue';
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, onBeforeMount } from 'vue';
 import type Card from '@/types/cards/Card';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
@@ -83,17 +83,26 @@ const deck = ref<CreateDeck>({
     cards: []
 })
 
-onMounted(() => {
+onBeforeMount(() => {
     if (props.deckData) {
-        deck.value = props.deckData;
-        cards.value = props.deckData.cards;
-        if (cards.value) {
-            cards.value.forEach(card => {
+        deck.value = { ...props.deckData };
+        deck.value.cards = [...props.deckData.cards];
+        if (deck.value) {
+            deck.value.cards.forEach(card => {
                 selectedCards.value.push(card.id);
             })
         }
     }
 })
+
+// These function is to load the image and from the upload images and from the fake data images
+const loadImage = (image: string) => {
+    if (image.substring(0, 4) === 'http') {
+        return image;
+    } else {
+        return import.meta.env.VITE_BACNEND_IMAGE_URL + image;
+    }
+}
 
 // Close view details modal
 const deactiveteModal = () => {

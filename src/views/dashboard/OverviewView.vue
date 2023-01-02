@@ -3,7 +3,7 @@
         <!-- Title -->
         <MyTitle>Dashboard</MyTitle>
 
-        <div class="grid grid-cols-2 gap-8 mt-10 mx-20">
+        <div class="grid lg:grid-cols-2 grid-cols-1 gap-8 mt-10 mx-20">
             <div class="col-span-1 border bg-primary rounded-xl px-4 py-8 text-center">
                 <div class="text-white text-xl">Tables create</div>
                 <div class="text-white text-7xl">{{ data.tables }}</div>

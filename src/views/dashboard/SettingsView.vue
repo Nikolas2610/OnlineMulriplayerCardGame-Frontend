@@ -5,7 +5,7 @@
 
         <!-- Username -->
         <div class="flex justify-center mt-10">
-            <div class="w-6/12 bg-dark rounded-lg p-4">
+            <div class="lg:w-6/12 w-10-12 bg-dark rounded-lg p-4">
                 <div class="text-white text-center">
                     Username:
                     <span class="text-primary">

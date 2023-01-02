@@ -53,11 +53,7 @@ export const useUserStore = defineStore("UserStore", {
                     email: this.$state.user.email
                 })
                 if (response.data.affected === 1) {
-                    localStorage.removeItem('token');
-                    this.$state.user.token = null;
-                    this.$state.user.username = null;
-                    this.$state.user.email = null;
-                    this.$state.user.role = null;
+                    this.resetValues();
                     await router.push({ name: 'home' });
                     window.location.reload()
                 }
@@ -118,6 +114,13 @@ export const useUserStore = defineStore("UserStore", {
             this.$state.user.role = decodedToken.user.role;
             localStorage.setItem('token', token);
         },
+        resetValues() {
+            localStorage.removeItem('token');
+            this.$state.user.token = null;
+            this.$state.user.username = null;
+            this.$state.user.email = null;
+            this.$state.user.role = null;
+        }
     }
 })
 // Update Store without refresh page

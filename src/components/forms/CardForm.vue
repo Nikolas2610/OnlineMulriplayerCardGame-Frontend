@@ -17,13 +17,13 @@
             <label for="min_players" class="block text-lg font-medium">Image</label>
             <div class="mt-1">
                 <input id="min_players" type="file" class="rounded-md border border-gray-300" @change="onImageChoose" />
-                <img :src="imageScreen" class="w-52 h-80 mt-4" v-if="imageScreen">
+                <img :src="loadImage(imageScreen)" class="w-52 h-80 mt-4" v-if="imageScreen">
             </div>
         </div>
 
         <div class="flex justify-center">
             <button class="mt-4 btn-green" type="submit">Submit</button>
-            <button class="mt-4 ml-2 btn-grey" type="button" v-if="edit"  @click="$emit('closeEditMode')">Back</button>
+            <button class="mt-4 ml-2 btn-grey" type="button" v-if="edit" @click="$emit('closeEditMode')">Back</button>
         </div>
     </form>
 </template>
@@ -34,7 +34,6 @@ import { ref, watch, onMounted } from 'vue';
 
 onMounted(() => {
     if (props.cardData) {
-        console.log(props.cardData);
         card.value.name = props.cardData.name;
         card.value.private = props.cardData.private;
     }
@@ -83,6 +82,17 @@ watch(() => props.successResponse,
         }
     }
 );
+
+// These function is to load the image and from the upload images and from the fake data images
+const loadImage = (image: string) => {
+    if (image.substring(0, 4) === 'http') {
+        return image;
+    } else if (image.substring(0, 4) === 'data') {
+        return image;
+    } else {
+        return import.meta.env.VITE_BACNEND_IMAGE_URL + image;
+    }
+}
 </script>
 
 <style scoped>

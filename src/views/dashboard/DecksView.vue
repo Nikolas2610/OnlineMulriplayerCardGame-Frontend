@@ -70,7 +70,7 @@
             </div>
         </template>
         <template v-slot:modal_footer>
-            <button @click="deleteGame" disabled
+            <button @click="deleteDeck"
                 class="flex w-full items-center justify-center rounded-md border border-transparent bg-red-500 text-white px-8 py-3 text-base font-medium hover:bg-red-600 hover:text-white md:py-3 md:px-10 md:text-lg">
                 Delete
             </button>
@@ -91,20 +91,29 @@ import { onMounted, ref } from 'vue';
 import type Deck from '@/types/decks/Deck'
 import Modal from '@/components/Modal.vue';
 import { useToast } from "vue-toastification";
+import { useRoute } from 'vue-router';
+import { useUserStore } from '@/stores/UserStore';
 
-
+const userStore = useUserStore();
+const route = useRoute()
 const toast = useToast();
 const isDeleteModalOpen = ref<Boolean>(false);
 const decks = ref<Deck[]>([]);
 const modalDeck = ref<Deck>();
-const selectedGameId = ref<number | null>(null)
+const selectedDeckId = ref<number | null>(null)
 const editDeck = ref(false);
+const role = ref<string | null>('user');
 const tablesFields = ref([
     'No', 'NAME', 'PRIVATE'
 ]);
 
+
 // Get Deck data when component add to the DOM
 onMounted(async () => {
+    // Admin Router APIs calls
+    if (route.meta.admin) {
+        role.value = userStore.$state.user.role;    // user or admin
+    }
     getDecksList();
 })
 // Close delete modal
@@ -114,7 +123,7 @@ const deactiveteDeleteModal = () => {
 // Axios call to get Deck list data
 const getDecksList = async () => {
     try {
-        const response: AxiosResponse = await axiosUser.get('user/decks');
+        const response: AxiosResponse = await axiosUser.get(`${role.value}/decks`);
         decks.value = response.data;
     } catch (error) {
         console.log(error);
@@ -123,22 +132,22 @@ const getDecksList = async () => {
 // Open view details modal
 const openDetailsModal = (id: number) => {
     modalDeck.value = { ...decks.value[id] };   // Copy by value the Deck
-    selectedGameId.value = decks.value[id].id;  // Save the ID of the Deck to a variable
+    selectedDeckId.value = decks.value[id].id;  // Save the ID of the Deck to a variable
     editDeck.value = true;
 }
 // Open Delete modal confirmation
 const openDeleteModal = (id: number) => {
-    selectedGameId.value = decks.value[id].id;  // Save the ID of the Deck to a variable
+    selectedDeckId.value = decks.value[id].id;  // Save the ID of the Deck to a variable
     isDeleteModalOpen.value = true; // Open Modal
 }
 // Axios call to delete a Deck to database
-const deleteGame = async () => {
+const deleteDeck = async () => {
     try {
-        if (selectedGameId.value) { // Typescript checks
+        if (selectedDeckId.value) { // Typescript checks
             // Pass the ID of the Deck
-            const response: AxiosResponse = await axiosUser.delete('user/delete/Deck', {
+            const response: AxiosResponse = await axiosUser.delete(role.value === 'admin' ? 'admin/deck' : 'deck', {
                 data: {
-                    game_id: selectedGameId.value
+                    deck_id: selectedDeckId.value
                 }
             });
             if (response.data.affected === 1) { // Success delete
@@ -152,14 +161,14 @@ const deleteGame = async () => {
         };
     } catch (error: any) {
         // Capture the errors
-        toast.error('Something went wrong. Please try again later', error);
+        toast.error(error.response.data.message);
     }
 }
 // Axios call to update the Deck to database
 const saveDeck = async (deck: Deck) => {
     try {
         // Pass the edit Deck object
-        const response: AxiosResponse = await axiosUser.patch('deck', deck);
+        const response: AxiosResponse = await axiosUser.patch(role.value === 'admin' ? 'admin/deck' : 'deck', deck);
         if (response.status === 200) { // Success response from axios
             toast.success('Deck updated succesfully');
             editDeck.value = false;

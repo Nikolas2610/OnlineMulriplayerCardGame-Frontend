@@ -103,38 +103,60 @@ const router = createRouter({
       path: '/lobby',
       name: 'lobby',
       component: () => import('../views/LobbyPage.vue'),
+      redirect: { name: 'lobby-room' },
       meta: {
         requiresAuth: false,
         title: `${appName} | Game Lobby`
-      }, 
+      },
+      children: [
+        {
+          path: '/room',
+          name: 'lobby-room',
+          component: () => import('../views/lobby/LobbyRoom.vue'),
+          meta: {
+            requiresAuth: false,
+            title: `${appName} | Lobby`
+          },
+        },
+        {
+          path: '/create-game',
+          name: 'create-game',
+          component: () => import('../views/lobby/CreateGameView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: `${appName} | Create Game`
+          },
+        },
+        {
+          path: '/create-deck',
+          name: 'create-deck',
+          component: () => import('../views/lobby/CreateDeckView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: `${appName} | Create Deck`
+          },
+        },
+        {
+          path: '/create-table',
+          name: 'create-table',
+          component: () => import('../views/lobby/CreateTableView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: `${appName} | Create Table`
+          },
+        },
+        {
+          path: '/create-card',
+          name: 'create-card',
+          component: () => import('../views/lobby/CreateCardView.vue'),
+          meta: {
+            requiresAuth: true,
+            title: `${appName} | Create Card`
+          },
+        },
+      ]
     },
-    {
-      path: '/lobby/create-game',
-      name: 'create-game',
-      component: () => import('../views/lobby/CreateGameView.vue'),
-      meta: {
-        requiresAuth: true,
-        title: `${appName} | Create Game`
-      }, 
-    },
-    {
-      path: '/lobby/create-deck',
-      name: 'create-deck',
-      component: () => import('../views/lobby/CreateDeckView.vue'),
-      meta: {
-        requiresAuth: true,
-        title: `${appName} | Create Deck`
-      }, 
-    },
-    {
-      path: '/lobby/create-table',
-      name: 'create-table',
-      component: () => import('../views/lobby/CreateTableView.vue'),
-      meta: {
-        requiresAuth: true,
-        title: `${appName} | Create Table`
-      }, 
-    },
+
     {
       path: '/dashboard',
       name: 'dashboard',
