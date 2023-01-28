@@ -1,5 +1,5 @@
 <template>
-    <div class="container w-full overflow-x-auto px-2">
+    <div class="w-full overflow-x-auto px-4">
         <div v-if="!editCard">
             <MyTitle>My Cards</MyTitle>
             <!-- Table -->
@@ -30,7 +30,7 @@
                                                 {{ card.name }}
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                                <img :src="loadImage(card.image)" :alt="card.name" class="w-32 h-32">
+                                                <img :src="loadImage(card.image)" :alt="card.name" class="w-20 h-32">
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                                 {{ card.private ? 'YES' : 'NO' }}
@@ -161,7 +161,7 @@ const deleteCard = async () => {
                 }
             });
             if (response.data.affected === 1) { // Success delete
-                toast.success('Card deleted succesfully');
+                toast.success('Card deleted successfully');
                 isDeleteModalOpen.value = false;
                 getCardsList(); // Refresh game list
                 return
@@ -194,7 +194,7 @@ const saveCardChanges = async (card: CreateCard, image: any, cardData: Card) => 
             }
         })
         if (response.status === 200) {
-            toast.success('Card updated succesfully');
+            toast.success('Card updated successfully');
             getCardsList();
             editCard.value = false;
             return

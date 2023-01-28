@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="w-full overflow-x-auto px-4">
         <MyTitle>My Tables - Not Ready</MyTitle>
     </div>
 </template>

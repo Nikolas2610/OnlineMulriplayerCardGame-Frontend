@@ -1,10 +1,6 @@
 <template>
-    <div class="container w-full overflow-x-auto px-2">
-        <div class="w-1/6">
-            <div class="text-2xl border-b-4 border-primary py-4 px-2">
-                Users
-            </div>
-        </div>
+    <div class="w-full overflow-x-auto px-4">
+        <MyTitle>Users</MyTitle>
 
         <!-- Table -->
         <div class="mx-auto mt-4">
@@ -40,8 +36,8 @@
                                             {{ user.role }}
                                         </td>
                                         <td class="py-4 px-6 text-sm font-medium whitespace-nowrap"
-                                            :class="user.isEmailConfirmed ? 'text-primary' : 'text-red-500'">
-                                            {{ user.isEmailConfirmed ? 'YES' : 'NO' }}
+                                            :class="user.email_confirmed ? 'text-primary' : 'text-red-500'">
+                                            {{ user.email_confirmed ? 'YES' : 'NO' }}
                                         </td>
                                         <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                             {{ formattedDate(user.created_at) }}
@@ -73,7 +69,7 @@
     <!-- Modal Edit User -->
     <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal">
         <template v-slot:modal_header>
-            Game Info
+            Edit User
         </template>
 
         <template v-slot:body>
@@ -102,7 +98,7 @@
                 </div>
                 <div class="mt-1 flex">
                     <label for="dealer" class="block text-sm font-medium mr-2">Email Confirmed</label>
-                    <input id="dealer" type="checkbox" v-model="modalUser.isEmailConfirmed" class="" />
+                    <input id="dealer" type="checkbox" v-model="modalUser.email_confirmed" class="" />
                 </div>
             </div>
         </template>
@@ -145,6 +141,7 @@ font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:te
 
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue';
+import MyTitle from '@/components/MyTitle.vue';
 import axiosUser from '@/plugins/axiosUser';
 import type User from '@/types/User';
 import type { AxiosResponse } from 'axios';
@@ -205,7 +202,7 @@ const deleteUser = async () => {
             }
         });
         if (response.data.affected === 1) {
-            toast.success('User deleted succesfully');
+            toast.success('User deleted successfully');
             deactiveteDeleteModal();
             getUsersList();
             return
@@ -223,11 +220,11 @@ const updateUser = async () => {
             id: modalUser.value?.id,
             username: modalUser.value?.username,
             email: modalUser.value?.email,
-            isEmailConfirmed: modalUser.value?.isEmailConfirmed,
+            email_confirmed: modalUser.value?.email_confirmed,
             role: modalUser.value?.role,
         });
         if (response.data.affected === 1) {
-            toast.success('User updated succesfully');
+            toast.success('User updated successfully');
             deactiveteModal();
             getUsersList();
             return

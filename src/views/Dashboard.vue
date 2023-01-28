@@ -1,6 +1,8 @@
 <template>
     <Sidebar :menu-items="menuItems">
-        <router-view></router-view>
+        <div class="bg-gray-300 w-full overflow-x-auto">
+            <router-view></router-view>
+        </div>
     </Sidebar>
 </template>
 

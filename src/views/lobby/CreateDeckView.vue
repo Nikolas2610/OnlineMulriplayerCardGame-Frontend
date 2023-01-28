@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container w-4/6 border rounded-lg shadow-xl lg:mt-4">
         <MyTitle>Create Deck</MyTitle>
         <DeckForm :successResponse="successResponse" @sendData="saveDeck"  />
     </div>
@@ -21,7 +21,7 @@ const saveDeck = async (deck: CreateDeck) => {
     try {
         const response: AxiosResponse = await axiosUser.post('deck', deck);
         if (response.status === 201) {
-            toast.success('Deck save succesfully');
+            toast.success('Deck save successfully');
             successResponse.value = 1;
             setTimeout(() => {
                 successResponse.value = -1;

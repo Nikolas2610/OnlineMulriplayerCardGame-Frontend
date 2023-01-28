@@ -3,7 +3,6 @@ import { RouterView } from 'vue-router'
 import NavBar from '@/components/NavBar.vue'
 import { onMounted, ref } from 'vue';
 import { useUserStore } from './stores/UserStore'
-import Modal from '@/components/Modal.vue'
 
 const userStore = useUserStore();
 const isModalOpen = ref<Boolean>(false);

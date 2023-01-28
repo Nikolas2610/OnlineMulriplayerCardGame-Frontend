@@ -1,6 +1,5 @@
 <template>
-    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 bg-dark"
-        style="height: calc(100vh - 3.8rem)">
+    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 bg-dark one-page">
         <div class="container py-20">
             <!-- Title -->
             <div class="sm:mx-auto sm:w-full sm:max-w-lg">
@@ -14,29 +13,11 @@
                     <form class="space-y-6">
                         <!-- Email Input -->
                         <div>
-                            <label for="email" class="block text-sm font-medium text-white">Email address</label>
-                            <div class="mt-1">
-                                <input id="email" type="email" v-model="loginUser.email"
-                                    class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                            </div>
-                            <!-- Email error messages -->
-                            <div v-for="error in v$.email.$errors" :key="error.$uid"
-                                class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{ error.$message }}
-                            </div>
+                            <InputField :title="'Email Address'" :input="userStore.userLogin.email" :errors="v$.email.$errors" :type="'email'" class="text-white" @change="(value) => userStore.userLogin.email = value" />
                         </div>
                         <!-- Password Input -->
                         <div>
-                            <label for="password" class="block text-sm font-medium text-white">Password</label>
-                            <div class="mt-1">
-                                <input id="password" v-model="loginUser.password" type="password"
-                                    class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                            </div>
-                            <!-- Password error messages -->
-                            <div v-for="error in v$.password.$errors" :key="error.$uid"
-                                class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{ error.$message }}
-                            </div>
+                            <InputField :title="'Password'" :input="userStore.$state.userLogin.password" :errors="v$.password.$errors" :type="'password'" class="text-white" @change="(value) => userStore.$state.userLogin.password = value" />
                         </div>
                         <!-- Forgot Password Link -->
                         <div class="flex items-center justify-between">
@@ -68,80 +49,66 @@
     </div>
 </template>
 
-<script lang="ts">
-import type UserLogin from '@/types/auth/UserLogin';
-import { defineComponent, reactive, ref, onMounted } from 'vue'
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue'
 import { required, email } from '@vuelidate/validators';
 import { computed } from '@vue/reactivity';
 import { useVuelidate } from '@vuelidate/core'
 import { useUserStore } from '@/stores/UserStore'
 import router from '@/router';
 import { useToast } from "vue-toastification";
+import InputField from '@/components/ui/InputField.vue';
+
 const toast = useToast();
 const userStore = useUserStore();
-
-export default defineComponent({
-    setup() {
-        // Redirect to home page if the user has login
-        onMounted(() => {
-            if (userStore.authToken) {
-                router.push({ name: 'home' })
-            }
-        })
-        // User Object
-        const loginUser = reactive<UserLogin>({
-            email: 'admin@omcg.com',
-            password: 'CardGame-0',
-        })
-        // Loading Button
-        const loadingButton = ref<Boolean>(false);
-        const rules = computed(() => {
-            return {
-                email: { required, email },
-                password: {
-                    required
-                }
-            }
-        });
-        // Create Validation with rules
-        const v$ = useVuelidate(rules, loginUser);
-        // Submit Form 
-        const login = async () => {
-            // Set Loading Button 
-            loadingButton.value = true;
-            // Validate Form 
-            await v$.value.$validate()
-            // Check for error forms
-            if (!v$.value.$error) {
-                // Success Form
-                // ***Import axios
-                const response: string = await userStore.login(loginUser);
-                // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error
-                if (response === 'success') {
-                    resetLoginForm();
-                    v$.value.$reset();
-                    router.push({ name: 'lobby' })
-                    toast.success(`You have been succesfully login!`)
-                } else {
-                    // TODO: Error Notifications - Server error or credentials (messages from middleware)
-                    toast.error(`Login error!\n${response}`)
-                }
-            } else {
-                // TODO: Error Notifications - Please complete correct the form
-                toast.error(`Login error!\nPlease complete correct the form`)
-            }
-            // Disable loading button
-            loadingButton.value = false;
-        }
-
-        const resetLoginForm = () => {
-            loginUser.email = '';
-            loginUser.password = '';
-        }
-
-        return {
-            v$, login, loginUser, loadingButton
-        }
+// Redirect to home page if the user has login
+onMounted(() => {
+    if (userStore.authToken) {
+        router.push({ name: 'home' })
     }
 })
+// Loading Button
+const loadingButton = ref<Boolean>(false);
+// Login Form rules
+const rules = computed(() => {
+    return {
+        email: { required, email },
+        password: {
+            required
+        }
+    }
+});
+// Create Validation with rules
+const v$ = useVuelidate(rules, userStore.userLoginCredentials);
+// Submit Form 
+const login = async () => {
+    // Set Loading Button 
+    loadingButton.value = true;
+    // Validate Form 
+    await v$.value.$validate()
+    // Check for error forms
+    if (!v$.value.$error) {
+        // Success Form
+        // ***Import axios
+        const response: string = await userStore.login();
+        // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error
+        if (response === 'success') {
+            resetLoginForm();
+            v$.value.$reset();
+            router.push({ name: 'lobby' })
+            toast.success(`You have been successfully login!`)
+        } else {
+            toast.error(`Login error!\n${response}`)
+        }
+    } else {
+        toast.error(`Login error!\nPlease complete correct the form`)
+    }
+    // Disable loading button
+    loadingButton.value = false;
+}
+
+const resetLoginForm = () => {
+    userStore.userLogin.email = '';
+    userStore.userLogin.password = '';
+}
 </script>

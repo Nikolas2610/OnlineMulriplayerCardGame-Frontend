@@ -2,7 +2,7 @@ import type UserState from "./auth/UserState";
 
 export default interface User extends UserState {
     id: number;
-    isEmailConfirmed: boolean;
+    email_confirmed: boolean;
     created_at: Date;
     updated_at: Date;
 }

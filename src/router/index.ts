@@ -100,7 +100,7 @@ const router = createRouter({
       ]
     },
     {
-      path: '/lobby',
+      path: '/main-lobby',
       name: 'lobby',
       component: () => import('../views/LobbyPage.vue'),
       redirect: { name: 'lobby-room' },
@@ -110,7 +110,7 @@ const router = createRouter({
       },
       children: [
         {
-          path: '/room',
+          path: '/lobby',
           name: 'lobby-room',
           component: () => import('../views/lobby/LobbyRoom.vue'),
           meta: {

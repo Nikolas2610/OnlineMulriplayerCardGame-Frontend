@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container w-4/6 border rounded-lg shadow-xl lg:mt-4">
         <MyTitle>Create Card</MyTitle>
 
         <CardForm @sendData="saveCard" :successResponse="successResponse" :cardData="undefined"
@@ -32,7 +32,7 @@ const saveCard = async (card: CreateCard, image: any) => {
             }
         })
         if (response.status === 201) {
-            toast.success('Card save succesfully')
+            toast.success('Card save successfully')
             successResponse.value = 1;
             setTimeout(() => {
                 successResponse.value = -1;

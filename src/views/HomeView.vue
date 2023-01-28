@@ -1,15 +1,15 @@
 <template>
-  <section class="bg-dark" style="height: calc(100vh - 3.8rem)">
+  <section class="bg-dark one-page">
     <div class="container h-full">
       <div class="grid lg:grid-cols-2 grid-cols-1 h-full">
         <div class="col-span-1 h-100 flex items-center justify-center mt-10 lg:mt-0">
           <div class="box pr-15">
             <div class="text-white text-7xl mb-2">Online Multiplayer</div>
             <div class="text-primary text-6xl mb-10">Card Game</div>
-            <p class="text-gray-400 text-xl mb-10">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nihil ea
-              quasi
-              laboriosam
-              aspernatur fugit voluptas. Tenetur nam, natus a!</p>
+            <p class="text-gray-400 text-xl mb-10">
+              Introducing a web app for card game enthusiasts. Create and play your own custom or existing games in
+              real-time with friends.
+            </p>
             <div class="sm:flex sm:justify-center lg:justify-start">
               <div class="rounded-md shadow">
                 <RouterLink :to="{ name: userStore.authToken ? 'lobby' : 'register' }"

@@ -15,7 +15,7 @@
 
         <div class="flex justify-center">
             <button class="mt-4 mr-2 btn-grey" type="button" v-if="edit" @click="$emit('closeEditMode')">Back</button>
-            <button class="mt-4 btn-outline-green" @click="openModal" type="button">Add Card</button>
+            <button class="mt-4 btn-outline-green" @click="openModal" type="button">Add or Remove Cards</button>
             <button class="mt-4 ml-2 btn-green" type="submit">Submit</button>
         </div>
         <h1 class="mt-4 text-lg font-medium">Card List:</h1>
@@ -32,7 +32,7 @@
 
     <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal">
         <template v-slot:modal_header>
-            Add Cards
+            Add or Remove Cards
         </template>
         <template v-slot:body>
             <div>
