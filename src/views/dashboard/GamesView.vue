@@ -1,5 +1,5 @@
 <template>
-    <div class="container w-full overflow-x-auto px-2">
+    <div class="w-full overflow-x-auto px-4">
         <MyTitle>My Games</MyTitle>
 
         <!-- Table -->
@@ -257,7 +257,7 @@ const deleteGame = async () => {
                 }
             });
             if (response.data.affected === 1) { // Success delete
-                toast.success('Game deleted succesfully');
+                toast.success('Game deleted successfully');
                 isDeleteModalOpen.value = false;
                 getGamesList(); // Refresh game list
                 return
@@ -276,7 +276,7 @@ const saveGameChanges = async () => {
         // Pass the edit game object
         const response: AxiosResponse = await axiosUser.patch(`${role.value}/edit/game`, modalGame.value);
         if (response.data.affected === 1) { // Success response from axios
-            toast.success('Game updated succesfully');
+            toast.success('Game updated successfully');
             isModalOpen.value = false;
             getGamesList(); // Refresh game list
             return

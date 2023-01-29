@@ -1,22 +1,22 @@
 <template>
-    <div class="container w-full overflow-x-auto px-2">
+    <div class="w-full overflow-x-auto px-4">
         <!-- Title -->
         <MyTitle>Dashboard</MyTitle>
 
         <div class="grid lg:grid-cols-2 grid-cols-1 gap-8 mt-10 mx-20">
-            <div class="col-span-1 border bg-primary rounded-xl px-4 py-8 text-center">
+            <div class="col-span-1 border bg-primary border-primary rounded-xl px-4 py-8 text-center">
                 <div class="text-white text-xl">Tables create</div>
                 <div class="text-white text-7xl">{{ data.tables }}</div>
             </div>
-            <div class="col-span-1 border bg-indigo-500 rounded-xl px-4 py-8 text-center">
+            <div class="col-span-1 border bg-indigo-500 border-indigo-500 rounded-xl px-4 py-8 text-center">
                 <div class="text-white text-xl">Games create</div>
                 <div class="text-white text-7xl">{{ data.games }}</div>
             </div>
-            <div class="col-span-1 border bg-blue-500 rounded-xl px-4 py-8 text-center">
+            <div class="col-span-1 border bg-blue-500 border-blue-500 rounded-xl px-4 py-8 text-center">
                 <div class="text-white text-xl">Decks create</div>
                 <div class="text-white text-7xl">{{ data.decks }}</div>
             </div>
-            <div class="col-span-1 border bg-orange-500 rounded-xl px-4 py-8 text-center">
+            <div class="col-span-1 border bg-orange-500 border-orange-500 rounded-xl px-4 py-8 text-center">
                 <div class="text-white text-xl">Cards create</div>
                 <div class="text-white text-7xl">{{ data.cards }}</div>
             </div>

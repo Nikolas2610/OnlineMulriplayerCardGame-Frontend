@@ -1,5 +1,5 @@
 <template>
-    <div class="container w-full overflow-x-auto px-2">
+    <div class="w-full overflow-x-auto px-4">
         <div v-if="!editDeck">
             <MyTitle>My Decks</MyTitle>
 
@@ -151,7 +151,7 @@ const deleteDeck = async () => {
                 }
             });
             if (response.data.affected === 1) { // Success delete
-                toast.success('Deck deleted succesfully');
+                toast.success('Deck deleted successfully');
                 isDeleteModalOpen.value = false;
                 getDecksList(); // Refresh Deck list
                 return
@@ -170,7 +170,7 @@ const saveDeck = async (deck: Deck) => {
         // Pass the edit Deck object
         const response: AxiosResponse = await axiosUser.patch(role.value === 'admin' ? 'admin/deck' : 'deck', deck);
         if (response.status === 200) { // Success response from axios
-            toast.success('Deck updated succesfully');
+            toast.success('Deck updated successfully');
             editDeck.value = false;
             getDecksList(); // Refresh Deck list
             return

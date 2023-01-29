@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-no-wrap" style="height: calc(100vh - 3.8rem)">
+    <div class="flex flex-no-wrap one-page">
         <div class="w-64 absolute sm:relative bg-dark shadow md:h-full flex-col justify-between hidden sm:flex">
             <div class="px-8">
                 <div class="w-full flex items-center text-white text-lg mt-12 capitalize">
@@ -21,8 +21,8 @@
             </div>
         </div>
         <!-- Mobile Sidebar -->
-        <div class="w-64 z-40 absolute bg-dark shadow md:h-full flex-col justify-between sm:hidden transition duration-150 ease-in-out"
-            style="height: calc(100vh - 3.8rem)" id="mobile-nav">
+        <div class="w-64 z-40 absolute bg-dark shadow md:h-full flex-col justify-between sm:hidden transition duration-150 ease-in-out one-page"
+            id="mobile-nav">
             <button aria-label="toggle sidebar" id="openSideBar"
                 class="h-10 w-10 bg-dark absolute right-0 mt-16 -mr-10 flex items-center shadow rounded-tr rounded-br justify-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 rounded focus:ring-dark"
                 @click="sidebarHandler(true)">

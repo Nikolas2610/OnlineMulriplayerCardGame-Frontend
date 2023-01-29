@@ -1,5 +1,5 @@
 <template>
-    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 bg-dark">
+    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 bg-dark one-page">
         <div class="container py-20">
             <!-- Title -->
             <div class="sm:mx-auto sm:w-full sm:max-w-lg">

@@ -1,5 +1,5 @@
 <template>
-    <div class="container w-full overflow-x-auto px-2">
+    <div class="w-full overflow-x-auto px-4">
         <!-- Title -->
         <MyTitle>My Personal Info</MyTitle>
 
@@ -162,7 +162,7 @@ const updateUsername = async () => {
             })
             if (response.status === 200) {
                 userStore.decodeToken(response.data.token);
-                toast.success('Username updated succesfully');
+                toast.success('Username updated successfully');
                 deactiveteChangeUsernameModal();
                 return
             }
@@ -221,7 +221,7 @@ const updatePassword = async () => {
         try {
             const response: AxiosResponse = await axiosUser.patch('user/edit/password', passwords);
             resetPassword();
-            response.data.affected === 1 ? toast.success('Password updated succesfully') : toast.error('Something went wrong.');
+            response.data.affected === 1 ? toast.success('Password updated successfully') : toast.error('Something went wrong.');
         } catch (err: any) {
             toast.error(err.response.data.error)
         }

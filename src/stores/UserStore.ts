@@ -17,27 +17,38 @@ export const useUserStore = defineStore("UserStore", {
                 token: null,
                 forgotPasswordToken: null,
                 role: null
-            } as UserState
+            } as UserState,
+            userLogin: {
+                email: 'admin@omcg.com',
+                password: 'CardGame-0', 
+            } as UserLogin,
+            userRegister: {
+                username: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            } as UserRegister
         }
     },
     getters: {
         authToken: (state) => state.user.token === null ? false : true,
         isAdmin: (state) => state.user.role === 'admin',
         getToken: (state) => state.user.token,
+        userLoginCredentials: (state) => state.userLogin
     },
     actions: {
-        async register(user: UserRegister) {
+        async register() {
             try {
-                const { username, email, password } = user;
+                const { username, email, password } = this.$state.userRegister;
                 const response: AxiosResponse = await axiosClient.post(`auth/register`, { username, email, password });
                 return response.status === 201 ? 'success' : 'error';
             } catch (error: any) {
                 return error.response ? error.response.data.error : error.message;
             }
         },
-        async login(user: UserLogin) {
+        async login() {
             try {
-                const { email, password } = user;
+                const { email, password } = this.$state.userLogin;
                 const response: AxiosResponse = await axiosClient.post(`auth/login`, { email, password });
                 if (response.status === 201) {
                     this.decodeToken(response.data.token);
@@ -55,7 +66,6 @@ export const useUserStore = defineStore("UserStore", {
                 if (response.data.affected === 1) {
                     this.resetValues();
                     await router.push({ name: 'home' });
-                    window.location.reload()
                 }
             } catch (error) {
                 console.log(error);

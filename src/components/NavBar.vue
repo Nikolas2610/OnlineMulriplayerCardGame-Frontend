@@ -84,8 +84,8 @@ import { useUserStore } from '@/stores/UserStore'
 const userStore = useUserStore();
 
 const navbar_items = ref([
-    { id: 1, title: 'About', path: 'about', registerUser: false },
-    { id: 2, title: 'Contact', path: 'contact', registerUser: false },
+    // { id: 1, title: 'About', path: 'about', registerUser: false },
+    // { id: 2, title: 'Contact', path: 'contact', registerUser: false },
     { id: 3, title: 'Lobby', path: 'lobby', registerUser: false },
     { id: 4, title: 'Dashboard', path: 'dashboard', registerUser: true },
 ])

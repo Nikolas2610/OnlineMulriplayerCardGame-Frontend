@@ -1,29 +1,36 @@
 <template>
     <form class="mt-10 px-4 py-8" v-if="card" @submit.prevent="submitCard">
-        <div>
-            <label for="name" class="block text-lg font-medium">Name</label>
-            <div class="mt-1">
-                <input id="name" type="text" v-model="card.name"
-                    class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-lg" />
-            </div>
+        <!-- Name field -->
+        <label for="name" class="block text-lg font-medium">Name</label>
+        <div class="mt-1">
+            <input id="name" type="text" v-model="card.name"
+                class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-lg" />
         </div>
 
+        <!-- Private Field -->
         <div class="mt-4 flex">
             <label for="private" class="block text-lg font-medium mr-2">Private</label>
             <input id="private" type="checkbox" v-model="card.private" />
         </div>
 
+        <!-- Image Field -->
         <div class="mt-4 relative">
-            <label for="min_players" class="block text-lg font-medium">Image</label>
+            <label for="imageFile" class="block text-lg font-medium">Image</label>
             <div class="mt-1">
-                <input id="min_players" type="file" class="rounded-md border border-gray-300" @change="onImageChoose" />
-                <img :src="loadImage(imageScreen)" class="w-52 h-80 mt-4" v-if="imageScreen">
+                <input id="imageFile" type="file" class="rounded-md border border-gray-300" @change="onImageChoose" />
+                <!-- Loaded image -->
+                <img :src="loadImage(imageScreen)" class="w-52 h-60 mt-4" v-if="imageScreen">
             </div>
         </div>
 
+        <!-- Submit button -->
         <div class="flex justify-center">
-            <button class="mt-4 btn-green" type="submit">Submit</button>
-            <button class="mt-4 ml-2 btn-grey" type="button" v-if="edit" @click="$emit('closeEditMode')">Back</button>
+            <button class="mt-4 btn-green" type="submit">
+                Submit
+            </button>
+            <button class="mt-4 ml-2 btn-grey" type="button" v-if="edit" @click="$emit('closeEditMode')">
+                Back
+            </button>
         </div>
     </form>
 </template>
@@ -70,9 +77,9 @@ const submitCard = () => {
 }
 
 const resetData = () => {
-    card.value.name = ''
-    card.value.private = false
-    imageScreen.value = ''
+    card.value.name = '';
+    card.value.private = false;
+    imageScreen.value = '';
 }
 
 watch(() => props.successResponse,
