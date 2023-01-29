@@ -49,9 +49,9 @@
                     @update="(e) => createGameStore.game.extra_roles = e" @addItem="createGameStore.addRole()" />
             </div>
             <!-- More Roles -->
-            <MoreItems :items="createGameStore.roles" :input="createGameStore.game.extra_roles"
+            <MoreItems :items="createGameStore.getRoles" :input="createGameStore.game.extra_roles"
                 :itemsTitle="'Role name'" @update="(value, index) => createGameStore.roles[index].name = value"
-                @deleteItem="(index) => createGameStore.deleteRole(index)" />
+                @deleteItem="(index) => createGameStore.deleteRole(index)" :disabled-items="true" />
 
             <div class="col-span-2">
                 <ExtraItems :title="'Teams'" :input="createGameStore.game.extra_teams"
@@ -61,6 +61,17 @@
             <MoreItems :items="createGameStore.teams" :input="createGameStore.game.extra_teams"
                 :itemsTitle="'Team name'" @update="(value, index) => createGameStore.teams[index].name = value"
                 @deleteItem="(index) => createGameStore.deleteTeam(index)" />
+
+            <div class="col-span-2">
+                <CheckBoxField :title="'Set starting cards'" :input="createGameStore.game.hand_start_cards" class="p-2"
+                    @change="(e) => createGameStore.game.hand_start_cards = e" />
+            </div>
+            <div class="col-span-2">
+                <MultipleSelectField />
+            </div>
+            <div class="col-span-2">
+                <CreateHandStartCardsForm v-if="!createGameStore.game.hand_start_cards" />
+            </div>
         </div>
         <div class="flex justify-center mt-4">
             <button class="btn-green" type="submit">Submit</button>
@@ -69,13 +80,15 @@
 </template>
 
 <script setup lang="ts">
+import MultipleSelectField from '../ui/MultipleSelectField.vue';
+import CreateHandStartCardsForm from './CreateHandStartCardsForm.vue';
 import MoreItems from './MoreItems.vue';
 import ExtraItems from './ExtraItems.vue';
 import CheckBoxField from '../ui/CheckBoxField.vue';
 import TextAreaFiled from '../ui/TextAreaFiled.vue';
 import InputField from '@/components/ui/InputField.vue';
 import { useCreateGameStore } from '@/stores/GameStore'
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 
@@ -91,5 +104,33 @@ const submit = () => {
     let validateExtraItems = createGameStore.validateExtraItems();
     console.log(validateExtraItems);
 }
+
+watch(() => createGameStore.game.extra_roles, 
+    (newVal) => {
+        if (newVal) {
+            createGameStore.addRole();
+        } else {
+            createGameStore.roles = createGameStore.roles.filter(role => role.name !== '')
+        }
+    }
+)
+watch(() => createGameStore.game.extra_teams, 
+    (newVal) => {
+        if (newVal) {
+            createGameStore.addTeam();
+        } else {
+            createGameStore.teams = createGameStore.teams.filter(team => team.name !== '')
+        }
+    }
+)
+watch(() => createGameStore.game.status_player, 
+    (newVal) => {
+        if (newVal) {
+            createGameStore.addStatus();
+        } else {
+            createGameStore.status = createGameStore.status.filter(s => s.name !== '')
+        }
+    }
+)
 
 </script>

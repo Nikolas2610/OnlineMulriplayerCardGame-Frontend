@@ -1,4 +1,5 @@
 import type CreateGame from "@/types/games/CreateGame";
+import type { CreateHandStartCards } from "@/types/games/CreateHandStartCards";
 import type CreateRole from "@/types/roles/CreateRole";
 import type CreateStatus from "@/types/status/CreateStatus";
 import type CreateTeam from "@/types/teams/CreateTeam";
@@ -21,14 +22,29 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
                 grid_cols: 1,
                 max_players: 1,
                 min_players: 1,
+                hand_start_cards: false
             } as CreateGame,
-            teams: [{ name: '' }] as CreateTeam[],
-            status: [{ name: '', description: '' }] as CreateStatus[],
-            roles: [{ name: '', description: '', max_players: 1 }] as CreateRole[]
+            teams: [] as CreateTeam[],
+            status: [] as CreateStatus[],
+            roles: [
+                { name: 'Table' },
+                { name: 'Player' },
+            ] as CreateRole[],
+            hand_start_cards: [
+                {
+                    count_cards: 1,
+                    hidden: false,
+                    repeat: 1,
+                    deck: 0,
+                    role: 0,
+                }
+            ] as CreateHandStartCards[]
         }
     },
     getters: {
         getTeams: (state) => state.teams,
+        getStatus: (state) => state.status,
+        getRoles: (state) => state.roles,
     },
     actions: {
         addTeam() {
@@ -38,27 +54,43 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
             if (this.$state.teams.length > 1) {
                 this.$state.teams = this.$state.teams.filter((team, index) => index !== id);
             } else {
-                toast.error("Can't delete the last team");
+                toast.warning("Can't delete the last team");
             }
         },
         addRole() {
-            this.$state.roles.push({ name: '', description: '', max_players: 1 });
+            this.$state.roles.push({ name: '' });
         },
         deleteRole(id: number) {
-            if (this.$state.roles.length > 1) {
+            if (this.$state.roles.length > 3) {
                 this.$state.roles = this.$state.roles.filter((team, index) => index !== id);
             } else {
-                toast.error("Can't delete the last role");
+                toast.warning("Can't delete the default roles");
             }
         },
         addStatus() {
-            this.$state.status.push({ name: '', description: '' });
+            this.$state.status.push({ name: '' });
         },
         deleteStatus(id: number) {
             if (this.$state.status.length > 1) {
                 this.$state.status = this.$state.status.filter((team, index) => index !== id);
             } else {
-                toast.error("Can't delete the last status");
+                toast.warning("Can't delete the last status");
+            }
+        },
+        addHandStartCardsRow() {
+            this.$state.hand_start_cards.push({
+                count_cards: 1,
+                hidden: false,
+                repeat: 1,
+                deck: 0,
+                role: 0,
+            })
+        },
+        deleteHandStartCardsRow(id: number) {
+            if (this.$state.hand_start_cards.length > 1) {
+                this.$state.hand_start_cards = this.$state.hand_start_cards.filter((item, index) => index !== id);
+            } else {
+                toast.warning("Can't delete the last field of the table");
             }
         },
         validateExtraItems() {

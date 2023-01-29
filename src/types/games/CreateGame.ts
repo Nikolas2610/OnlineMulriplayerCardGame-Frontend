@@ -10,4 +10,5 @@ export default interface CreateGame {
     grid_cols: number;
     max_players: number;
     min_players: number;
+    hand_start_cards: boolean;
 }

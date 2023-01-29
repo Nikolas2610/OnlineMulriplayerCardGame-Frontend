@@ -26,7 +26,3 @@ watch(() => label.value,
     }
 );
 </script>
-
-<style scoped>
-
-</style>

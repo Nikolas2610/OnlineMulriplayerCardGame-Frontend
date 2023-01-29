@@ -16,67 +16,18 @@
                         <InputField class="text-white" :input="userStore.userRegister.username"
                             :errors="v$.username.$errors" :title="'Username'"
                             @change="(e) => userStore.userRegister.username = e" />
-                        <!-- <div>
-                            <label for="username" class="block text-sm font-medium text-white">Username</label>
-                            <div class="mt-1">
-                                <input id="username" type="text" v-model="registerUser.username"
-                                    class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                            </div> -->
-                        <!-- Username error messages -->
-                        <!-- <div v-for="error in v$.username.$errors" :key="error.$uid"
-                                class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{ error.$message }}
-                            </div>
-                        </div> -->
                         <!-- Email Input -->
                         <InputField class="text-white" :input="userStore.userRegister.email" :type="'email'"
                             :errors="v$.email.$errors" :title="'Email'"
                             @change="(e) => userStore.userRegister.email = e" />
-                        <!-- <div>
-                            <label for="email" class="block text-sm font-medium text-white">Email address</label>
-                            <div class="mt-1">
-                                <input id="email" type="email" v-model="registerUser.email"
-                                    class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                            </div>
-                            Email error messages
-                            <div v-for="error in v$.email.$errors" :key="error.$uid"
-                                class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{ error.$message }}
-                            </div>
-                        </div> -->
                         <!-- Password Input  -->
                         <InputField class="text-white" :input="userStore.userRegister.password" :type="'password'"
                             :errors="v$.password.$errors" :title="'Password'"
                             @change="(e) => userStore.userRegister.password = e" />
-                        <!-- <div>
-                            <label for="password" class="block text-sm font-medium text-white">Password</label>
-                            <div class="mt-1">
-                                <input id="password" type="password" v-model="registerUser.password"
-                                    class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                            </div> -->
-                            <!-- Password Error Messages -->
-                            <!-- <div v-for="error in v$.password.$errors" :key="error.$uid"
-                                class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{ error.$message }}
-                            </div>
-                        </div> -->
                         <!-- Confirm Password Input -->
                         <InputField class="text-white" :input="userStore.userRegister.confirmPassword" :type="'password'"
                             :errors="v$.confirmPassword.$errors" :title="'Confirm password'"
                             @change="(e) => userStore.userRegister.confirmPassword = e" />
-                        <!-- <div>
-                            <label for="confirmPassword" class="block text-sm font-medium text-white">Confirm
-                                Password</label>
-                            <div class="mt-1">
-                                <input id="confirmPassword" type="password" v-model="registerUser.confirmPassword"
-                                    class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm" />
-                            </div> -->
-                            <!-- Confirm Password error messages -->
-                            <!-- <div v-for="error in v$.confirmPassword.$errors" :key="error.$uid"
-                                class="text-rose-700 text-base font-medium mt-1 px-2">
-                                {{ error.$message }}
-                            </div>
-                        </div> -->
                         <!-- Submit Form -->
                         <div>
                             <div @click="register()"

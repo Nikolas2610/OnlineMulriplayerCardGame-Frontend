@@ -2,7 +2,7 @@
     <div>
         <div class="mt-1 flex">
             <!-- Checkbox Label -->
-            <label class="block text-sm font-medium mr-2">{{ title }}</label>
+            <label class="block text-sm font-medium mr-2" v-if="titleShow">{{ title }}</label>
             <input type="checkbox" v-model="label" @input="$emit('change', !label)" />
         </div>
         <!-- Password error messages -->
@@ -17,7 +17,8 @@ import { ref, onMounted } from 'vue';
 const props = defineProps({
     input: { type: Boolean, required: true },
     errors: { type: Object },
-    title: { type: String, required: true },
+    title: { type: String },
+    titleShow: { type: Boolean, default: true }
 });
 const emits = defineEmits(['change']);
 const label = ref<boolean>();
