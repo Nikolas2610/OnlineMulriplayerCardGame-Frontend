@@ -3,9 +3,9 @@
         <div class="" v-for="(item, index) in items" :key="index">
             <div class="flex items-center w-full gap-4">
                 <InputField :title="itemsTitle" :input="item.name" :disabled="disableItem(parseInt(index))"
-                @change="(value) => $emit('update', value, index)" />
+                    @change="(value) => $emit('update', value, index)" />
                 <button class="btn-delete mt-3" type="button" :disabled="disableItem(parseInt(index))"
-                 @click="$emit('deleteItem', index)">-</button>
+                    v-if="!disableItem(parseInt(index))" @click="$emit('deleteItem', index)">-</button>
             </div>
         </div>
     </div>

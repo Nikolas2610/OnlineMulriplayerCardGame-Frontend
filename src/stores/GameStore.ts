@@ -1,3 +1,5 @@
+import axiosUser from "@/plugins/axiosUser";
+import type { DeckReturn } from "@/types/decks/DeckReturn";
 import type CreateGame from "@/types/games/CreateGame";
 import type { CreateHandStartCards } from "@/types/games/CreateHandStartCards";
 import type CreateRole from "@/types/roles/CreateRole";
@@ -33,18 +35,21 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
             hand_start_cards: [
                 {
                     count_cards: 1,
-                    hidden: false,
-                    repeat: 1,
                     deck: 0,
                     role: 0,
+                    hidden: true,
+                    repeat: 1
                 }
-            ] as CreateHandStartCards[]
+            ] as CreateHandStartCards[],
+            decks: [] as DeckReturn[],
+            selectedDecks: [] as Array<number>
         }
     },
     getters: {
         getTeams: (state) => state.teams,
         getStatus: (state) => state.status,
         getRoles: (state) => state.roles,
+        validateEmptyDecks: (state) => state.selectedDecks.length !== 0
     },
     actions: {
         addTeam() {
@@ -120,6 +125,52 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
                 })
             }
             return !error ? true : false
+        },
+        async _submit() {
+            try {
+                const response = await axiosUser.post('game', {
+                    game: this.$state.game,
+                    roles: this.$state.roles,
+                    status: this.$state.status,
+                    teams: this.$state.teams,
+                    hand_start_cards: this.$state.hand_start_cards,
+                    decks: this.$state.selectedDecks
+                });
+                if (response.status === 201) {
+                    toast.success('Table create successfully');
+                    this.clearFormData();
+                }
+            } catch (error: any) {
+                toast.error(error)
+            }
+        },
+        clearFormData() {
+            this.$state.game.name = '';
+            this.$state.game.description = '';
+            this.$state.game.extra_roles = false;
+            this.$state.game.status_player = false;
+            this.$state.game.extra_teams = false;
+            this.$state.game.rank = false;
+            this.$state.game.private = false;
+            this.$state.game.grid_rows = 1;
+            this.$state.game.grid_cols = 1;
+            this.$state.game.max_players = 1;
+            this.$state.game.min_players = 1;
+            this.$state.game.hand_start_cards = false;
+            this.$state.roles = [
+                { name: 'Table' },
+                { name: 'Player' },
+            ];
+            this.$state.hand_start_cards = [{
+                count_cards: 1,
+                deck: 0,
+                role: 0,
+                hidden: true,
+                repeat: 1
+            }]
+            this.$state.status = [];
+            this.$state.teams = [];
+            this.$state.selectedDecks = [];
         }
     }
 })

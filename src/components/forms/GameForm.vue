@@ -3,29 +3,35 @@
         <div class="grid grid-cols-2" v-if="createGameStore.game">
             <div class="col-span-2">
                 <InputField :input="createGameStore.game.name" @change="(e) => createGameStore.game.name = e"
-                    :title="'Name'" />
+                    :title="'Name'" :errors="v$.name.$errors" />
             </div>
             <div class="col-span-1">
                 <InputField :input="createGameStore.game.min_players"
                     @change="(e) => createGameStore.game.min_players = e" :title="'Min Players'" :max="10" :min="1"
-                    :type="'number'" />
+                    :type="'number'" :errors="v$.min_players.$errors" />
             </div>
             <div class="col-span-1">
                 <InputField :input="createGameStore.game.max_players"
                     @change="(e) => createGameStore.game.max_players = e" :title="'Min Players'" :max="10" :min="1"
-                    :type="'number'" />
+                    :type="'number'" :errors="v$.max_players.$errors" />
             </div>
             <div class="col-span-1">
                 <InputField :input="createGameStore.game.grid_rows" @change="(e) => createGameStore.game.grid_rows = e"
-                    :title="'Grid Rows'" :max="10" :min="1" :type="'number'" />
+                    :title="'Grid Rows'" :max="10" :min="1" :type="'number'" :errors="v$.grid_rows.$errors" />
             </div>
             <div class="col-span-1">
                 <InputField :input="createGameStore.game.grid_cols" @change="(e) => createGameStore.game.grid_cols = e"
-                    :title="'Grid Columns'" :max="10" :min="1" :type="'number'" />
+                    :title="'Grid Columns'" :max="10" :min="1" :type="'number'" :errors="v$.grid_cols.$errors" />
             </div>
             <div class="col-span-2">
                 <TextAreaFiled :title="'Description'" :input="createGameStore.game.description"
                     @change="(e) => createGameStore.game.description = e" />
+            </div>
+            <div class="col-span-2" v-if="publicDecks.length > 0 || userDecks.length > 0">
+                <MultipleSelectField
+                    :public-decks="publicDecks.map((deck: DeckReturn) => ({ value: deck.id, label: deck.name }))"
+                    :user-decks="userDecks.map((deck: DeckReturn) => ({ value: deck.id, label: deck.name }))"
+                    :error="deckErrors" />
             </div>
             <div class="col-span-2">
                 <CheckBoxField :title="'Private'" :input="createGameStore.game.private" class="p-2"
@@ -67,10 +73,7 @@
                     @change="(e) => createGameStore.game.hand_start_cards = e" />
             </div>
             <div class="col-span-2">
-                <MultipleSelectField />
-            </div>
-            <div class="col-span-2">
-                <CreateHandStartCardsForm v-if="!createGameStore.game.hand_start_cards" />
+                <CreateHandStartCardsForm v-if="createGameStore.game.hand_start_cards" />
             </div>
         </div>
         <div class="flex justify-center mt-4">
@@ -88,24 +91,42 @@ import CheckBoxField from '../ui/CheckBoxField.vue';
 import TextAreaFiled from '../ui/TextAreaFiled.vue';
 import InputField from '@/components/ui/InputField.vue';
 import { useCreateGameStore } from '@/stores/GameStore'
-import { computed, watch } from 'vue';
-import { required } from '@vuelidate/validators';
+import { computed, watch, ref } from 'vue';
+import { required, numeric, minLength } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
+import axiosUser from '@/plugins/axiosUser';
+import { useUserStore } from '@/stores/UserStore';
+import type { DeckReturn } from "@/types/decks/DeckReturn";
 
 const createGameStore = useCreateGameStore();
-const validationGameRules = computed(() => {
+const emits = defineEmits(['submit'])
+const userStore = useUserStore();
+const deckErrors = ref<String | null>(null);
+const validationGameDetailsRules = computed(() => {
     return {
-        name: { required }
+        name: { required },
+        min_players: { required, numeric, minLength: minLength(1) },
+        max_players: { required, numeric, minLength: minLength(1) },
+        grid_rows: { required, numeric, minLength: minLength(1) },
+        grid_cols: { required, numeric, minLength: minLength(1) },
     }
 });
-const v$ = useVuelidate(validationGameRules, createGameStore.game);
+const publicDecks = ref<DeckReturn[]>([]);
+const userDecks = ref<DeckReturn[]>([]);
+const v$ = useVuelidate(validationGameDetailsRules, createGameStore.game);
 
-const submit = () => {
-    let validateExtraItems = createGameStore.validateExtraItems();
-    console.log(validateExtraItems);
+const submit = async () => {
+    const validateExtraItems = createGameStore.validateExtraItems();
+    const validateDecks = createGameStore.validateEmptyDecks;
+    v$.value.$validate()
+    
+    !validateDecks ? deckErrors.value = 'You have to choose at lease one deck' : deckErrors.value = null;
+    if (validateExtraItems && validateDecks && !v$.value.$error) {
+        emits('submit');
+    }
 }
 
-watch(() => createGameStore.game.extra_roles, 
+watch(() => createGameStore.game.extra_roles,
     (newVal) => {
         if (newVal) {
             createGameStore.addRole();
@@ -114,7 +135,7 @@ watch(() => createGameStore.game.extra_roles,
         }
     }
 )
-watch(() => createGameStore.game.extra_teams, 
+watch(() => createGameStore.game.extra_teams,
     (newVal) => {
         if (newVal) {
             createGameStore.addTeam();
@@ -123,7 +144,7 @@ watch(() => createGameStore.game.extra_teams,
         }
     }
 )
-watch(() => createGameStore.game.status_player, 
+watch(() => createGameStore.game.status_player,
     (newVal) => {
         if (newVal) {
             createGameStore.addStatus();
@@ -133,4 +154,41 @@ watch(() => createGameStore.game.status_player,
     }
 )
 
+const getDecks = async () => {
+    const { data: decks } = await axiosUser.get("deck/private-public");
+    createGameStore.decks = decks;
+    userDecks.value = decks.filter((deck: DeckReturn) => deck.creator === userStore.user.username);
+    publicDecks.value = decks.filter((deck: DeckReturn) => deck.creator !== userStore.user.username);
+};
+
+getDecks();
 </script>
+
+<style>
+.multiselect-tag.is-user {
+    padding: 5px 8px;
+    border-radius: 22px;
+    background: #35495e;
+    margin: 3px 3px 8px;
+}
+
+.multiselect-tag.is-user img {
+    width: 18px;
+    border-radius: 50%;
+    height: 18px;
+    margin-right: 8px;
+    border: 2px solid #ffffffbf;
+}
+
+.multiselect-tag.is-user i:before {
+    color: #ffffff;
+    border-radius: 50%;
+    ;
+}
+
+.user-image {
+    margin: 0 6px 0 0;
+    border-radius: 50%;
+    height: 22px;
+}
+</style>
