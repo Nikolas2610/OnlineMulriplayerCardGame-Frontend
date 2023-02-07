@@ -2,9 +2,9 @@ import axiosUser from "@/plugins/axiosUser";
 import type { DeckReturn } from "@/types/decks/DeckReturn";
 import type CreateGame from "@/types/games/CreateGame";
 import type { CreateHandStartCards } from "@/types/games/CreateHandStartCards";
-import type CreateRole from "@/types/roles/CreateRole";
-import type CreateStatus from "@/types/status/CreateStatus";
-import type CreateTeam from "@/types/teams/CreateTeam";
+import type CreateRole from "@/types/games/relations/roles/CreateRole";
+import type CreateStatus from "@/types/games/relations/status/CreateStatus";
+import type CreateTeam from "@/types/games/relations/teams/CreateTeam";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 const toast = useToast();
@@ -42,7 +42,18 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
                 }
             ] as CreateHandStartCards[],
             decks: [] as DeckReturn[],
-            selectedDecks: [] as Array<number>
+            selectedDecks: [] as Array<number>, 
+            loading: false,
+            editGame: {
+                edit: false,
+                game: {
+
+                }
+            }, 
+            stepForm: {
+                value: 1, 
+                loading: false
+            }
         }
     },
     getters: {

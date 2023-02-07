@@ -1,6 +1,6 @@
 <template>
     <label class="block text-sm font-medium mb-1">Game</label>
-    <Multiselect v-model="selectedGame" mode="single" :close-on-select="true" :searchable="true" :create-option="true"
+    <Multiselect v-model="selectedGame" mode="tag" :close-on-select="true" :searchable="true" :create-option="true"
         :groups="true" :options="options" @change="$emit('update', selectedGame)" />
     <div v-for="error in errors" :key="error.$uid" class="text-rose-700 text-base font-medium mt-1 px-2">
         {{ error.$message }}

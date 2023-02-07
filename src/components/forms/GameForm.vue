@@ -1,5 +1,5 @@
 <template>
-    <form class="mt-10 px-4 py-8" @submit.prevent="submit">
+    <form class="mt-10 px-4 py-8" @submit.prevent="submit" v-if="true">
         <div class="grid grid-cols-2" v-if="createGameStore.game">
             <div class="col-span-2">
                 <InputField :input="createGameStore.game.name" @change="(e) => createGameStore.game.name = e"
@@ -80,9 +80,20 @@
             <button class="btn-green" type="submit">Submit</button>
         </div>
     </form>
+    <form class="mt-10 px-4 py-8" @submit.prevent="submit">
+        <StepForm :active-item="createGameStore.stepForm.value" @decrease="(value) => createGameStore.stepForm.value = value"
+            @increase="(value) => createGameStore.stepForm.value = value">
+            <div v-if="createGameStore.stepForm.value === 1">Form 1</div>
+            <div v-if="createGameStore.stepForm.value === 2">Form 2</div>
+            <div v-if="createGameStore.stepForm.value === 3">Form 3</div>
+            <div v-if="createGameStore.stepForm.value === 4">Form 4</div>
+            <div v-if="createGameStore.stepForm.value === 5">Form 5</div>
+        </StepForm>
+    </form>
 </template>
 
 <script setup lang="ts">
+import StepForm from '../wrappers/StepForm.vue';
 import MultipleSelectField from '../ui/MultipleSelectField.vue';
 import CreateHandStartCardsForm from './CreateHandStartCardsForm.vue';
 import MoreItems from './MoreItems.vue';
@@ -119,7 +130,7 @@ const submit = async () => {
     const validateExtraItems = createGameStore.validateExtraItems();
     const validateDecks = createGameStore.validateEmptyDecks;
     v$.value.$validate()
-    
+
     !validateDecks ? deckErrors.value = 'You have to choose at lease one deck' : deckErrors.value = null;
     if (validateExtraItems && validateDecks && !v$.value.$error) {
         emits('submit');

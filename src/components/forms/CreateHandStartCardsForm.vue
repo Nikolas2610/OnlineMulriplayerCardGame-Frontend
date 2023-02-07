@@ -7,7 +7,8 @@
                         <table class="min-w-full divide-y table-fixed divide-gray-700">
                             <thead class="bg-gray-700">
                                 <tr>
-                                    <th scope="col" v-for="(title, index) in tablesFields" :key="index" :class="`w-${widthColumns[index]}/12`"
+                                    <th scope="col" v-for="(title, index) in tablesFields" :key="index"
+                                        :class="`w-${widthColumns[index]}/12`"
                                         class="py-3 px-6 text-xs font-medium tracking-wider text-left uppercase text-gray-400">
                                         {{ title }}
                                     </th>
@@ -20,12 +21,12 @@
                                 <tr class="hover:bg-gray-700" v-for="(item, index) in createGameStore.hand_start_cards"
                                     :key="`start_cards_${index}`">
                                     <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                        <SelectField :input="createGameStore.game.extra_roles ?
+                                        <SelectField :options="createGameStore.game.extra_roles ?
                                         roles.map((role, index) => ({ id: index, name: role.name }))
-                                        : defaultRoles" :disable="roles.length === 0" />
+                                        : defaultRoles" :disable="roles.length === 0" :dark="true" />
                                     </td>
                                     <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                        <SelectField :input="decks" :disable="decks.length === 0" />
+                                        <SelectField :options="decks" :disable="decks.length === 0" :dark="true" />
                                     </td>
                                     <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                         <CheckBoxField :title-show="false" :input="item.hidden" />
