@@ -105,7 +105,6 @@ import { useGameStore } from '@/stores/GameStore';
 import PreLoader from '@/components/PreLoader.vue';
 import GameForm from '@/components/forms/GameForm.vue';
 import Flex from '@/components/wrappers/Flex.vue';
-import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import BackButton from '@/components/buttons/BackButton.vue'
 
 const gameStore = useGameStore();
