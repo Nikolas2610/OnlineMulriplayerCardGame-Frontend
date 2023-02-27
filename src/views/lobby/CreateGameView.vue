@@ -12,6 +12,18 @@ import { useCreateGameStore } from '@/stores/GameStore';
 
 const createGameStore = useCreateGameStore();
 const createGame = () => {
-    createGameStore._submit();
+    if (createGameStore.stepForm.change[createGameStore.stepForm.value - 1]) {
+        console.log("continue");
+        createGameStore.stepForm.submitted[createGameStore.stepForm.value - 1] ?
+            createGameStore._update() : createGameStore._submit();
+    } else {
+        createGameStore.stepForm.value++
+        console.log(createGameStore.stepForm.value);
+        
+        console.log("no continue");
+    }
+}
+if (!createGameStore.stepForm.submitted[0]) {
+    createGameStore.clearFormData();
 }
 </script>

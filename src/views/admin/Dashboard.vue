@@ -9,10 +9,14 @@
 <script lang="ts" setup>
 import SideBar from '@/components/SideBar.vue';
 import { useUserStore } from '@/stores/UserStore';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onUnmounted } from 'vue';
 import router from '@/router';
 import type MenuItem from '@/types/MenuItem';
+import { useCreateGameStore } from '@/stores/GameStore'
+import { useTableStore } from '@/stores/TableStore'
 
+const gameStore = useCreateGameStore();
+const tableStore = useTableStore();
 const userStore = useUserStore();
 
 // Menu list items
@@ -32,8 +36,9 @@ onMounted(() => {
     }
 })
 
+onUnmounted(() => {
+    gameStore.unMountedDashboard();
+    tableStore.unMountedDashboard();
+})
+
 </script>
-
-<style scoped>
-
-</style>

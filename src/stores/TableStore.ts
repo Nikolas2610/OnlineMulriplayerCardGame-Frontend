@@ -111,6 +111,10 @@ export const useTableStore = defineStore('TableStore', {
                 this.toggleLoading();
                 toast.error(error)
             }
+        }, 
+        unMountedDashboard() {
+            this.$state.games = [];
+            this.$state.tables = [];
         }
     }
 })

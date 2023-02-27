@@ -8,16 +8,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, type PropType } from 'vue';
+
+export interface SelectOptions {
+    id: number;
+    name: string;
+}
 
 const props = defineProps({
-    options: { type: Array<{ id: number | string, name: string }>, required: true },
+    options: { type: Array as PropType<SelectOptions[] | undefined>, required: true },
     disable: { type: Boolean, default: false },
     titleShow: { type: Boolean, default: true },
     title: { type: String },
     input: { type: Object, default: null },
     dark: { type: Boolean, default: false }
 });
+
 const emits = defineEmits(['update'])
 const selectValue = ref();
 if (props.input) {

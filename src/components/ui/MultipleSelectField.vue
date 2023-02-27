@@ -1,6 +1,6 @@
 <template>
     <label class="block text-sm font-medium mb-1">Decks</label>
-    <Multiselect v-model="createGameStore.selectedDecks" mode="tags" :close-on-select="false" :searchable="true"
+    <Multiselect v-model="createGameStore.createGame.selectedDecks" mode="tags" :close-on-select="false" :searchable="true" @change="createGameStore.stepFormChange()"
         :create-option="true" :groups="true" :options="options" />
     <div class="text-rose-700 text-base font-medium mt-1 px-2" v-if="errorMessage">
         {{ errorMessage }}
@@ -19,7 +19,7 @@ const props = defineProps({
     error: { Type: String || null, required: false }
 })
 const errorMessage = ref(props.error);
-const submited = ref(false);
+const submitted = ref(false);
 
 const options = ref([
     {
@@ -31,13 +31,13 @@ const options = ref([
         options: props.publicDecks,
     },
 ])
-watch(() => createGameStore.selectedDecks,
+watch(() => createGameStore.createGame.selectedDecks,
     () => {
         if (errorMessage.value) {
             errorMessage.value = null;
             return
         }
-        if (submited.value && !createGameStore.validateEmptyDecks) {
+        if (submitted.value && !createGameStore.validateEmptyDecks) {
             errorMessage.value = 'You have to choose at lease one deck'
         }
 
@@ -45,7 +45,7 @@ watch(() => createGameStore.selectedDecks,
 watch(() => props.error,
     () => {
         errorMessage.value = props.error
-        submited.value = true;
+        submitted.value = true;
     })
 </script>
 

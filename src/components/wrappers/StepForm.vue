@@ -9,8 +9,8 @@
     <Flex :justify="'between'" :gap="8" class="mt-10">
         <PrimaryButton :title="'Previous'" :disable="activeItem === 1"
             @click="activeItem > 1 ? $emit('decrease', activeItem - 1) : ''" />
-        <PrimaryButton :title="'Next'" :disable="activeItem === items.length"
-            @click="activeItem !== items.length ? $emit('increase', activeItem + 1) : ''" />
+        <PrimaryButton :title="activeItem !== items.length ? 'Next' : 'Submit'"
+            :type="'submit'" :loading="loading" />
     </Flex>
 </template>
 
@@ -20,14 +20,13 @@ import Flex from './Flex.vue';
 import { ref } from 'vue';
 import StepFormItem from './StepFormItem.vue';
 const props = defineProps({
-    activeItem: { type: Number, require: true, default: 1 }
+    activeItem: { type: Number, require: true, default: 1 },
+    loading: { type: Boolean, default: false }
 });
 const emits = defineEmits(['increase', 'decrease'])
 const items = ref([
-    { index: 1, title: 'Create Game' },
-    { index: 2, title: 'Add Teams' },
-    { index: 3, title: 'Add Status' },
-    { index: 4, title: 'Add Roles' },
-    { index: 5, title: 'Starting Cards' },
+    { index: 1, title: 'Game' },
+    { index: 2, title: 'More Settings' },
+    { index: 3, title: 'Starting Cards' },
 ]);
 </script>

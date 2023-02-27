@@ -18,7 +18,7 @@
 <script setup lang="ts">
 const props = defineProps({
     type: { type: String, default: 'button' },
-    width: { type: String, default: '40' },
+    width: { type: String, default: '52' },
     title: { type: String, required: true },
     loading: { type: Boolean, default: false },
     disable: { type: Boolean, default: false }

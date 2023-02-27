@@ -1,40 +1,50 @@
 <template>
-    <div class="col-span-2 p-2" v-if="label" :class="label ? 'border border-primary rounded-b' : ''">
-        <div class="" v-for="(item, index) in items" :key="index">
-            <div class="flex items-center w-full gap-4">
-                <InputField :title="itemsTitle" :input="item.name" :disabled="disableItem(parseInt(index))"
-                    @change="(value) => $emit('update', value, index)" />
-                <button class="btn-delete mt-3" type="button" :disabled="disableItem(parseInt(index))"
-                    v-if="!disableItem(parseInt(index))" @click="$emit('deleteItem', index)">-</button>
-            </div>
+    <SubTitle class="mt-8">
+        {{ title }}
+        <template v-slot:button>
+            <PrimaryButton :title="buttonTitle" @click="$emit('addItem'); gameStore.stepFormChange();"></PrimaryButton>
+        </template>
+    </SubTitle>
+
+    <Flex class="mt-4" :items="'center'" :justify="'center'" :gap="4" v-for="(item, index) in items" :key="index"
+        v-if="items.length > 0">
+        <div class="w-11/12">
+            <InputField :title="itemsTitle" :input="item.name" :disabled="disableItem(index)"
+                @change="(value) => $emit('update', value, index)" />
         </div>
-    </div>
+        <div class="w-1/12 text-right">
+            <RemoveButton v-if="!disableItem(index)" @click="$emit('deleteItem', index); gameStore.stepFormChange();"
+                class="mt-4" />
+        </div>
+    </Flex>
+
+    <Alert class="my-8" v-else>
+        {{ message }}
+    </Alert>
 </template>
 
 <script setup lang="ts">
 import InputField from '@/components/ui/InputField.vue';
-import { ref, onMounted, watch } from 'vue';
+import { useCreateGameStore } from '@/stores/GameStore';
+import PrimaryButton from '../buttons/PrimaryButton.vue';
+import RemoveButton from '../buttons/RemoveButton.vue';
+import SubTitle from '../SubTitle.vue';
+import Alert from '../ui/Alert.vue';
+import Flex from '../wrappers/Flex.vue';
+
 const props = defineProps({
-    input: { type: Boolean, required: true },
     errors: { type: Object },
-    items: { type: Object, required: true },
+    items: { type: Array<{ name: string }>, required: true },
     itemsTitle: { type: String, required: true },
-    disabledItems: { type: Boolean, default: false }
+    disabledItems: { type: Boolean, default: false },
+    title: { type: String },
+    message: { type: String },
+    buttonTitle: { type: String, required: true },
 });
-const emits = defineEmits(['deleteItem', 'update']);
-const label = ref<boolean>(false);
 
-onMounted(() => {
-    label.value = props.input;
-})
-
+const gameStore = useCreateGameStore();
+const emits = defineEmits(['deleteItem', 'update', 'addItem']);
 const disableItem = (index: number) => {
     return props.disabledItems && (index === 0 || index === 1);
 }
-
-watch(() => props.input,
-    (newVal) => {
-        label.value = newVal;
-    }
-);
 </script>
