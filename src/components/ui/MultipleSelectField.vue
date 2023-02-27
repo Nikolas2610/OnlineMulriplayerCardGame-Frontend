@@ -1,6 +1,6 @@
 <template>
     <label class="block text-sm font-medium mb-1">Decks</label>
-    <Multiselect v-model="createGameStore.createGame.selectedDecks" mode="tags" :close-on-select="false" :searchable="true" @change="createGameStore.stepFormChange()"
+    <Multiselect v-model="gameStore.createGame.selectedDecks" mode="tags" :close-on-select="false" :searchable="true" @change="gameStore.stepFormChange()"
         :create-option="true" :groups="true" :options="options" />
     <div class="text-rose-700 text-base font-medium mt-1 px-2" v-if="errorMessage">
         {{ errorMessage }}
@@ -8,11 +8,11 @@
 </template>
 
 <script setup lang="ts">
-import { useCreateGameStore } from '@/stores/GameStore';
+import { useGameStore } from '@/stores/GameStore';
 import Multiselect from '@vueform/multiselect'
 import { ref, watch } from 'vue';
 
-const createGameStore = useCreateGameStore();
+const gameStore = useGameStore();
 const props = defineProps({
     publicDecks: { type: Array, require: true },
     userDecks: { type: Array, require: true },
@@ -31,13 +31,13 @@ const options = ref([
         options: props.publicDecks,
     },
 ])
-watch(() => createGameStore.createGame.selectedDecks,
+watch(() => gameStore.createGame.selectedDecks,
     () => {
         if (errorMessage.value) {
             errorMessage.value = null;
             return
         }
-        if (submitted.value && !createGameStore.validateEmptyDecks) {
+        if (submitted.value && !gameStore.validateEmptyDecks) {
             errorMessage.value = 'You have to choose at lease one deck'
         }
 

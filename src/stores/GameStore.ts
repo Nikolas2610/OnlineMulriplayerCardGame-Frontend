@@ -25,7 +25,7 @@ const defaultGame = {
     min_players: 1,
 } as Game;
 
-export const useCreateGameStore = defineStore("CreateGameStore", {
+export const useGameStore = defineStore("GameStore", {
     state: () => {
         return {
             loading: false,
@@ -140,7 +140,7 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
             this.$state.createGame.teams.push({ name: '' });
         },
         deleteTeam(id: number) {
-            if (this.$state.createGame.teams.length > 0) {
+            if (this.$state.createGame.teams.length) {
                 this.$state.createGame.teams = this.$state.createGame.teams.filter((team, index) => index !== id);
             }
         },
@@ -156,7 +156,7 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
             this.$state.createGame.status.push({ name: '' });
         },
         deleteStatus(id: number) {
-            if (this.$state.createGame.status.length > 0) {
+            if (this.$state.createGame.status.length) {
                 this.$state.createGame.status = this.$state.createGame.status.filter((team, index) => index !== id);
             }
         },
@@ -170,10 +170,8 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
             })
         },
         deleteHandStartCardsRow(id: number) {
-            if (this.$state.createGame.hand_start_cards.length > 1) {
+            if (this.$state.createGame.hand_start_cards) {
                 this.$state.createGame.hand_start_cards = this.$state.createGame.hand_start_cards.filter((item, index) => index !== id);
-            } else {
-                toast.warning("Can't delete the last field of the table");
             }
         },
         validateMoreSettings() {
@@ -277,8 +275,6 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
                         this.$state.stepForm.loading = false;
                         break;
                     case 2:
-                        console.log("here");
-
                         const moreSettingsResponse: AxiosResponse = await axiosUser.patch('game/more-settings', {
                             game: this.$state.createGame.game,
                             roles: this.$state.createGame.roles,
@@ -318,7 +314,6 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
             }
         },
         async _delete(id: number | null) {
-            console.log("delete2")
             if (!id) {
                 toast.error('Something went wrong. Please try again later');
                 return
@@ -330,7 +325,6 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
                         game_id: id
                     }
                 });
-                console.log(response)
                 if (response.data.affected === 1) { // Success delete
                     toast.success('Game deleted successfully');
                     this.fetchGames()
@@ -378,5 +372,5 @@ export const useCreateGameStore = defineStore("CreateGameStore", {
 
 // Update Store without refresh page
 if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useCreateGameStore, import.meta.hot))
+    import.meta.hot.accept(acceptHMRUpdate(useGameStore, import.meta.hot))
 }

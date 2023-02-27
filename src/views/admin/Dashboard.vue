@@ -12,10 +12,10 @@ import { useUserStore } from '@/stores/UserStore';
 import { onMounted, ref, onUnmounted } from 'vue';
 import router from '@/router';
 import type MenuItem from '@/types/MenuItem';
-import { useCreateGameStore } from '@/stores/GameStore'
+import { useGameStore } from '@/stores/GameStore'
 import { useTableStore } from '@/stores/TableStore'
 
-const gameStore = useCreateGameStore();
+const gameStore = useGameStore();
 const tableStore = useTableStore();
 const userStore = useUserStore();
 
@@ -31,7 +31,6 @@ const menuItems = ref<MenuItem[]>([
 
 onMounted(() => {
     if (!userStore.isAdmin) {
-        console.log('redirect');
         router.push({ name: 'home' })
     }
 })

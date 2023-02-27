@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import InputField from '@/components/ui/InputField.vue';
-import { useCreateGameStore } from '@/stores/GameStore';
+import { useGameStore } from '@/stores/GameStore';
 import PrimaryButton from '../buttons/PrimaryButton.vue';
 import RemoveButton from '../buttons/RemoveButton.vue';
 import SubTitle from '../SubTitle.vue';
@@ -42,7 +42,7 @@ const props = defineProps({
     buttonTitle: { type: String, required: true },
 });
 
-const gameStore = useCreateGameStore();
+const gameStore = useGameStore();
 const emits = defineEmits(['deleteItem', 'update', 'addItem']);
 const disableItem = (index: number) => {
     return props.disabledItems && (index === 0 || index === 1);

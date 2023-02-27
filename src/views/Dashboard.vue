@@ -10,10 +10,10 @@
 import Sidebar from '@/components/SideBar.vue'
 import type MenuItem from '@/types/MenuItem';
 import { ref, onUnmounted } from 'vue';
-import { useCreateGameStore } from '@/stores/GameStore'
+import { useGameStore } from '@/stores/GameStore'
 import { useTableStore } from '@/stores/TableStore'
 
-const gameStore = useCreateGameStore();
+const gameStore = useGameStore();
 const tableStore = useTableStore();
 // Menu list items
 const menuItems = ref<MenuItem[]>([

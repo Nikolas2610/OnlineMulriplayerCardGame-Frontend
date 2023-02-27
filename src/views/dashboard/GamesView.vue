@@ -63,8 +63,11 @@
         </div>
 
         <div v-else>
-            <button @click="closeEditGame()">Back</button>
-            <MyTitle>Edit Game</MyTitle>
+            <Flex :justify="'between'">                
+                <MyTitle>Edit Game</MyTitle>
+                <BackButton :title="'Back to Games'" @click="closeEditGame()"></BackButton>
+            </Flex>
+
             <GameForm @submit="updateGame()" />
         </div>
     </div>
@@ -94,19 +97,18 @@
 
 <script setup lang="ts">
 import MyTitle from '@/components/MyTitle.vue';
-import axiosUser from '@/plugins/axiosUser';
-import type { AxiosResponse } from 'axios';
 import { onMounted, ref } from 'vue';
-import type Game from '@/types/games/Game'
 import Modal from '@/components/Modal.vue';
-import { useToast } from "vue-toastification";
 import { useUserStore } from '@/stores/UserStore';
 import { useRoute } from 'vue-router';
-import { useCreateGameStore } from '@/stores/GameStore';
+import { useGameStore } from '@/stores/GameStore';
 import PreLoader from '@/components/PreLoader.vue';
 import GameForm from '@/components/forms/GameForm.vue';
+import Flex from '@/components/wrappers/Flex.vue';
+import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
+import BackButton from '@/components/buttons/BackButton.vue'
 
-const gameStore = useCreateGameStore();
+const gameStore = useGameStore();
 const route = useRoute()
 const userStore = useUserStore();
 const role = ref<string | null>('user');
@@ -138,7 +140,6 @@ const openDeleteModal = (id: number) => {
 }
 // Axios call to delete a game to database
 const deleteGame = async () => {
-    console.log("delete")
     gameStore._delete(selectedGameId.value).finally(() => {
         isDeleteModalOpen.value = false; // Close Modal
     })

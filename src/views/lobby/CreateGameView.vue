@@ -8,22 +8,18 @@
 <script setup lang="ts">
 import MyTitle from '@/components/MyTitle.vue';
 import GameForm from '@/components/forms/GameForm.vue';
-import { useCreateGameStore } from '@/stores/GameStore';
+import { useGameStore } from '@/stores/GameStore';
 
-const createGameStore = useCreateGameStore();
+const gameStore = useGameStore();
 const createGame = () => {
-    if (createGameStore.stepForm.change[createGameStore.stepForm.value - 1]) {
-        console.log("continue");
-        createGameStore.stepForm.submitted[createGameStore.stepForm.value - 1] ?
-            createGameStore._update() : createGameStore._submit();
+    if (gameStore.stepForm.change[gameStore.stepForm.value - 1]) {
+        gameStore.stepForm.submitted[gameStore.stepForm.value - 1] ?
+            gameStore._update() : gameStore._submit();
     } else {
-        createGameStore.stepForm.value++
-        console.log(createGameStore.stepForm.value);
-        
-        console.log("no continue");
+        gameStore.stepForm.value++
     }
 }
-if (!createGameStore.stepForm.submitted[0]) {
-    createGameStore.clearFormData();
+if (!gameStore.stepForm.submitted[0]) {
+    gameStore.clearFormData();
 }
 </script>

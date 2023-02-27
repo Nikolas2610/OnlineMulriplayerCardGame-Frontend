@@ -4,7 +4,8 @@
             <div class="overflow-x-auto shadow-md sm:rounded-lg">
                 <div class="inline-block min-w-full align-middle">
                     <div class="overflow-hidden ">
-                        <table class="min-w-full divide-y table-fixed divide-gray-700">
+                        <table class="min-w-full divide-y table-fixed divide-gray-700"
+                            v-if="gameStore.createGame.hand_start_cards.length !== 0">
                             <thead class="bg-gray-700">
                                 <tr>
                                     <th scope="col" v-for="(title, index) in tablesFields" :key="index"
@@ -18,45 +19,52 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y bg-dark divide-gray-700">
-                                <tr class="hover:bg-gray-700"
-                                    v-for="(item, index) in createGameStore.createGame.hand_start_cards"
+                                <tr class="hover:bg-gray-700" v-for="(item, index) in gameStore.createGame.hand_start_cards"
                                     :key="`start_cards_${index}`">
                                     <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                         <SelectField
-                                            :options="createGameStore.createGame.game.roles?.map((role, index) => ({ id: index, name: role.name }))"
-                                            @update="(value) => { createGameStore.createGame.hand_start_cards[index].role = value; createGameStore.stepFormChange() }"
-                                            :input="{ value: createGameStore.createGame.hand_start_cards[index].role }" />
+                                            :options="gameStore.createGame.game.roles?.map((role, index) => ({ id: index, name: role.name }))"
+                                            @update="(value) => { gameStore.createGame.hand_start_cards[index].role = value; gameStore.stepFormChange() }"
+                                            :input="{ value: gameStore.createGame.hand_start_cards[index].role }" />
                                     </td>
                                     <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                         <SelectField
-                                            :options="createGameStore.createGame.game.deck?.map((deck, index) => ({ id: index, name: deck.name }))"
+                                            :options="gameStore.createGame.game.deck?.map((deck, index) => ({ id: index, name: deck.name }))"
                                             :disable="decks.length === 0" :dark="true"
-                                            @update="(value) => { createGameStore.createGame.hand_start_cards[index].deck = value; createGameStore.stepFormChange() }"
-                                            :input="{ value: createGameStore.createGame.hand_start_cards[index].deck }" />
+                                            @update="(value) => { gameStore.createGame.hand_start_cards[index].deck = value; gameStore.stepFormChange() }"
+                                            :input="{ value: gameStore.createGame.hand_start_cards[index].deck }" />
                                     </td>
                                     <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                         <CheckBoxField :title-show="false" :input="item.hidden"
-                                            @change="(value) => { createGameStore.createGame.hand_start_cards[index].hidden = value; createGameStore.stepFormChange() }" />
+                                            @change="(value) => { gameStore.createGame.hand_start_cards[index].hidden = value; gameStore.stepFormChange() }" />
                                     </td>
                                     <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                         <InputField :title-show="false" :input="item.count_cards" :type="'number'" :min="1"
-                                            @change="(value) => { item.count_cards = value; createGameStore.stepFormChange() }" />
+                                            @change="(value) => { item.count_cards = value; gameStore.stepFormChange() }" />
                                     </td>
                                     <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                         <InputField :title-show="false" :input="item.repeat" :type="'number'" :min="1"
-                                            @change="(value) => { item.repeat = value; createGameStore.stepFormChange() }" />
+                                            @change="(value) => { item.repeat = value; gameStore.stepFormChange() }" />
                                     </td>
                                     <td class="py-4 px-6 text-sm font-medium text-right whitespace-nowrap mb-2">
                                         <Flex :gap="2">
                                             <AddButton
-                                                @click="{ createGameStore.addHandStartCardsRow(); createGameStore.stepFormChange() }" />
+                                                @click="{ gameStore.addHandStartCardsRow(); gameStore.stepFormChange() }" />
                                             <RemoveButton
-                                                @click="{ createGameStore.deleteHandStartCardsRow(index); createGameStore.stepFormChange() }" />
+                                                @click="{ gameStore.deleteHandStartCardsRow(index); gameStore.stepFormChange() }" />
                                         </Flex>
                                     </td>
                                 </tr>
                             </tbody>
+
                         </table>
+                        <div class="bg-dark p-4 text-center w-full text-white" v-else>
+                            <div class="p-2 shadow-lg">No rules. <span class="underline cursor-pointer hover:text-primary"
+                                    @click="{ gameStore.addHandStartCardsRow(); gameStore.stepFormChange() }">
+                                    Click here to add a role
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -66,7 +74,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { useCreateGameStore } from '@/stores/GameStore'
+import { useGameStore } from '@/stores/GameStore'
 import InputField from '@/components/ui/InputField.vue';
 import SelectField from '../ui/SelectField.vue';
 import CheckBoxField from '../ui/CheckBoxField.vue';
@@ -75,14 +83,14 @@ import AddButton from '../buttons/AddButton.vue';
 import RemoveButton from '../buttons/RemoveButton.vue';
 import Flex from '../wrappers/Flex.vue';
 
-const createGameStore = useCreateGameStore();
+const gameStore = useGameStore();
 const tablesFields = ref([
     'ROLE', 'DECK', 'HIDDEN', 'CARDS', 'REPEAT TIMES'
 ]);
 const widthColumns = ref([
     '3', '3', '1', '2', '2'
 ])
-const roles = ref(createGameStore.getRoles);
+const roles = ref(gameStore.getRoles);
 const decks = ref<DeckReturn[]>([]);
 
 const defaultRoles = ref([
@@ -90,12 +98,12 @@ const defaultRoles = ref([
     { id: 1, name: 'Player' },
 ])
 const getSelectedDecks = () => {
-    decks.value = createGameStore.decks.filter((deck: DeckReturn) => {
-        return createGameStore.createGame.selectedDecks.includes(deck.id);
+    decks.value = gameStore.decks.filter((deck: DeckReturn) => {
+        return gameStore.createGame.selectedDecks.includes(deck.id);
     });
 }
 
-watch(() => createGameStore.createGame.selectedDecks,
+watch(() => gameStore.createGame.selectedDecks,
     () => {
         getSelectedDecks();
     })
