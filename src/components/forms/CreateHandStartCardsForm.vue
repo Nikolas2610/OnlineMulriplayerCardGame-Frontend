@@ -90,13 +90,8 @@ const tablesFields = ref([
 const widthColumns = ref([
     '3', '3', '1', '2', '2'
 ])
-const roles = ref(gameStore.getRoles);
 const decks = ref<DeckReturn[]>([]);
 
-const defaultRoles = ref([
-    { id: 0, name: 'Table' },
-    { id: 1, name: 'Player' },
-])
 const getSelectedDecks = () => {
     decks.value = gameStore.decks.filter((deck: DeckReturn) => {
         return gameStore.createGame.selectedDecks.includes(deck.id);

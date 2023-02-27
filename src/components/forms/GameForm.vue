@@ -86,7 +86,6 @@ import { useGameStore } from '@/stores/GameStore'
 import { computed, ref } from 'vue';
 import { required, numeric, minLength } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
-import axiosUser from '@/plugins/axiosUser';
 import { useUserStore } from '@/stores/UserStore';
 import type { DeckReturn } from "@/types/decks/DeckReturn";
 import GridCol from '../wrappers/GridCol.vue';
@@ -135,11 +134,6 @@ const submit = async () => {
     }
 }
 
-const getDecks = async () => {
-    const { data: decks } = await axiosUser.get("deck/private-public");
-    gameStore.decks = decks;
-
-};
 gameStore.fetchDecks().then(decks => {
     userDecks.value = decks.filter((deck: DeckReturn) => deck.creator === userStore.user.username);
     publicDecks.value = decks.filter((deck: DeckReturn) => deck.creator !== userStore.user.username);
