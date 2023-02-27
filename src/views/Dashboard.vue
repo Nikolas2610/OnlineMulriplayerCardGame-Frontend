@@ -9,8 +9,12 @@
 <script setup lang="ts">
 import Sidebar from '@/components/SideBar.vue'
 import type MenuItem from '@/types/MenuItem';
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
+import { useGameStore } from '@/stores/GameStore'
+import { useTableStore } from '@/stores/TableStore'
 
+const gameStore = useGameStore();
+const tableStore = useTableStore();
 // Menu list items
 const menuItems = ref<MenuItem[]>([
     { name: 'Dashboard', icon: '/src/assets/icons/sidebar/dashboard.svg', router: 'overview' },
@@ -21,8 +25,11 @@ const menuItems = ref<MenuItem[]>([
     { name: 'Settings', icon: '/src/assets/icons/sidebar/settings.svg', router: 'settings' },
 ])
 
+onUnmounted(() => {
+    gameStore.unMountedDashboard();
+    tableStore.unMountedDashboard();
+})
+
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

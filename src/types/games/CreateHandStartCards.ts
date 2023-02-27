@@ -1,8 +1,6 @@
-import type Deck from "../decks/Deck";
-
 export interface CreateHandStartCards {
     count_cards: number;
-    hidden: false;
+    hidden: boolean;
     repeat: number;
     deck: number;
     role: number;

@@ -1,14 +1,32 @@
 <template>
-    <select id="countries"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        <option :value="item.id" v-for="(item, index) in input" :key="index">{{ item.name }}</option>
+    <label class="block text-sm font-medium" v-if="titleShow">{{ title }}</label>
+    <select id="countries" :disabled="disable" v-model="selectValue" @change="$emit('update', selectValue)"
+        class="border border-gray-300 file:after:text-sm rounded-md focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
+        :class="dark ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500' : 'bg-gray-50  text-gray-900'">
+        <option :value="item.id" v-for="(item, index) in options" :key="index">{{ item.name }}</option>
     </select>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { ref, type PropType } from 'vue';
+
+export interface SelectOptions {
+    id: number;
+    name: string;
+}
 
 const props = defineProps({
-    input: { type: Array<{ id: number, name: string }>, required: true },
+    options: { type: Array as PropType<SelectOptions[] | undefined>, required: true },
+    disable: { type: Boolean, default: false },
+    titleShow: { type: Boolean, default: true },
+    title: { type: String },
+    input: { type: Object, default: null },
+    dark: { type: Boolean, default: false }
 });
+
+const emits = defineEmits(['update'])
+const selectValue = ref();
+if (props.input) {
+    selectValue.value = props.input.value
+}
 </script>
