@@ -1,5 +1,5 @@
 <template>
-    <form class="mt-10 px-4 py-8" @submit.prevent="submit" v-if="!tableStore.loadingStatus">
+    <form class="px-4 py-8" @submit.prevent="submit" v-if="!tableStore.loadingStatus">
         <div class="grid grid-cols-2" v-if="table">
             <div class="col-span-2">
                 <InputField :input="table.name" :title="'Name'" :errors="v$.name.$errors"
@@ -24,7 +24,7 @@
                     @update="(value) => tableStore.edit.status = value" />
             </div>
         </div>
-        <div class="flex justify-center mt-8">
+        <div class="flex justify-center mt-8" v-if="false">
             <button class="mr-2 btn-grey" type="button" v-if="tableStore.editTable"
                 @click="tableStore.editTable = false">Back</button>
             <button class="btn-green" type="submit">Submit</button>

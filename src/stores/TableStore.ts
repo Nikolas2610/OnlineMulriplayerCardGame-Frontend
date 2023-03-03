@@ -5,7 +5,14 @@ import type { Table } from "@/types/tables/Table";
 import type { AxiosResponse } from "axios";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { useToast } from "vue-toastification";
+import { useUserStore } from "./UserStore";
+import socket from "@/plugins/socket";
+import router from "@/router";
+import type { LobbyTable } from "@/types/lobby/LobbyTable";
+import { usePlayerStore } from "./PlayerStore";
+const userStore = useUserStore();
 const toast = useToast();
+const playerStore = usePlayerStore();
 
 export const useTableStore = defineStore('TableStore', {
     state: () => {
@@ -22,7 +29,7 @@ export const useTableStore = defineStore('TableStore', {
             edit: {} as Table,
             tables: [] as Table[],
             gameSelected: 0,
-            selectedTableId: -1, 
+            selectedTableId: -1,
             role: 'user',
         }
     },
@@ -58,17 +65,14 @@ export const useTableStore = defineStore('TableStore', {
             this.toggleLoading();
         },
         async _submit() {
-            try {
-                const response: AxiosResponse = await axiosUser.post('table',
-                    { table: this.$state.table }
-                );
-                if (response.status === 201) {
-                    toast.success('Table create successfully');
-                    this.clearFormData();
+            // TODO: Validation and catch the errors
+            const user_id = userStore.user.id;
+            socket.emit('createOnlineTable', { user_id, table: this.$state.table }, (response: LobbyTable) => {
+                if (response.id) {
+                    playerStore.table = response;
+                    router.push({ name: 'room', params: { id: response.public_url } })
                 }
-            } catch (error: any) {
-                toast.error(error)
-            }
+            })
         },
         toggleEditTable(index: number) {
             this.$state.edit = { ...this.$state.tables[index] };
@@ -111,7 +115,7 @@ export const useTableStore = defineStore('TableStore', {
                 this.toggleLoading();
                 toast.error(error)
             }
-        }, 
+        },
         unMountedDashboard() {
             this.$state.games = [];
             this.$state.tables = [];

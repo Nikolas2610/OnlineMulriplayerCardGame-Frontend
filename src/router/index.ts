@@ -156,7 +156,15 @@ const router = createRouter({
         },
       ]
     },
-
+    {
+      path: '/room/:id',
+      name: 'room',
+      component: () => import('@/views/lobby/room/RoomView.vue'),
+      meta: {
+        requiresAuth: false,
+        title: `${appName} | Room`
+      },
+    },
     {
       path: '/dashboard',
       name: 'dashboard',
