@@ -12,6 +12,7 @@ export const useUserStore = defineStore("UserStore", {
     state: () => {
         return {
             user: {
+                id: null,
                 username: null,
                 email: null,
                 token: null,
@@ -122,6 +123,7 @@ export const useUserStore = defineStore("UserStore", {
             this.$state.user.username = decodedToken.user.username;
             this.$state.user.email = decodedToken.user.email;
             this.$state.user.role = decodedToken.user.role;
+            this.$state.user.id = decodedToken.user.id;
             localStorage.setItem('token', token);
         },
         resetValues() {

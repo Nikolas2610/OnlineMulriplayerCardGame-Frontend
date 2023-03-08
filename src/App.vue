@@ -7,7 +7,7 @@ import { useUserStore } from './stores/UserStore'
 const userStore = useUserStore();
 const isModalOpen = ref<Boolean>(false);
 
-// Get the JWT token from localstage if user close the browser 
+// Get the JWT token from local storage if user close the browser 
 onMounted(() => {
   if (localStorage.getItem('token')) {
     const token = localStorage.getItem('token');

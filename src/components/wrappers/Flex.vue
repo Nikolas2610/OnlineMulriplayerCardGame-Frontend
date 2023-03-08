@@ -1,31 +1,36 @@
 <template>
-    <div class="flex" :class="[
-    getJustify(justify),
-    items ? `items-${items}` : '',
-    gap ? `gap-${gap}` : '']">
+    <div class="flex" :class="getClasses()">
         <slot></slot>
     </div>
 </template>
 
 <script setup lang="ts">
+
 const props = defineProps({
-    justify: { type: String },
+    justify: { type: String, default: 'start' },
     items: { type: String },
-    gap: { type: Number }
+    gap: { type: Number },
+    column: { type: Boolean }, 
+    wrap: { type: Boolean, default: false }
 })
 
-const getJustify = (rule:string | undefined) => {
-    switch(rule) {
-        case "center":
-            return 'justify-center'
-        case "end":
-            return 'justify-end'
-        case "around":
-            return 'justify-around'
-        case "between":
-            return 'justify-between'
-        default:
-            return 'justify-start'
+const getClasses = () => {
+    let classes = '';
+    if (props.gap) {
+        classes += `gap-${props.gap} `
     }
+    if (props.justify) {
+        classes += `justify-${props.justify} `
+    }
+    if (props.items) {
+        classes += `items-${props.items} `
+    }
+    if (props.column) {
+        classes += `flex-col `
+    }
+    if (props.wrap) {
+        classes += `flex-wrap `
+    }
+    return classes;
 }
 </script>
