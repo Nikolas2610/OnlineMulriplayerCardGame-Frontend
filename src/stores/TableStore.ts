@@ -116,6 +116,20 @@ export const useTableStore = defineStore('TableStore', {
                 toast.error(error)
             }
         },
+        async _deleteTableUsers() {
+            try {
+                this.toggleLoading();
+                const response: AxiosResponse = await axiosUser.delete(`${this.$state.role}/table/users`,
+                { data: { id: this.$state.edit.id } });
+                if (response.status === 200) {
+                    toast.success('Table users has been successfully deleted');
+                    this.toggleLoading();
+                }
+            } catch (error: any) {
+                this.toggleLoading();
+                toast.error(error)
+            }
+        },
         unMountedDashboard() {
             this.$state.games = [];
             this.$state.tables = [];

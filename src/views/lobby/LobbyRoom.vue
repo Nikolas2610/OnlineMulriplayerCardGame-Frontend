@@ -8,13 +8,13 @@
                     {{ table.name }}
                 </DarkTableCell>
                 <DarkTableCell>
-                    {{ table.game.name }}
+                    {{ table.game?.name }}
                 </DarkTableCell>
                 <DarkTableCell>
                     {{ table.table_users?.length ? table.table_users.length : 0 }}
                 </DarkTableCell>
                 <DarkTableCell>
-                    {{ table.creator.username }}
+                    {{ table.creator?.username }}
                 </DarkTableCell>
                 <DarkTableCell>
                     {{ table.status }}
@@ -33,7 +33,7 @@
                 <Flex :justify="'center'" :gap="2">
                     <PrimaryButton :title="'Create Table'" @click="createTableModal = true"></PrimaryButton>
                     <PrimaryButton :title="'Join Table'" :disable="selectTable === -1" @click="joinRoom()"></PrimaryButton>
-                    <RemoveButton v-if="playerStore.table?.creator.id === userStore.user.id" @click="playerStore._removeTable()" />
+                    <RemoveButton v-if="playerStore.table?.creator?.id === userStore.user.id" @click="playerStore._removeTable()" />
                 </Flex>
             </GridColItem>
         </GridCol>
@@ -50,41 +50,37 @@ import DarkTableRow from '@/components/table/DarkTableRow.vue';
 import DarkTableCell from '@/components/table/DarkTableCell.vue';
 import { ref, onBeforeMount, watch } from 'vue';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
-import type { LobbyTable } from '@/types/lobby/LobbyTable'
 import Flex from '@/components/wrappers/Flex.vue';
 import InputField from '@/components/ui/InputField.vue';
 import GridCol from '@/components/wrappers/GridCol.vue';
 import GridColItem from '@/components/wrappers/GridColItem.vue';
 import CreateTableModal from '@/components/modals/CreateTableModal.vue';
-import { useTableStore } from '@/stores/TableStore';
 import { useUserStore } from '@/stores/UserStore';
-import { useToast } from 'vue-toastification';
 import { usePlayerStore } from '@/stores/PlayerStore';
 import socket from '@/plugins/socket'
 import { useRouter } from 'vue-router';
-import type { TableUsers } from '@/types/lobby/TableUsers';
 import RemoveButton from '@/components/buttons/RemoveButton.vue';
+import type { Table } from '@/types/tables/Table';
+
 
 
 const router = useRouter()
 const userStore = useUserStore();
 // TEST
-const tables = ref<LobbyTable[]>([]);
-const filterTables = ref<LobbyTable[]>([]);
+const tables = ref<Table[]>([]);
+const filterTables = ref<Table[]>([]);
 
 const playerStore = usePlayerStore();
 const search = ref('');
 const createTableModal = ref(false);
-const tableStore = useTableStore();
-const toast = useToast();
 
 onBeforeMount(() => {
     // Get active tables
-    socket.emit('findAllOnlineTable', {}, (response: LobbyTable[]) => {
-        tables.value = filterTables.value = response;
+    socket.emit('findAllOnlineTable', {}, (response: Table[]) => {
+        tables.value = filterTables.value = response; 
     });
     // Add a new table - Update list
-    socket.on('addNewTable', (response: LobbyTable) => {
+    socket.on('addNewTable', (response: Table) => {
         response.table_users = [];
         tables.value.unshift(response);
     });
@@ -93,11 +89,11 @@ onBeforeMount(() => {
         tables.value = filterTables.value = tables.value.filter(table => table.id !== response);
     })
     // Update players to the tables
-    socket.on('getTableUsers', (table_users: TableUsers[], room: string, tableId: number) => {
-        const index = tables.value.map(table => table.id).indexOf(tableId);
+    socket.on('getTableUsers', (tableGame: Table) => {
+        const index = tables.value.map(table => table.id).indexOf(tableGame.id);
 
         if (index !== -1) {
-            tables.value[index].table_users = table_users;
+            tables.value[index].table_users = tableGame.table_users;
         }
     })
 })
@@ -116,14 +112,14 @@ const tablesFields = ref([
 ]);
 const selectTable = ref<number>(-1);
 
-const handleSelectTable = (index: number, table: LobbyTable) => {
+const handleSelectTable = (index: number, table: Table) => {
     if (selectTable.value === index) {
         selectTable.value = -1
         playerStore.table = null;
     } else {
         selectTable.value = index;
         playerStore.table = table;
-    }
+    } 
 }
 
 watch(() => search.value,

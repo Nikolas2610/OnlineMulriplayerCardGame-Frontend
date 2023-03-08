@@ -12,6 +12,6 @@ export interface LobbyTable {
     status: string;
     creator: User;
     public_url: string;
-    table_users: TableUsers[];
+    table_users: TableUsers[] | null;
     game_master: User;
 }

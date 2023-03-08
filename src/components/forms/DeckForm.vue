@@ -100,7 +100,7 @@ const loadImage = (image: string) => {
     if (image.substring(0, 4) === 'http') {
         return image;
     } else {
-        return import.meta.env.VITE_BACNEND_IMAGE_URL + image;
+        return import.meta.env.VITE_BACKEND_IMAGE_URL + image;
     }
 }
 

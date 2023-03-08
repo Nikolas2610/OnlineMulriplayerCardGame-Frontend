@@ -24,7 +24,10 @@
                     @update="(value) => tableStore.edit.status = value" />
             </div>
         </div>
-        <div class="flex justify-center mt-8" v-if="false">
+        <PrimaryButton :title="'Delete Users'" 
+        v-if="tableStore.role === 'admin' && tableStore.editTable"
+        @click="tableStore._deleteTableUsers()" />
+        <div class="flex justify-center mt-8" v-if="tableStore.editTable">
             <button class="mr-2 btn-grey" type="button" v-if="tableStore.editTable"
                 @click="tableStore.editTable = false">Back</button>
             <button class="btn-green" type="submit">Submit</button>
@@ -44,6 +47,7 @@ import { computed, ref } from 'vue';
 import { required, requiredIf, minLength } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import PreLoader from '../PreLoader.vue';
+import PrimaryButton from '../buttons/PrimaryButton.vue';
 
 const tableStore = useTableStore();
 const table = computed(() => {
