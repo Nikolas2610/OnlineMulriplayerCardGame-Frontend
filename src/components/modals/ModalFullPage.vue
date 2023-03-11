@@ -30,16 +30,14 @@
                                     Actions
                                 </Flex>
                                 <Flex :column="true" :gap="4">
-                                    <PrimaryButton :title="'Start Game'" @click="$emit('startGame')" />
-                                    <PrimaryButton :title="'Pause Game'" />
-                                    <PrimaryButton :title="'End Game'" />
-                                    <PrimaryButton :title="'New Game'" />
+                                    <PrimaryButton :title="'Pause Game'" :disable="true" />
+                                    <PrimaryButton :title="'End Game'" @click="$emit('stopGame')" />
+                                    <PrimaryButton :title="'New Game'" @click="$emit('newGame')" />
                                     <PrimaryButton :title="'Leave Game'" @click="$emit('leaveGame')" />
-                                    <PrimaryButton :title="'Undo Movement'" />
-                                    <PrimaryButton :title="'Redo Movement'" />
-                                    <PrimaryButton :title="'Give Starting cards'" />
-                                    <PrimaryButton :title="'Show Cards'" />
-                                    <PrimaryButton :title="'Set table status'" />
+                                    <PrimaryButton :title="'Undo Movement'" :disable="true" />
+                                    <PrimaryButton :title="'Redo Movement'" :disable="true" />
+                                    <PrimaryButton :title="'Show Cards'" :disable="true" />
+                                    <PrimaryButton :title="'Set table status'" :disable="true" />
                                 </Flex>
 
 
@@ -111,8 +109,9 @@ const emit = defineEmits([
     'updateRole',
     'updateStatus',
     'updateTeam',
-    'startGame', 
-    'leaveGame'
+    'stopGame',
+    'leaveGame',
+    'newGame'
 ]);
 const props = defineProps({
     modalOpen: { type: Boolean },

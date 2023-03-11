@@ -38,6 +38,7 @@
 <script setup lang="ts">
 import type CreateCard from '@/types/cards/CreateCard';
 import { ref, watch, onMounted } from 'vue';
+import { loadImage } from '@/utils/Function';
 
 onMounted(() => {
     if (props.cardData) {
@@ -89,19 +90,4 @@ watch(() => props.successResponse,
         }
     }
 );
-
-// These function is to load the image and from the upload images and from the fake data images
-const loadImage = (image: string) => {
-    if (image.substring(0, 4) === 'http') {
-        return image;
-    } else if (image.substring(0, 4) === 'data') {
-        return image;
-    } else {
-        return import.meta.env.VITE_BACKEND_IMAGE_URL + image;
-    }
-}
 </script>
-
-<style scoped>
-
-</style>

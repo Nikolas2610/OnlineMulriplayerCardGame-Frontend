@@ -1,6 +1,7 @@
 import type Deck from "../decks/Deck";
 import type User from "../User";
 import type { Table } from "./Table";
+import type { TableDeckType } from "./TableDeckType";
 
 export interface TableDeck {
     id: number;
@@ -9,4 +10,5 @@ export interface TableDeck {
     table_id: Table | null;
     user: User | null;
     deck_id: Deck | null;
+    type: TableDeckType
 }

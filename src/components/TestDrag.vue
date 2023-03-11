@@ -41,6 +41,8 @@ onMounted(() => {
     if (dropZone2.value) {
         dropZones.value.push(dropZone2.value)
     }
+    console.log(dropZones.value);
+    
 })
 
 const getCards = ((id: number) => {

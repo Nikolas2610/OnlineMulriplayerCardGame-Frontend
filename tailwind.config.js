@@ -5,6 +5,7 @@ module.exports = {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   safelist: [
+    'absolute',
     'bg-primary',
     'bg-secondary',
     'flex-col',

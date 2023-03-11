@@ -122,8 +122,13 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 this.$state.gameMaster = userStore.user.id === this.$state.table?.game_master.id
             }
         },
-        _startGame() {
-            socket.emit('startGame', {
+        _stopGame() {
+            socket.emit('stopGame', {
+                table: this.$state.table, room: this.$state.room
+            })
+        },
+        _newGame() {
+            socket.emit('newGame', {
                 table: this.$state.table, room: this.$state.room
             })
         },

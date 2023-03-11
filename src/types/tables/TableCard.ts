@@ -12,4 +12,5 @@ export interface TableCard {
     card: Card;
     created_at: Date;
     updated_at: Date;
+    z_index: number;
 }
