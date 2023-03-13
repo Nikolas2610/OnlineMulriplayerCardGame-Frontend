@@ -9,8 +9,7 @@
                         <div class="w-3/6">{{ user.user?.username }}</div>
                         <Flex :gap="2" class="w-2/6" v-if="playerStore.cards">
                             <img src="@/assets/icons/sidebar/cards.svg" alt="cards" srcset="">
-                            <div>{{ playerStore.cards.filter(card => card.table_deck.id ===
-                                playerStore.tableDeckId).length }}</div>
+                            <div>{{ playerStore.getCards(playerStore.getTableDeckIdOfUser(user.user.id))?.length }}</div>
                         </Flex>
                         <div class="w-1/6 cursor-pointer group" @click="toggleOpenUserCard(user.id)"
                             v-if="(user.team?.name || user.role?.name || user.status?.name) || playerStore.cards">
@@ -38,9 +37,9 @@
                         </Flex>
                     </div>
                     <div v-if="playerStore.cards && isOpenUserCard(user.id)" class="mt-4">
-                        <Flex :gap="2" class="flex-wrap" :justify="'center'">
+                        <Flex :gap="2" class="flex-wrap" :justify="'start'">
                             <img :src="card.hidden ? backCardImage : loadImage(card.card.image)" alt="" srcset=""
-                                v-for="(card, index) in playerStore.cards.filter(card => card.table_deck?.user?.id === user.user.id)"
+                                v-for="(card, index) in playerStore.getCards(playerStore.getTableDeckIdOfUser(user.user.id))"
                                 :key="`user-card-${index}`" class="w-10 h-12">
                         </Flex>
                     </div>
@@ -64,6 +63,7 @@ import BackButton from '@/components/buttons/BackButton.vue';
 import backCardImage from '@/assets/images/close-card.png'
 import { loadImage } from '@/utils/Function';
 import { ref } from 'vue';
+
 
 const playerStore = usePlayerStore();
 const openUserCards = ref<number[]>([]);

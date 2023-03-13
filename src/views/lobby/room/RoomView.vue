@@ -7,13 +7,18 @@
                 {{ playerStore.table?.name }} - {{ playerStore.table?.game?.name }} - ({{ route.params.id }})
             </div>
 
-            <OnlineTable v-if="true" />
-            <TestDrag v-else />
+            <OnlineTable v-if="playerStore.table?.status === TableStatus.PLAYING" />
+            <Flex v-else>
+                <!-- Game Not started -->
+                <div class="h-[200px] w-[1000px] bg-red-500 relative">
+                    <CardSettings />
+                </div>
+            </Flex>
+            <!-- <TestDrag v-else /> -->
         </div>
 
         <SideBarGame class="w-1/6" />
     </Flex>
-
     <!-- <TestDragItem /> -->
 
 
@@ -25,11 +30,8 @@
         @update-turn-table-users="playerStore._updateTurnTableUsers()"
         @update-role="(value, user) => playerStore._setRoleTableUser(value, user)"
         @update-status="(value, user) => playerStore._setStatusTableUser(value, user)"
-        @update-team="(value, user) => playerStore._setTeamTableUser(value, user)" 
-        @stop-game="playerStore._stopGame()"
-        @leave-game="playerStore._leaveGame()"
-        @new-game="playerStore._newGame()"
-        />
+        @update-team="(value, user) => playerStore._setTeamTableUser(value, user)" @stop-game="playerStore._stopGame()"
+        @leave-game="playerStore._leaveGame()" @new-game="playerStore._newGame()" />
 </template>
 
 <script setup lang="ts">
@@ -43,21 +45,26 @@ import ModalFullPage from '@/components/modals/ModalFullPage.vue';
 import SideBarGame from '@/components/sidebar/SidebarGame.vue';
 import Flex from '@/components/wrappers/Flex.vue';
 import type { Table } from '@/types/tables/Table';
-import TestDrag from '@/components/TestDrag.vue'
 import type { TableUsers } from '@/types/lobby/TableUsers';
 import type { TableCard } from '@/types/tables/TableCard'
 import OnlineTable from '@/components/online-table/OnlineTable.vue';
+import { TableDeckType } from '@/types/tables/TableDeckType';
+import { TableStatus } from '@/types/tables/TableStatus.enum';
+import CardSettings from '@/components/online-table/CardSettings.vue'
 
 const route = useRoute();
 const playerStore = usePlayerStore();
 const modalOpen = ref(false)
-
 
 playerStore.room = route.params.id.toString();
 if (playerStore.table) {
     playerStore._joinTable(playerStore.room);
 } else {
     router.push({ name: 'lobby' })
+}
+
+const showCardSettings = () => {
+
 }
 
 onBeforeMount(() => {
@@ -88,10 +95,11 @@ onBeforeMount(() => {
 
     socket.on('getStartGameDetails', (response: Table, cards: TableCard[]) => {
         console.log('\x1b[31m%s\x1b[0m', 'getStartGameDetails');
-        console.log('\x1b[31m%s\x1b[0m', cards.length);
+        console.log(cards);
 
         if (response) {
             playerStore.table = response;
+            extractTableDecksDetails();
         }
         if (cards) {
             playerStore.cards = cards;
@@ -106,14 +114,49 @@ onBeforeMount(() => {
         playerStore.cards = null;
         router.push({ name: 'lobby' })
     })
+
+    socket.on('getUpdateCardPosition', (response: TableCard[]) => {
+        console.log('\x1b[33m%s\x1b[0m', 'getUpdateCardPosition');
+        if (response && playerStore.cards) {
+            playerStore.cards = response;
+            const max = playerStore.cards.reduce((maxValue, obj) => {
+                return obj.z_index > maxValue ? obj.z_index : maxValue;
+            }, 0);
+            console.log("🚀 ~ file: RoomView.vue:118 ~ max ~ max:", max)
+            playerStore.zIndex = max + 1;
+        }
+    });
 })
+
+const extractTableDecksDetails = () => {
+    playerStore.resetDropZones();
+    playerStore.table?.table_decks?.forEach(deck => {
+        switch (deck.type) {
+            case TableDeckType.DECK:
+                playerStore.dropZones.deck.push({ tableDeckId: deck.id, element: null })
+                break;
+            case TableDeckType.JUNK:
+                playerStore.dropZones.junk.push({ tableDeckId: deck.id, element: null })
+                break;
+            case TableDeckType.TABLE:
+                playerStore.dropZones.table.push({ tableDeckId: deck.id, element: null })
+                break;
+            case TableDeckType.USER:
+                if (deck.id === playerStore.getExistPlayerTableDeckId) {
+                    playerStore.dropZones.user.push({ tableDeckId: deck.id, element: null })
+                }
+                break;
+            default:
+                break;
+        }
+    })
+}
+
+
 onUnmounted(() => {
     playerStore.room = null;
     playerStore.gameMaster = false;
     playerStore.cards = null;
     playerStore._leaveTable();
 })
-
-
-
 </script>

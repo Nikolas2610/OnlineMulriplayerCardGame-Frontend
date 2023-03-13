@@ -64,3 +64,7 @@ html {
 .btn-add {
     @apply rounded-md border border-transparent bg-primary text-white px-8 py-1 text-base font-medium hover:bg-secondary hover:text-white md:py-1 md:px-6 md:text-lg transition duration-300;
 }
+
+.card-box {
+    @apply w-[50px] h-[75px];
+}

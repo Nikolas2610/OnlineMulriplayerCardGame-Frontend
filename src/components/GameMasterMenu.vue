@@ -1,6 +1,6 @@
 <template>
     <Flex
-        class="border w-64 fixed bottom-20 rounded-3xl h-14 bg-dark px-8 -translate-x-[160px] transition duration-700 hover:-translate-x-[60px] group cursor-pointer"
+        class="border w-64 fixed bottom-10 rounded-3xl h-14 bg-dark px-8 -translate-x-[160px] transition duration-700 hover:-translate-x-[60px] group cursor-pointer"
         :justify="'end'" :items="'center'" :gap="4" @click="$emit('close')">
         <div class="text-white group-hover:text-primary">Settings</div>
         <Flex :justify="'center'" class="w-12 h-12 rounded-3xl p-2 bg-dark group">
