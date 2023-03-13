@@ -1,6 +1,6 @@
 <template>
     <Transition name="modal">
-        <div class="bg-dark bg-opacity-90 fixed top-0 left-0 w-full h-full flex justify-center items-center z-20"
+        <div class="bg-dark bg-opacity-90 fixed top-0 left-0 w-full h-full flex justify-center items-center z-[2147483647]"
             v-if="modalOpen">
             <div class="bg-dark relative rounded-sm shadow h-full w-full" ref="modal">
                 <Flex class="border-b-2 px-8" :justify="'between'" :items="'center'">
@@ -30,16 +30,13 @@
                                     Actions
                                 </Flex>
                                 <Flex :column="true" :gap="4">
-                                    <PrimaryButton :title="'Start Game'" @click="$emit('startGame')" />
-                                    <PrimaryButton :title="'Pause Game'" />
-                                    <PrimaryButton :title="'End Game'" />
-                                    <PrimaryButton :title="'New Game'" />
+                                    <PrimaryButton :title="'Pause Game'" :disable="true" />
+                                    <PrimaryButton :title="'End Game'" @click="$emit('stopGame')" />
+                                    <PrimaryButton :title="'New Game'" @click="$emit('newGame'); emit('closeModal');" />
                                     <PrimaryButton :title="'Leave Game'" @click="$emit('leaveGame')" />
-                                    <PrimaryButton :title="'Undo Movement'" />
-                                    <PrimaryButton :title="'Redo Movement'" />
-                                    <PrimaryButton :title="'Give Starting cards'" />
-                                    <PrimaryButton :title="'Show Cards'" />
-                                    <PrimaryButton :title="'Set table status'" />
+                                    <PrimaryButton :title="'Undo Movement'" :disable="true" />
+                                    <PrimaryButton :title="'Redo Movement'" :disable="true" />
+                                    <PrimaryButton :title="'Show Cards'" :disable="true" />
                                 </Flex>
 
 
@@ -111,8 +108,9 @@ const emit = defineEmits([
     'updateRole',
     'updateStatus',
     'updateTeam',
-    'startGame', 
-    'leaveGame'
+    'stopGame',
+    'leaveGame',
+    'newGame'
 ]);
 const props = defineProps({
     modalOpen: { type: Boolean },
@@ -120,17 +118,13 @@ const props = defineProps({
     table: { type: Object as PropType<Table | undefined> }
 })
 
-const test = (value: any) => {
-    console.log(value);
-}
-
 const modal = ref(null)
 const menuItems = ref([
     { id: 0, name: 'Table' },
     { id: 1, name: 'Game' },
     { id: 2, name: 'Players' },
 ])
-const selectedMenuItem = ref(2);
+const selectedMenuItem = ref(1);
 
 const updateTurn = (event: any) => {
     emit('updateTurnTableUsers');

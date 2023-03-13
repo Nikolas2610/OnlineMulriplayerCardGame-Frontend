@@ -97,6 +97,7 @@ import { useToast } from "vue-toastification";
 import type CreateCard from '@/types/cards/CreateCard';
 import { useUserStore } from '@/stores/UserStore';
 import { useRoute } from 'vue-router';
+import { loadImage } from '@/utils/Function';
 
 const userStore = useUserStore();
 const route = useRoute()
@@ -204,14 +205,6 @@ const saveCardChanges = async (card: CreateCard, image: any, cardData: Card) => 
     } catch (error: any) {
         // Capture the errors
         toast.error('Something went wrong. Please try again later', error);
-    }
-}
-// These function is to load the image and from the upload images and from the fake data images
-const loadImage = (image: string) => {
-    if (image.substring(0, 4) === 'http') {
-        return image;
-    } else {
-        return import.meta.env.VITE_BACKEND_IMAGE_URL + image;
     }
 }
 </script>

@@ -12,8 +12,12 @@
 import { ref, type PropType } from 'vue';
 
 export interface SelectOptions {
-    id: number;
+    id: number | string | null;
     name: string;
+}
+
+export interface Input {
+    value: number | string | null | undefined
 }
 
 const props = defineProps({
@@ -21,7 +25,7 @@ const props = defineProps({
     disable: { type: Boolean, default: false },
     titleShow: { type: Boolean, default: true },
     title: { type: String },
-    input: { type: Object as PropType<{ value: number } | null>, default: null },
+    input: { type: Object as PropType<Input | null>, default: null },
     dark: { type: Boolean, default: false }
 });
 
