@@ -67,7 +67,7 @@ export const useTableStore = defineStore('TableStore', {
         async _submit() {
             // TODO: Validation and catch the errors
             const user_id = userStore.user.id;
-            socket.emit('createOnlineTable', { user_id, table: this.$state.table }, (response: LobbyTable) => {
+            socket.emit('createOnlineTable', { user_id, table: this.$state.table }, (response: Table) => {
                 if (response.id) {
                     playerStore.table = response;
                     router.push({ name: 'room', params: { id: response.public_url } })
