@@ -3,8 +3,8 @@
         <Flex :column="true" :justify="'between'" class="h-[96%]">
             <div>
                 <div class="text-2xl border-b border-primary pb-2">Users</div>
-                <GameUserItem v-for="(user, index) in playerStore.table?.table_users" :key="index" class="mt-3 w-2xl"
-                    :game-master="playerStore.table?.game_master?.id === user.id">
+                <GameUserItem v-for="(user, index) in playerStore.table?.table_users" :key="index"
+                    class="mt-3 w-2xl bg-primary" :playing="user.playing">
                     <Flex :items="'center'" :justify="playerStore.cards ? 'center' : 'between'" :gap="2">
                         <div class="w-3/6">{{ user.user?.username }}</div>
                         <Flex :gap="2" class="w-2/6" v-if="playerStore.cards">
@@ -21,6 +21,9 @@
                             </svg>
                         </div>
                     </Flex>
+                    <div class="italic font-bold"
+                        :class="playerStore.table.game_master.id === user.user.id && user.playing ? 'text-dark' : 'text-primary'"
+                        v-if="playerStore.table?.game_master?.id === user.user.id">Game Master</div>
                     <div class="p-2 mt-2 shadow-2xl rounded-xl border-dashed border" v-if="isOpenUserCard(user.id) &&
                         (user.team?.name || user.role?.name || user.status?.name)">
                         <Flex v-if="user.team?.name">
@@ -62,7 +65,8 @@ import GameUserItem from '@/components/sidebar/GameUserItem.vue';
 import BackButton from '@/components/buttons/BackButton.vue';
 import backCardImage from '@/assets/images/close-card.png'
 import { loadImage } from '@/utils/Function';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { TableStatus } from '@/types/tables/TableStatus.enum';
 
 
 const playerStore = usePlayerStore();
@@ -77,4 +81,14 @@ const toggleOpenUserCard = (id: number) => {
         ? openUserCards.value = openUserCards.value.filter(userId => userId !== id)
         : openUserCards.value.push(id);
 }
+
+watch(() => playerStore.table,
+    () => {
+        if (playerStore.table?.status !== TableStatus.WAITING) {
+            openUserCards.value = [];
+            playerStore.table?.table_users?.forEach(user => {
+                openUserCards.value.push(user.id);
+            })
+        }
+    })
 </script>

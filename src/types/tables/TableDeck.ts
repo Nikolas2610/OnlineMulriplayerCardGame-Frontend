@@ -9,6 +9,6 @@ export interface TableDeck {
     updated_at: Date;
     table_id: Table | null;
     user: User | null;
-    deck_id: Deck | null;
+    deck: Deck | null;
     type: TableDeckType
 }

@@ -10,6 +10,8 @@ import type { TableCard } from "@/types/tables/TableCard";
 import type { DropZone } from "@/types/online-table/DropZone";
 import type { DeckItem } from "@/types/online-table/DeckItem";
 import { TableStatus } from "@/types/tables/TableStatus.enum";
+import { MovementRotateCard } from "@/types/online-table/RotateCard.enum";
+import type { Status } from "@/types/games/relations/status/Status";
 
 const userStore = useUserStore();
 const toast = useToast();
@@ -27,15 +29,22 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 deck: [],
                 junk: [],
                 user: [],
-            } as DropZone, 
+            } as DropZone,
             zIndex: 1,
+            clickCardId: null as number | null,
+            deckReferences: {
+                table: null as HTMLElement | null,
+                junk: null as HTMLElement | null,
+                user: null as HTMLElement | null
+            }
         }
     },
     getters: {
         getExistPlayerTableDeckId: (state) => state.table?.table_decks?.find(deck => deck.user?.id === userStore.user.id)?.id,
         getJunkTableDeckId: (state) => state.dropZones.junk[0]?.tableDeckId,
         getTableDeckId: (state) => state.dropZones.table[0]?.tableDeckId,
-        getCardsTest: (state) => state.cards
+        getExistPlayerPlayingStatus: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.playing,
+        getExistTableUserId: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.id
     },
     actions: {
         async _createTable() {
@@ -101,30 +110,18 @@ export const usePlayerStore = defineStore('PlayerStore', {
             const role = this.$state.table?.game?.roles?.find(role => role.id === roleId);
             socket.emit('setRoleTableUser', {
                 role, table_user, room: this.$state.room
-            }, (response: { message: string, status: number }) => {
-                if (response.status === 200) {
-                    // console.log(response);
-                }
             })
         },
         _setStatusTableUser(statusId: number, table_user: TableUsers) {
             const status = this.$state.table?.game?.status?.find(s => s.id === statusId);
             socket.emit('setStatusTableUser', {
                 status, table_user, room: this.$state.room
-            }, (response: { message: string, status: number }) => {
-                if (response.status === 200) {
-                    // console.log(response);
-                }
             })
         },
         _setTeamTableUser(teamId: number, table_user: TableUsers) {
             const team = this.$state.table?.game?.teams?.find(team => team.id === teamId);
             socket.emit('setTeamTableUser', {
                 team, table_user, room: this.$state.room
-            }, (response: { message: string, status: number }) => {
-                if (response.status === 200) {
-                    // console.log(response);
-                }
             })
         },
         getIndexTableUser(table_user: TableUsers) {
@@ -140,19 +137,14 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 table: this.$state.table, room: this.$state.room
             })
         },
-        _newGame() {
+        _newGame() { 
             socket.emit('newGame', {
                 table: this.$state.table, room: this.$state.room
             })
         },
         _leaveGame() {
-            console.log('\x1b[31m%s\x1b[0m', 'leaveGame');
             socket.emit('leaveGame', {
                 table: this.$state.table, room: this.$state.room
-            }, (response: { message: string, status: number }) => {
-                if (response.status === 200) {
-                    console.log(response);
-                }
             })
         },
         getCards(tableDeckId: number | undefined) {
@@ -201,24 +193,103 @@ export const usePlayerStore = defineStore('PlayerStore', {
                                 dragCard.position_y = offsetX;
                             }
                             dragCard.z_index = this.$state.zIndex;
-                            console.log(`Card id: ${dragCard.id}, z-index: ${this.$state.zIndex}`);
-                            
                         }
 
                     })
                     socket.emit('updateCardPosition', {
                         cards: this.$state.cards, room: this.$state.room
-                    }, (response: { message: string, status: number }) => {
-                        if (response.status === 200) {
-                            console.log(response);
-                        }
                     })
                 }
             }
         },
         getTableDeckIdOfUser(userId: number) {
             return this.$state.table?.table_decks?.find(deck => deck.user?.id === userId)?.id
-        }, 
+        },
+        updateCards() {
+            socket.emit('updateCardPosition', {
+                cards: this.$state.cards, room: this.$state.room
+            })
+        },
+        toggleCardVisibility() {
+            if (this.$state.clickCardId) {
+                this.$state.cards?.forEach(c => {
+                    if (c.id === this.$state.clickCardId) {
+                        c.hidden = !c.hidden;
+                    }
+                })
+                this.updateCards()
+            }
+        },
+        rotateCard(movement: MovementRotateCard) {
+            if (this.$state.clickCardId) {
+                this.$state.cards?.forEach(card => {
+                    if (card.id === this.$state.clickCardId) {
+                        if (movement === MovementRotateCard.RIGHT) {
+                            // If the movement is "right" and the degree is 270, set it to 0
+                            if (card.rotate === 270) {
+                                card.rotate = 0;
+                            } else {
+                                // Otherwise, add 90 to the degree value
+                                card.rotate += 90;
+                            }
+                        } else if (movement === MovementRotateCard.LEFT) {
+                            // If the movement is "left" and the degree is 0, set it to 270
+                            if (card.rotate === 0) {
+                                card.rotate = 270;
+                            } else {
+                                // Otherwise, subtract 90 from the degree value
+                                card.rotate -= 90;
+                            }
+                        }
+                    }
+                });
+                this.updateCards();
+            }
+        },
+        addStatusPlayer(status: Status | null) {
+            const table_user = this.$state.table?.table_users?.find(user => user.user.id === userStore.user.id);
+            socket.emit('setStatusTableUser', {
+                status, table_user, room: this.$state.room
+            })
+        },
+        setPlayingPlayer() {
+            const playingStatus = this.getExistPlayerPlayingStatus ? this.getExistPlayerPlayingStatus : false;
+            this.$state.table?.table_users?.forEach(user => {
+                if (user.user.id === userStore.user.id) {
+                    user.playing = !user.playing;
+                } else {
+                    user.playing = false
+                }
+            })
+            socket.emit('setPlayerPlaying', {
+                table_users: this.$state.table?.table_users, room: this.$state.room
+            })
+        },
+        isCardHidden() {
+            if (this.$state.clickCardId) {
+                this.$state.cards?.forEach(c => {
+                    if (c.id === this.$state.clickCardId) {
+                        return c.hidden
+                    }
+                })
+            }
+            return true;
+        },
+        _updateTableGameStatus(status: TableStatus) {
+            socket.emit('updateTableGameStatus', {
+                table: this.$state.table, status, room: this.$state.room
+            })
+        },
+        _showAllCards() {
+            socket.emit('showAllCards', {
+                room: this.$state.room
+            });
+        },
+        _removePlayer(userId: number) {
+            socket.emit('removePlayer', {
+                userId, tableId: this.$state.table?.id, publicUrl: this.$state.table?.public_url
+            });
+        },
         resetDropZones() {
             this.$state.dropZones = {
                 table: [],

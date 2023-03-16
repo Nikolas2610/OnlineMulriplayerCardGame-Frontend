@@ -1,8 +1,9 @@
 <template>
-    <img ref="cardRef" :src="hiddenCards ? backCardImage : loadImage(card.card.image)" alt="" :id="(card.id).toString()"
-        class="card-box cursor-pointer hover:border hover:border-dark transition duration-300"
-        @click="clicked = !clicked" @dragstart="(event) => $emit('onDragStart', event, cardRef)"
-        :class="[absolute ? 'absolute' : '', clicked ? 'border-red-500' : '']" draggable="true">
+    <img ref="cardRef" :src="showCardImage(card)" alt="" :id="(card.id).toString()"
+        class="card-box cursor-pointer transition duration-300"
+        @click="playerStore.clickCardId === card.id ? playerStore.clickCardId = null : playerStore.clickCardId = card.id"
+        @dragstart="(event) => $emit('onDragStart', event, cardRef)" :class="[absolute ? 'absolute' : '', playerStore.clickCardId === card.id ? 'border-2 border-red-500' : 'hover:border hover:border-dark', rotate ? getRotateCardPosition(card.rotate) : '',
+        playerDeck ? card.hidden ? 'opacity-50' : '' : '']" draggable="true">
 </template>
 
 <script setup lang="ts">
@@ -10,16 +11,53 @@ import type { TableCard } from '@/types/tables/TableCard';
 import { onMounted, ref, type PropType, watch } from 'vue';
 import backCardImage from '@/assets/images/close-card.png'
 import { loadImage } from '@/utils/Function';
+import { usePlayerStore } from '@/stores/PlayerStore';
+import { RotateCard } from '@/types/online-table/RotateCard.enum';
 
 const clicked = ref(false);
-
+const playerStore = usePlayerStore();
 const props = defineProps({
     card: { type: Object as PropType<TableCard>, required: true },
     absolute: { type: Boolean, default: true },
-    hiddenCards: { type: Boolean, default: false }
+    hiddenCards: { type: Boolean, default: false },
+    rotate: { type: Boolean, default: false },
+    showCards: { type: Boolean, default: false },
+    playerDeck: { type: Boolean, default: false }
 })
 const emits = defineEmits(['onDragStart']);
 const cardRef = ref<HTMLElement | null>(null)
+
+const getRotateCardPosition = (rotate: number) => {
+    switch (rotate) {
+        case RotateCard.ZERO:
+            return ''
+            break;
+        case RotateCard.NINETY:
+            return ' rotate-90'
+            break;
+        case RotateCard.ONE_EIGHTY:
+            return ' rotate-180'
+            break;
+        case RotateCard.TWO_SEVENTY:
+            return ' -rotate-90'
+            break;
+        default:
+            return ''
+            break;
+    }
+}
+
+const showCardImage = (card: TableCard) => {
+    if (props.hiddenCards) {
+        return backCardImage;
+    }
+
+    if (props.showCards) {
+        return loadImage(card.card.image);
+    }
+
+    return card.hidden ? backCardImage : loadImage(card.card.image);
+}
 
 onMounted(() => {
     if (props.card && cardRef.value) {
