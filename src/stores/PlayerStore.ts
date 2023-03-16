@@ -305,6 +305,11 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 userId, tableId: this.$state.table?.id, publicUrl: this.$state.table?.public_url
             });
         },
+        _setNextPlayer(next_player: boolean) {
+            socket.emit('setNextPlayer', {
+                next_player, table_users: this.$state.table?.table_users, room: this.$state.table?.public_url
+            });
+        },
         resetDropZones() {
             this.$state.dropZones = {
                 table: [],

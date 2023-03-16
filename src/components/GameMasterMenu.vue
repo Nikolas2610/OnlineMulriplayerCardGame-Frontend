@@ -67,7 +67,7 @@
             </Flex>
         </Flex>
         <Flex class="border-r h-full px-6" items="center" :gap="4">
-            <!-- Undo -->
+            <!-- Previous Player -->
             <Flex :justify="'center'" :items="'center'" @click="$emit('setNextPlayer', false)"
                 class="hover:text-primary duration-300 transition">
                 <VTooltip distance="22">
@@ -77,11 +77,11 @@
                             d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.79-2.907L8.5 7.028V5.5a.5.5 0 0 0-.79-.407L5 7.028V5.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0V8.972l2.71 1.935a.5.5 0 0 0 .79-.407V8.972l2.71 1.935A.5.5 0 0 0 12 10.5v-5a.5.5 0 0 0-.79-.407z" />
                     </svg>
                     <template #popper>
-                        Undo Movement
+                        Previous Player
                     </template>
                 </VTooltip>
             </Flex>
-            <!-- Redo -->
+            <!-- Next Player -->
             <Flex :justify="'center'" :items="'center'" @click="$emit('setNextPlayer', true)"
                 class="hover:text-primary duration-300 transition">
                 <VTooltip distance="22">
@@ -91,7 +91,7 @@
                             d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.79 5.093A.5.5 0 0 0 4 5.5v5a.5.5 0 0 0 .79.407L7.5 8.972V10.5a.5.5 0 0 0 .79.407L11 8.972V10.5a.5.5 0 0 0 1 0v-5a.5.5 0 0 0-1 0v1.528L8.29 5.093a.5.5 0 0 0-.79.407v1.528L4.79 5.093z" />
                     </svg>
                     <template #popper>
-                        Redo Movement
+                        Next Player
                     </template>
                 </VTooltip>
             </Flex>

@@ -89,26 +89,26 @@
                                 <div class="bg-dark-smooth p-4 mt-6">
                                     <div class="text-2xl text-white mb-4">Cards</div>
                                     <Flex class="w-full text-center cursor-pointer" :gap="8">
-                                        <div class="p-3 transition duration-300 text-lg w-1/3 bg-primary rounded-3xl text-white hover:bg-dark-smooth border border-primary cursor-not-allowed"
-                                            disabled>
+                                        <div class="p-3 transition duration-300 text-lg w-1/3 bg-primary rounded-3xl text-white hover:bg-dark-smooth border border-primary"
+                                            @click="$emit('setNextPlayer', false)">
                                             <Flex :justify="'center'" :items="'center'">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     fill="currentColor" class="w-6 h-6 mr-3" viewBox="0 0 16 16">
                                                     <path
                                                         d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.79-2.907L8.5 7.028V5.5a.5.5 0 0 0-.79-.407L5 7.028V5.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0V8.972l2.71 1.935a.5.5 0 0 0 .79-.407V8.972l2.71 1.935A.5.5 0 0 0 12 10.5v-5a.5.5 0 0 0-.79-.407z" />
                                                 </svg>
-                                                Undo
+                                                Previous Player
                                             </Flex>
                                         </div>
-                                        <div class="p-3 transition duration-300 text-lg w-1/3 bg-primary rounded-3xl text-white hover:bg-dark-smooth border border-primary cursor-not-allowed"
-                                            disabled>
+                                        <div class="p-3 transition duration-300 text-lg w-1/3 bg-primary rounded-3xl text-white hover:bg-dark-smooth border border-primary"
+                                            @click="$emit('setNextPlayer', true)">
                                             <Flex :justify="'center'" :items="'center'">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     fill="currentColor" class="w-6 h-6 mr-3" viewBox="0 0 16 16">
                                                     <path
                                                         d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.79 5.093A.5.5 0 0 0 4 5.5v5a.5.5 0 0 0 .79.407L7.5 8.972V10.5a.5.5 0 0 0 .79.407L11 8.972V10.5a.5.5 0 0 0 1 0v-5a.5.5 0 0 0-1 0v1.528L8.29 5.093a.5.5 0 0 0-.79.407v1.528L4.79 5.093z" />
                                                 </svg>
-                                                Redo
+                                                Next Player
                                             </Flex>
                                         </div>
                                         <div @click="$emit('showAllCards'); closeOnClick ? emit('closeModal') : '';"
@@ -164,8 +164,10 @@
                                                         :input="user.role?.id ? { value: user.role?.id } : null"
                                                         @update="(value) => $emit('updateRole', value, user)" />
                                                 </div>
-                                                <div class="w-1/6 text-red-500 cursor-pointer hover:text-red-600 transition duration-300 text-lg">
-                                                    <button @click="$emit('removePlayer', user.user.id)">Remove User</button>
+                                                <div
+                                                    class="w-1/6 text-red-500 cursor-pointer hover:text-red-600 transition duration-300 text-lg">
+                                                    <button @click="$emit('removePlayer', user.user.id)">Remove
+                                                        User</button>
                                                 </div>
                                             </Flex>
                                         </transition-group>
@@ -203,7 +205,8 @@ const emit = defineEmits([
     'newGame',
     'updateTableGameStatus',
     'showAllCards',
-    'removePlayer'
+    'removePlayer',
+    'setNextPlayer'
 ]);
 const props = defineProps({
     modalOpen: { type: Boolean },
@@ -231,9 +234,9 @@ onClickOutside(modal, () => {
 })
 
 watch(() => props.menuTab,
-() => {
-    selectedMenuItem.value = props.menuTab;
-})
+    () => {
+        selectedMenuItem.value = props.menuTab;
+    })
 </script>
 
 <style scoped>
@@ -246,5 +249,4 @@ watch(() => props.menuTab,
 .modal-leave-to {
     opacity: 0;
     transform: scale(1.1);
-}
-</style>
+}</style>
