@@ -70,9 +70,24 @@ export const usePlayerStore = defineStore('PlayerStore', {
                     }
                 });
             } else {
-                toast.warning('You have to login first');
+                toast.warning('You have to login or set guest nickname');
                 router.push({ name: 'lobby' })
             }
+        },
+        async _validateTablePassword(password: string): Promise<any> {
+            return new Promise((resolve, reject) => {
+                socket.emit('validateTablePassword', {
+                    table: this.$state.table, password
+                }, (response: any) => {
+                    if (response.error) {
+                        // Reject the promise if there's an error
+                        reject(response.error);
+                    } else {
+                        // Resolve the promise with the response
+                        resolve(response);
+                    }
+                });
+            });
         },
         _leaveTable() {
             const userId = userStore.user.id;
@@ -137,7 +152,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 table: this.$state.table, room: this.$state.room
             })
         },
-        _newGame() { 
+        _newGame() {
             socket.emit('newGame', {
                 table: this.$state.table, room: this.$state.room
             })
@@ -288,6 +303,11 @@ export const usePlayerStore = defineStore('PlayerStore', {
         _removePlayer(userId: number) {
             socket.emit('removePlayer', {
                 userId, tableId: this.$state.table?.id, publicUrl: this.$state.table?.public_url
+            });
+        },
+        _setNextPlayer(next_player: boolean) {
+            socket.emit('setNextPlayer', {
+                next_player, table_users: this.$state.table?.table_users, room: this.$state.table?.public_url
             });
         },
         resetDropZones() {

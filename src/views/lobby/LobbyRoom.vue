@@ -19,9 +19,6 @@
                 <DarkTableCell>
                     {{ table.status }}
                 </DarkTableCell>
-                <!-- <DarkTableCell class="flex justify-center">
-                    <PrimaryButton :title="'Join Game'"></PrimaryButton>
-                </DarkTableCell> -->
             </DarkTableRow>
         </DarkTable>
 
@@ -31,16 +28,24 @@
             </GridColItem>
             <GridColItem :all="1">
                 <Flex :justify="'center'" :gap="2">
-                    <PrimaryButton :title="'Create Table'" @click="createTableModal = true"></PrimaryButton>
+                    <PrimaryButton :title="'Create Table'" @click="createTableModal = true"
+                        v-if="userStore.user.role !== Roles.guest"></PrimaryButton>
                     <PrimaryButton :title="'Join Table'" :disable="selectTable === -1" @click="joinRoom()"></PrimaryButton>
-                    <RemoveButton v-if="playerStore.table?.creator?.id === userStore.user.id" @click="playerStore._removeTable()" />
+                    <RemoveButton v-if="playerStore.table?.creator?.id === userStore.user.id"
+                        @click="playerStore._removeTable()" />
                 </Flex>
             </GridColItem>
         </GridCol>
 
     </Container>
 
-    <CreateTableModal :is-modal-open="createTableModal" @close-modal="() => createTableModal = false" />
+    <CreateTableModal :is-modal-open="createTableModal" @close-modal="() => createTableModal = false"
+        v-if="userStore.user.role !== Roles.guest" />
+
+    <ModalSetGuestUsername :is-modal-open="isOpenModalSetGuestUsername" @close-modal="isOpenModalSetGuestUsername = false"
+        @register-guest="(username: string) => registerGuest(username)" />
+    <ModalSetPasswordTable :is-modal-open="isOpenModalSetTablePassword" @close-modal="isOpenModalSetTablePassword = false"
+        @set-password-table="(password: string) => validatePassword(password)" />
 </template>
 
 <script setup lang="ts">
@@ -61,23 +66,31 @@ import socket from '@/plugins/socket'
 import { useRouter } from 'vue-router';
 import RemoveButton from '@/components/buttons/RemoveButton.vue';
 import type { Table } from '@/types/tables/Table';
+import ModalSetGuestUsername from '@/components/modals/ModalSetGuestUsername.vue';
+import { Roles } from '@/types/Roles.enum';
+import ModalSetPasswordTable from '@/components/modals/ModalSetPasswordTable.vue';
+import { useToast } from 'vue-toastification';
 
 
+const isOpenModalSetGuestUsername = ref(false);
+const isOpenModalSetTablePassword = ref(false);
 
 const router = useRouter()
 const userStore = useUserStore();
-// TEST
 const tables = ref<Table[]>([]);
 const filterTables = ref<Table[]>([]);
-
+const toast = useToast();
 const playerStore = usePlayerStore();
 const search = ref('');
 const createTableModal = ref(false);
 
 onBeforeMount(() => {
+    if (!userStore.user.id) {
+        isOpenModalSetGuestUsername.value = true;
+    }
     // Get active tables
     socket.emit('findAllOnlineTable', {}, (response: Table[]) => {
-        tables.value = filterTables.value = response; 
+        tables.value = filterTables.value = response;
     });
     // Add a new table - Update list
     socket.on('addNewTable', (response: Table) => {
@@ -100,17 +113,38 @@ onBeforeMount(() => {
 
 const joinRoom = () => {
     if (playerStore.table) {
-        router.push({ name: 'room', params: { id: playerStore.table.public_url } })
+        if (playerStore.table.private) {
+            isOpenModalSetTablePassword.value = true;
+        } else {
+            router.push({ name: 'room', params: { id: playerStore.table.public_url } })
+        }
     }
 }
 
-
-// END TEST
+const validatePassword = async (password: string) => {
+    await playerStore._validateTablePassword(password).then((response) => {
+        if (response.status === 200) {
+            if (playerStore.table) {
+                isOpenModalSetTablePassword.value = false;
+                router.push({ name: 'room', params: { id: playerStore.table.public_url } })
+            }
+        } else {
+            isOpenModalSetTablePassword.value = false;
+            toast.error('Wrong Password')
+        }
+    })
+}
 
 const tablesFields = ref([
     'Table', 'Game', 'Players', 'creator', 'status'
 ]);
 const selectTable = ref<number>(-1);
+
+const registerGuest = (username: string) => {
+    userStore.registerGuest(username).then(() => {
+        isOpenModalSetGuestUsername.value = false;
+    })
+}
 
 const handleSelectTable = (index: number, table: Table) => {
     if (selectTable.value === index) {
@@ -119,7 +153,7 @@ const handleSelectTable = (index: number, table: Table) => {
     } else {
         selectTable.value = index;
         playerStore.table = table;
-    } 
+    }
 }
 
 watch(() => search.value,

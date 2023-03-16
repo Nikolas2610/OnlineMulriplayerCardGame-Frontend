@@ -7,6 +7,9 @@ import router from "@/router";
 import axiosClient from "@/plugins/axios";
 import type { AxiosResponse } from 'axios';
 import jwtDecode from "jwt-decode";
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 export const useUserStore = defineStore("UserStore", {
     state: () => {
@@ -21,7 +24,7 @@ export const useUserStore = defineStore("UserStore", {
             } as UserState,
             userLogin: {
                 email: 'admin@omcg.com',
-                password: 'CardGame-0', 
+                password: 'CardGame-0',
             } as UserLogin,
             userRegister: {
                 username: '',
@@ -115,6 +118,21 @@ export const useUserStore = defineStore("UserStore", {
                 return 'error';
             } catch (err: any) {
                 return err.response ? err.response.data.message : err.message;
+            }
+        },
+        async registerGuest(username: string) {
+            try {
+                const response: AxiosResponse = await axiosClient.post(`auth/guest`, { username });
+                if (response.status === 201) {
+                    this.$state.user.id = response.data.id;
+                    this.$state.user.role = response.data.role;
+                    this.$state.user.username = response.data.username;
+                    localStorage.setItem('username', response.data.username);
+                    localStorage.setItem('id', response.data.id);
+                    toast.success('Guest user created successfully')
+                }
+            } catch (err: any) {
+                toast.error(err.response ? err.response.data.message : err.message)
             }
         },
         decodeToken(token: string) {

@@ -25,7 +25,7 @@
         @stop-game="playerStore._stopGame()" @leave-game="playerStore._leaveGame()" @new-game="playerStore._newGame()"
         @update-table-game-status="(status) => playerStore._updateTableGameStatus(status)"
         @show-all-cards="playerStore._showAllCards()"
-        />
+        @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)" />
     <ModalFullPage :table-users="playerStore.table?.table_users" v-if="playerStore.gameMaster"
         :table-status="{ status: playerStore.table?.status }" :table="playerStore.table || undefined"
         :modal-open="modalOpen" @close-modal="modalOpen = false"
@@ -36,7 +36,8 @@
         @leave-game="playerStore._leaveGame()" @new-game="playerStore._newGame()"
         @update-table-game-status="(status) => playerStore._updateTableGameStatus(status)"
         @show-all-cards="playerStore._showAllCards()" :menu-tab="modalFullPageMenuTabProp"
-        @remove-player="(userId) => playerStore._removePlayer(userId)" />
+        @remove-player="(userId) => playerStore._removePlayer(userId)"
+        @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)" />
     <ModalViewAllCards :is-modal-open="modalOpenViewAllCards" :cards="playerStore.cards"
         :table-decks="playerStore.table?.table_decks" @close-modal="modalOpenViewAllCards = false"
         v-if="playerStore.cards" />
@@ -93,6 +94,8 @@ onBeforeMount(() => {
 
     // update table users turn
     socket.on('getTurnTableUsers', (response: TableUsers[]) => {
+        console.log('getTurnTableUsers');
+
         if (playerStore.table && response) {
             playerStore.table.table_users = response;
         }
