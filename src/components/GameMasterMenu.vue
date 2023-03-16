@@ -68,8 +68,8 @@
         </Flex>
         <Flex class="border-r h-full px-6" items="center" :gap="4">
             <!-- Undo -->
-            <Flex :justify="'center'" :items="'center'"
-                class="hover:text-primary duration-300 transition cursor-not-allowed">
+            <Flex :justify="'center'" :items="'center'" @click="$emit('setNextPlayer', false)"
+                class="hover:text-primary duration-300 transition">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -82,8 +82,8 @@
                 </VTooltip>
             </Flex>
             <!-- Redo -->
-            <Flex :justify="'center'" :items="'center'"
-                class="hover:text-primary duration-300 transition cursor-not-allowed">
+            <Flex :justify="'center'" :items="'center'" @click="$emit('setNextPlayer', true)"
+                class="hover:text-primary duration-300 transition">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -157,7 +157,9 @@ const emits = defineEmits([
     'leaveGame',
     'newGame',
     'updateTableGameStatus',
-    'showAllCards']);
+    'showAllCards', 
+    'setNextPlayer'
+]);
 
 </script>
 

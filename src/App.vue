@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import NavBar from '@/components/NavBar.vue'
 import { onMounted, ref } from 'vue';
 import { useUserStore } from './stores/UserStore'
+import { Roles } from './types/Roles.enum';
 
 const userStore = useUserStore();
 const isModalOpen = ref<Boolean>(false);
@@ -13,6 +14,14 @@ onMounted(() => {
     const token = localStorage.getItem('token');
     if (token) {
       userStore.decodeToken(token);
+    }
+  } else {
+    const id = localStorage.getItem('id')
+    const username = localStorage.getItem('username')
+    if (id && username) {
+      userStore.user.id = parseInt(id);
+      userStore.user.username = username;
+      userStore.user.role = Roles.guest;
     }
   }
 })
@@ -33,6 +42,4 @@ const deactiveteModal = () => {
   <RouterView />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
