@@ -3,7 +3,7 @@
     <Flex :justify="'center'">
         <Flex :class="`w-[${width}px] h-[120px]`" class="bg-secondary border px-4" :items="'center'" :justify="'between'">
             <Flex v-if="playerStore.cards">
-                <TableDecks :deck="{ tableDeckId: deck.tableDeckId, index, cards: playerStore.getCards(deck.tableDeckId) }"
+                <TableDecks :deck="{ tableDeckId: deck.tableDeckId, index, cards: playerStore.getCards(deck.tableDeckId), deckName: playerStore.table?.table_decks?.find(d => d.id === deck.tableDeckId)?.deck?.name }"
                     :index="index" v-for="(deck, index) in playerStore.dropZones.deck" :key="deck.tableDeckId"
                     @deck-create="(reference) => addDeckToDropZone(reference, index)"
                     @on-drag-start="(event, cardRef, card) => onDragStart(event, cardRef, card)"
@@ -24,7 +24,8 @@
     </Flex>
 
     <!-- Table -->
-    <Flex :justify="'center'" v-if="playerStore.cards">
+
+    <Flex :justify="'center'" v-if="playerStore.cards && playerStore.getTableExist">
         <div class="grid bg-dark relative" :class="`grid-cols-${playerStore.table?.game?.grid_cols} grid-rows-${playerStore.table?.game?.grid_rows} h-[${height}px] w-[${width}px]`
         " ref="tableDeckReference" @drop="(event) => onDrop(event, playerStore.getTableDeckId, 'table')"
             @dragover.prevent @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
@@ -66,7 +67,7 @@ import PlayerSettings from './PlayerSettings.vue';
 
 const playerStore = usePlayerStore();
 const height = ref(800);
-const width = ref(1200);
+const width = ref(1000);
 const heightCell = ref(800)
 
 if (playerStore.table?.game) {

@@ -15,7 +15,7 @@
                 <SelectField :title="'Game'"
                     :input="tableStore.editTable ? { value: tableStore.edit.game?.id } : { value: tableStore.table.game }"
                     :options="tableStore.games.map((game) => ({ id: game.id, name: game.name }))"
-                    @update="(value) => tableStore.updateSelectedGame(value)" />
+                    @update="(value) => tableStore.updateSelectedGame(value)" :errors="v$.game.$errors" />
             </div>
             <div class="col-span-2 mb-3" v-if="tableStore.editTable">
                 <SelectField :title="'Status'" :input="{ value: tableStore.edit.status }"
@@ -23,13 +23,25 @@
                     @update="(value) => tableStore.edit.status = value" />
             </div>
         </div>
-        <PrimaryButton :title="'Delete Users'" v-if="tableStore.role === 'admin' && tableStore.editTable"
-            @click="tableStore._deleteTableUsers()" />
-        <div class="flex justify-center mt-8" v-if="tableStore.editTable">
-            <button class="mr-2 btn-grey" type="button" v-if="tableStore.editTable"
-                @click="tableStore.editTable = false">Back</button>
-            <button class="btn-green" type="submit">Submit</button>
+        <div v-if="tableStore.editTable">
+            <PrimaryButton :title="'Delete Table Settings'" v-if="tableStore.role === 'admin'"
+                @click="tableStore._deleteTableDetails()" />
+            <div class="flex justify-center mt-8">
+                <button class="mr-2 btn-grey" type="button" @click="tableStore.editTable = false">Back</button>
+                <button class="btn-green" type="submit">Submit</button>
+            </div>
         </div>
+        <Flex class="mt-8" v-else>
+            <button type="submit"
+                class="rounded-md w-full border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
+                Submit
+            </button>
+            <button
+                class="rounded-md w-full border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
+                @click="$emit('closeModal')">
+                Close
+            </button>
+        </Flex>
     </form>
     <div v-else>
         <PreLoader />
@@ -47,6 +59,7 @@ import useVuelidate from '@vuelidate/core';
 import PreLoader from '../PreLoader.vue';
 import PrimaryButton from '../buttons/PrimaryButton.vue';
 import { StatusTable } from '@/utils/StatusTable'
+import Flex from '../wrappers/Flex.vue';
 
 const tableStore = useTableStore();
 const table = computed(() => {
@@ -67,10 +80,14 @@ const rules = computed(() => {
 const v$ = useVuelidate(rules, tableStore.editTable ? tableStore.edit : tableStore.table);
 
 const submit = async () => {
-    await v$.value.$validate();
-    if (!v$.value.$error) {
-        v$.value.$reset();
-        emits('submit');
+    if (tableStore.editTable) {
+        tableStore._update();
+    } else {
+        await v$.value.$validate();
+        if (!v$.value.$error) {
+            v$.value.$reset();
+            tableStore._submit();
+        }
     }
 }
 </script>

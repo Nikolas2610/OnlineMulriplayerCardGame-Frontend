@@ -136,15 +136,15 @@ const router = createRouter({
             title: `${appName} | Create Deck`
           },
         },
-        {
-          path: '/create-table',
-          name: 'create-table',
-          component: () => import('../views/lobby/CreateTableView.vue'),
-          meta: {
-            requiresAuth: true,
-            title: `${appName} | Create Table`
-          },
-        },
+        // {
+        //   path: '/create-table',
+        //   name: 'create-table',
+        //   component: () => import('../views/lobby/CreateTableView.vue'),
+        //   meta: {
+        //     requiresAuth: true,
+        //     title: `${appName} | Create Table`
+        //   },
+        // },
         {
           path: '/create-card',
           name: 'create-card',

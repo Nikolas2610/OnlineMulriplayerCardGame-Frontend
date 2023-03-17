@@ -33,9 +33,8 @@ const router = useRouter();
 const userStore = useUserStore();
 const items = ref([
     { id: 1, name: 'Lobby', icon: '/src/assets/icons/sidebar/joystick.svg', router: 'lobby-room', requireAuth: false },
-    { id: 2, name: 'Create Table', icon: '/src/assets/icons/sidebar/tables.svg', router: 'create-table', requireAuth: true },
-    { id: 3, name: 'Create Game', icon: '/src/assets/icons/sidebar/games.svg', router: 'create-game', requireAuth: true },
-    { id: 4, name: 'Create Deck', icon: '/src/assets/icons/sidebar/decks.svg', router: 'create-deck', requireAuth: true },
-    { id: 5, name: 'Create Card', icon: '/src/assets/icons/sidebar/cards.svg', router: 'create-card', requireAuth: true },
+    { id: 2, name: 'Create Game', icon: '/src/assets/icons/sidebar/games.svg', router: 'create-game', requireAuth: true },
+    { id: 3, name: 'Create Deck', icon: '/src/assets/icons/sidebar/decks.svg', router: 'create-deck', requireAuth: true },
+    { id: 4, name: 'Create Card', icon: '/src/assets/icons/sidebar/cards.svg', router: 'create-card', requireAuth: true },
 ])
 </script>
