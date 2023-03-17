@@ -33,9 +33,6 @@
                                                 {{ table.private ? 'YES' : 'NO' }}
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                                {{ table.password }}
-                                            </td>
-                                            <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                                 {{ table.status }}
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
@@ -108,7 +105,7 @@ const tableStore = useTableStore();
 const isDeleteModalOpen = ref(false);
 const tables = computed(() => tableStore.tables)
 const tablesFields = ref([
-    'No', 'NAME', 'PRIVATE', 'PASSWORD', 'STATUS', 'GAME', 'CREATED AT'
+    'No', 'NAME', 'PRIVATE', 'STATUS', 'GAME', 'CREATED AT'
 ]);
 route.meta.admin ? tableStore.setUserRole('admin') :tableStore.setUserRole('user');
 

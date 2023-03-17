@@ -23,12 +23,12 @@
                     <GridColItem :xs="1">
                         <InputField :input="gameStore.createGame.game.grid_rows"
                             @change="(e) => { gameStore.createGame.game.grid_rows = e; gameStore.stepFormChange() }"
-                            :title="'Grid Rows'" :max="10" :min="1" :type="'number'" :errors="v$.grid_rows.$errors" />
+                            :title="'Grid Rows'" :max="12" :min="0" :type="'number'" :errors="v$.grid_rows.$errors" />
                     </GridColItem>
                     <GridColItem :xs="1">
                         <InputField :input="gameStore.createGame.game.grid_cols"
                             @change="(e) => { gameStore.createGame.game.grid_cols = e; gameStore.stepFormChange() }"
-                            :title="'Grid Columns'" :max="10" :min="1" :type="'number'" :errors="v$.grid_cols.$errors" />
+                            :title="'Grid Columns'" :max="12" :min="0" :type="'number'" :errors="v$.grid_cols.$errors" />
                     </GridColItem>
                     <GridColItem :xs="2">
                         <TextAreaFiled :title="'Description'" :input="gameStore.createGame.game.description"

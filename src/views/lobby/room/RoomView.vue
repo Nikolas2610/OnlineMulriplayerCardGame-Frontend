@@ -25,7 +25,8 @@
         @stop-game="playerStore._stopGame()" @leave-game="playerStore._leaveGame()" @new-game="playerStore._newGame()"
         @update-table-game-status="(status) => playerStore._updateTableGameStatus(status)"
         @show-all-cards="playerStore._showAllCards()"
-        @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)" />
+        @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)"
+        @shuffle-deck="playerStore._shuffleDeck()" />
     <ModalFullPage :table-users="playerStore.table?.table_users" v-if="playerStore.gameMaster"
         :table-status="{ status: playerStore.table?.status }" :table="playerStore.table || undefined"
         :modal-open="modalOpen" @close-modal="modalOpen = false"
@@ -133,16 +134,6 @@ onBeforeMount(() => {
         router.push({ name: 'lobby' })
     })
 
-    socket.on('getUpdateCardPosition', (response: TableCard[]) => {
-        if (response && playerStore.cards) {
-            playerStore.cards = response;
-            const max = playerStore.cards.reduce((maxValue, obj) => {
-                return obj.z_index > maxValue ? obj.z_index : maxValue;
-            }, 0);
-            playerStore.zIndex = max + 1;
-        }
-    });
-
     socket.on('getTableGameStatus', (tableGame: Table) => {
         if (tableGame) {
             playerStore.table = tableGame;
@@ -154,7 +145,31 @@ onBeforeMount(() => {
             modalOpenViewAllCards.value = response;
         }
     })
-})
+
+    socket.on('getUpdateCard', (response) => {
+        if (response) {
+            updateCard(response);
+        }
+    });
+
+    socket.on('getShuffleDeck', (response: TableCard[]) => {
+        console.log(response);
+        
+        if (response) {
+            response.forEach(card => {
+                updateCard(card);
+            })
+        }
+    });
+});
+
+const updateCard = (cardResponse: TableCard) => {
+    const cardIndex = playerStore.cards?.findIndex((card) => card.id === cardResponse.id);
+    if (cardIndex && cardIndex > -1) {
+        playerStore.cards?.splice(cardIndex, 1); // Remove the card from the array
+    }
+    playerStore.cards?.push(cardResponse); // Add the updated card to the array
+}
 
 const extractTableDecksDetails = () => {
     playerStore.resetDropZones();

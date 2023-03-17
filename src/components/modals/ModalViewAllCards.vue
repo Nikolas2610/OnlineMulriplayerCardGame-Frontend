@@ -1,22 +1,23 @@
 <template>
-    <Modal :modalOpen="isModalOpen" @closeModal="$emit('closeModal')" v-if="cards || tableDecks" 
-    class="z-[2147483645]">
+    <Modal :modalOpen="isModalOpen" @closeModal="$emit('closeModal')" v-if="cards || tableDecks" class="z-[2147483645]">
         <template v-slot:modal_header>
             Cards
         </template>
 
         <template v-slot:body>
-            <div v-for="deck in tableDecks" :key="deck.id" class="px-4">
-                <div class="border-b border-primary text-black py-2 mb-3">
-                    {{ printName(deck) }}
+            <div class=" max-h-[500px] overflow-y-auto">
+                <div v-for="deck in tableDecks" :key="deck.id" class="px-4">
+                    <div class="border-b border-primary text-black py-2 mb-3">
+                        {{ printName(deck) }}
+                    </div>
+                    <Flex :gap="2" :wrap="true" v-if="getCards(deck.id)?.length > 0">
+                        <img class="card-box" :src="loadImage(card.card.image)" v-for="card in getCards(deck.id)"
+                            :key="card.id">
+                    </Flex>
+                    <Flex :gap="2" v-else>
+                        <div>No cards</div>
+                    </Flex>
                 </div>
-                <Flex :gap="2" v-if="getCards(deck.id)?.length > 0">
-                    <img class="card-box" :src="loadImage(card.card.image)" v-for="card in getCards(deck.id)"
-                        :key="card.id">
-                </Flex>
-                <Flex :gap="2" v-else>
-                    <div>No cards</div>
-                </Flex>
             </div>
         </template>
 

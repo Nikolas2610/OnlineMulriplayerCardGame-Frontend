@@ -12,7 +12,7 @@ import { useTableStore } from '@/stores/TableStore';
 
 const tableStore = useTableStore();
 const createGame = async () => {
-    tableStore._submit();
+    // tableStore._submit();
 }
 tableStore.fetchGames();
 </script>

@@ -21,7 +21,7 @@ export const useTableStore = defineStore('TableStore', {
                 name: '',
                 private: false,
                 password: '',
-                game: 0,
+                game: null as number | null,
             } as CreateTable,
             games: [] as Game[],
             editTable: false,
@@ -65,11 +65,14 @@ export const useTableStore = defineStore('TableStore', {
             this.toggleLoading();
         },
         async _submit() {
-            // TODO: Validation and catch the errors
             const user_id = userStore.user.id;
             socket.emit('createOnlineTable', { user_id, table: this.$state.table }, (response: Table) => {
                 if (response.id) {
                     playerStore.table = response;
+                    this.$state.table.game = null;
+                    this.$state.table.name = '';
+                    this.$state.table.password = '';
+                    this.$state.table.private = false;
                     router.push({ name: 'room', params: { id: response.public_url } })
                 }
             })
@@ -116,7 +119,7 @@ export const useTableStore = defineStore('TableStore', {
                 toast.error(error)
             }
         },
-        async _deleteTableUsers() {
+        async _deleteTableDetails() {
             try {
                 this.toggleLoading();
                 const response: AxiosResponse = await axiosUser.delete(`${this.$state.role}/table/users`,

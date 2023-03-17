@@ -1,4 +1,3 @@
-
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { useUserStore } from "./UserStore";
 import socket from "@/plugins/socket";
@@ -44,18 +43,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
         getJunkTableDeckId: (state) => state.dropZones.junk[0]?.tableDeckId,
         getTableDeckId: (state) => state.dropZones.table[0]?.tableDeckId,
         getExistPlayerPlayingStatus: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.playing,
-        getExistTableUserId: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.id
+        getExistTableUserId: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.id,
+        getTableExist: (state) => state.table?.game?.grid_cols && state.table?.game?.grid_rows ? state.table?.game?.grid_cols > 0 && state.table?.game?.grid_rows > 0 : false
     },
     actions: {
-        async _createTable() {
-            // TODO: Validation and catch the errors
-            // ! FIX FUNCTION
-            const userId = userStore.user.id;
-
-            socket.emit('createOnlineTable', { userId, table: this.$state.table }, (response: any) => {
-
-            });
-        },
         _joinTable(publicUrl: string) {
             const userId = userStore.user.id
 
@@ -182,9 +173,6 @@ export const usePlayerStore = defineStore('PlayerStore', {
                     const { offsetHeight, offsetWidth } = dropZone.element;
                     this.$state.cards?.forEach(dragCard => {
                         if (dragCard.id === card.id) {
-                            if (tableDeckId && card.table_deck.id !== tableDeckId) {
-                                dragCard.table_deck.id = tableDeckId;
-                            }
                             // Update the top position of the dropped box
                             if (offsetY > offsetHeight - cardHeight) {
                                 // Card is too big, adjust it to fit inside the drop zone
@@ -208,11 +196,22 @@ export const usePlayerStore = defineStore('PlayerStore', {
                                 dragCard.position_y = offsetX;
                             }
                             dragCard.z_index = this.$state.zIndex;
-                        }
+                            if (type === 'junk') {
+                                dragCard.hidden = false;
+                            }
 
-                    })
-                    socket.emit('updateCardPosition', {
-                        cards: this.$state.cards, room: this.$state.room
+                            if (type === 'user') {
+                                this.$state.dropZones.deck.forEach(deck => {
+                                    if (deck.tableDeckId === dragCard.table_deck.id) {
+                                        dragCard.hidden = true;
+                                    }
+                                })
+                            }
+                            if (tableDeckId && card.table_deck.id !== tableDeckId) {
+                                dragCard.table_deck.id = tableDeckId;
+                            }
+                            this.updateCard(dragCard);
+                        }
                     })
                 }
             }
@@ -220,9 +219,9 @@ export const usePlayerStore = defineStore('PlayerStore', {
         getTableDeckIdOfUser(userId: number) {
             return this.$state.table?.table_decks?.find(deck => deck.user?.id === userId)?.id
         },
-        updateCards() {
-            socket.emit('updateCardPosition', {
-                cards: this.$state.cards, room: this.$state.room
+        updateCard(card: TableCard) {
+            socket.emit('updateCard', {
+                card, room: this.$state.room
             })
         },
         toggleCardVisibility() {
@@ -230,9 +229,9 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 this.$state.cards?.forEach(c => {
                     if (c.id === this.$state.clickCardId) {
                         c.hidden = !c.hidden;
+                        this.updateCard(c);
                     }
                 })
-                this.updateCards()
             }
         },
         rotateCard(movement: MovementRotateCard) {
@@ -256,9 +255,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
                                 card.rotate -= 90;
                             }
                         }
+                        this.updateCard(card);
                     }
                 });
-                this.updateCards();
+                // this.updateCards();
             }
         },
         addStatusPlayer(status: Status | null) {
@@ -282,11 +282,13 @@ export const usePlayerStore = defineStore('PlayerStore', {
         },
         isCardHidden() {
             if (this.$state.clickCardId) {
+                let hidden = true;
                 this.$state.cards?.forEach(c => {
                     if (c.id === this.$state.clickCardId) {
-                        return c.hidden
+                        hidden = c.hidden;
                     }
-                })
+                });
+                return hidden;
             }
             return true;
         },
@@ -309,6 +311,14 @@ export const usePlayerStore = defineStore('PlayerStore', {
             socket.emit('setNextPlayer', {
                 next_player, table_users: this.$state.table?.table_users, room: this.$state.table?.public_url
             });
+        },
+        _shuffleDeck() {
+            if (this.$state.clickCardId) {
+                const table_deck_id = this.$state.cards?.find(card => card.id === this.$state.clickCardId)?.table_deck.id;
+                socket.emit('shuffleDeck', {
+                    table_deck_id, room: this.$state.table?.public_url
+                });
+            }
         },
         resetDropZones() {
             this.$state.dropZones = {

@@ -1,6 +1,6 @@
 <template>
     <Flex
-        class="border text-white fixed bottom-10 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[450px] hover:-translate-x-[20px]"
+        class="border text-white fixed bottom-10 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[490px] hover:-translate-x-[20px]"
         items="center" justify="center">
         <Flex class="border-r h-full px-6 pl-10" items="center" :gap="4">
             <!-- Play -->
@@ -22,7 +22,7 @@
                 <button
                     @click="playerStore.table?.status === TableStatus.PLAYING ? $emit('updateTableGameStatus', TableStatus.PAUSE) : $emit('updateTableGameStatus', TableStatus.PLAYING)"
                     :disabled="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING"
-                    :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed' : ''">
+                    :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed opacity-50' : ''">
                     <VTooltip distance="22">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -39,7 +39,7 @@
             <!-- Stop -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
                 @click="$emit('stopGame')"
-                :class="playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed' : ''">
+                :class="playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed opacity-50' : ''">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -97,7 +97,7 @@
             </Flex>
             <!-- Show all cards -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
-                :class="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.PAUSE ? '' : 'cursor-not-allowed'"
+                :class="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.PAUSE ? '' : 'cursor-not-allowed opacity-50'"
                 @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.PAUSE ? $emit('showAllCards') : ''">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -107,6 +107,23 @@
                     </svg>
                     <template #popper>
                         Show all cards to players
+                    </template>
+                </VTooltip>
+            </Flex>
+            <!-- Shuffle click deck -->
+            <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
+                :class="isAvailableShuffleDeck() ? 'cursor-not-allowed opacity-50' : ''"
+                @click="isAvailableShuffleDeck() ? '' : $emit('shuffleDeck')">
+                <VTooltip distance="22">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z" />
+                        <path
+                            d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z" />
+                    </svg>
+                    <template #popper>
+                        Shuffle selected deck
                     </template>
                 </VTooltip>
             </Flex>
@@ -157,9 +174,27 @@ const emits = defineEmits([
     'leaveGame',
     'newGame',
     'updateTableGameStatus',
-    'showAllCards', 
-    'setNextPlayer'
+    'showAllCards',
+    'setNextPlayer',
+    'shuffleDeck'
 ]);
+
+const isAvailableShuffleDeck = () => {
+    if (!playerStore.clickCardId) {
+        return true;
+    }
+
+    const tableDeckId = playerStore.cards?.find(card => card.id === playerStore.clickCardId)?.table_deck.id;
+    if (!tableDeckId || playerStore.table?.status !== TableStatus.PLAYING) {
+        return true;
+    }
+
+    if (tableDeckId === playerStore.getJunkTableDeckId) {
+        return false;
+    }
+
+    return !playerStore.dropZones.deck.some(deck => deck.tableDeckId === tableDeckId);
+};
 
 </script>
 

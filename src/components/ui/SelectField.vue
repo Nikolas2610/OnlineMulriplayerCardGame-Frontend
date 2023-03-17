@@ -6,6 +6,9 @@
         <option :value="null">--Empty--</option>
         <option :value="item.id" v-for="(item, index) in options" :key="index">{{ item.name }}</option>
     </select>
+    <div v-for="error in errors" :key="error.$uid" class="text-rose-700 text-base font-medium mt-1 px-2">
+        {{ error.$message }}
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -26,7 +29,8 @@ const props = defineProps({
     titleShow: { type: Boolean, default: true },
     title: { type: String },
     input: { type: Object as PropType<Input | null>, default: null },
-    dark: { type: Boolean, default: false }
+    dark: { type: Boolean, default: false }, 
+    errors: { type: Object },
 });
 
 const emits = defineEmits(['update'])

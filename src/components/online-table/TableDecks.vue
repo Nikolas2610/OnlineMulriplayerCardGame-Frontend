@@ -7,7 +7,7 @@
                     <DraggableCard :card="card" v-for="(card, index) in deck.cards" :key="index"
                         @on-drag-start="(event, cardRef) => $emit('onDragStart', event, cardRef, card)" :hidden-cards="true" />
             </div>
-            <div>Deck {{ (deck.index + 1) }}</div>
+            <div>{{ deck.deckName }}</div>
         </Flex>
     </Flex>
 </template>
@@ -23,7 +23,8 @@ const deckReference = ref<HTMLElement | null>(null);
 interface TableDeckId {
     tableDeckId: number | undefined;
     cards: TableCard[] | undefined;
-    index: number
+    index: number,
+    deckName: string | undefined
 }
 
 const props = defineProps({

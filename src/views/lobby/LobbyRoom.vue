@@ -1,5 +1,4 @@
 <template>
-    <!-- TODO: -->
     <Container>
         <DarkTable :table-headers="tablesFields" v-if="filterTables.length > 0">
             <DarkTableRow v-for="(table, i) in filterTables" :key="`lobby-row-${table.id}`"
@@ -14,9 +13,27 @@
                     {{ table.table_users?.length ? table.table_users.length : 0 }}
                 </DarkTableCell>
                 <DarkTableCell>
-                    {{ table.creator?.username }}
+                    <Flex>
+                        <div v-if="table.private">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="w-6 h-6 text-red-500" viewBox="0 0 16 16">
+                                <path
+                                    d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+                            </svg>
+                        </div>
+                        <div v-else>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="w-6 h-6 text-primary" viewBox="0 0 16 16">
+                                <path
+                                    d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z" />
+                            </svg>
+                        </div>
+                    </Flex>
                 </DarkTableCell>
                 <DarkTableCell>
+                    {{ table.creator?.username }}
+                </DarkTableCell>
+                <DarkTableCell :class="[table.status === TableStatus.WAITING ? 'text-blue-500' : '', table.status === TableStatus.PLAYING ? 'text-primary' : '', table.status === TableStatus.PAUSE ? 'text-yellow-500' : '']" class="capitalize">
                     {{ table.status }}
                 </DarkTableCell>
             </DarkTableRow>
@@ -41,7 +58,6 @@
 
     <CreateTableModal :is-modal-open="createTableModal" @close-modal="() => createTableModal = false"
         v-if="userStore.user.role !== Roles.guest" />
-
     <ModalSetGuestUsername :is-modal-open="isOpenModalSetGuestUsername" @close-modal="isOpenModalSetGuestUsername = false"
         @register-guest="(username: string) => registerGuest(username)" />
     <ModalSetPasswordTable :is-modal-open="isOpenModalSetTablePassword" @close-modal="isOpenModalSetTablePassword = false"
@@ -70,6 +86,7 @@ import ModalSetGuestUsername from '@/components/modals/ModalSetGuestUsername.vue
 import { Roles } from '@/types/Roles.enum';
 import ModalSetPasswordTable from '@/components/modals/ModalSetPasswordTable.vue';
 import { useToast } from 'vue-toastification';
+import { TableStatus } from '@/types/tables/TableStatus.enum';
 
 
 const isOpenModalSetGuestUsername = ref(false);
@@ -136,7 +153,7 @@ const validatePassword = async (password: string) => {
 }
 
 const tablesFields = ref([
-    'Table', 'Game', 'Players', 'creator', 'status'
+    'Table', 'Game', 'Players', 'Private', 'creator', 'status'
 ]);
 const selectTable = ref<number>(-1);
 
