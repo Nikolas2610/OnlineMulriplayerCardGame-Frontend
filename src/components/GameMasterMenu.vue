@@ -1,6 +1,6 @@
 <template>
     <Flex
-        class="border text-white fixed bottom-10 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[490px] hover:-translate-x-[20px]"
+        class="border text-white fixed bottom-10 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[610px] hover:-translate-x-[20px]"
         items="center" justify="center">
         <Flex class="border-r h-full px-6 pl-10" items="center" :gap="4">
             <!-- Play -->
@@ -10,7 +10,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
                         <path
-                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z" />
+                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
                     </svg>
                     <template #popper>
                         New Game
@@ -20,18 +20,43 @@
             <!-- Pause -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition">
                 <button
-                    @click="playerStore.table?.status === TableStatus.PLAYING ? $emit('updateTableGameStatus', TableStatus.PAUSE) : $emit('updateTableGameStatus', TableStatus.PLAYING)"
+                    @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? $emit('updateTableGameStatus', TableStatus.PAUSE) : $emit('updateTableGameStatus', TableStatus.PLAYING)"
+                    :disabled="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING"
+                    :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed opacity-50' : ''">
+                    <VTooltip distance="22">
+                        <svg v-if="playerStore.table?.status !== TableStatus.PAUSE" xmlns="http://www.w3.org/2000/svg"
+                            width="16" height="16" fill="currentColor" class="w-6 h-6 focus:outline-none"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.25 5C5.56 5 5 5.56 5 6.25v3.5a1.25 1.25 0 1 0 2.5 0v-3.5C7.5 5.56 6.94 5 6.25 5zm3.5 0c-.69 0-1.25.56-1.25 1.25v3.5a1.25 1.25 0 1 0 2.5 0v-3.5C11 5.56 10.44 5 9.75 5z" />
+                        </svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
+                            <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z" />
+                        </svg>
+                        <template #popper>
+                            Pause / Resume Game
+                        </template>
+                    </VTooltip>
+                </button>
+            </Flex>
+            <!-- Edit Table / Hide from other players -->
+            <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition">
+                <button
+                    @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.PAUSE ? $emit('updateTableGameStatus', TableStatus.GAME_MASTER_EDIT) : $emit('updateTableGameStatus', TableStatus.PLAYING)"
                     :disabled="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING"
                     :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed opacity-50' : ''">
                     <VTooltip distance="22">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
                             <path
-                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.25 5C5.56 5 5 5.56 5 6.25v3.5a1.25 1.25 0 1 0 2.5 0v-3.5C7.5 5.56 6.94 5 6.25 5zm3.5 0c-.69 0-1.25.56-1.25 1.25v3.5a1.25 1.25 0 1 0 2.5 0v-3.5C11 5.56 10.44 5 9.75 5z" />
+                                d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                            <path fill-rule="evenodd"
+                                d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                         </svg>
                         <template #popper>
-                            {{ playerStore.table?.status === TableStatus.PAUSE ? 'Resume Game' : 'Pause Game' }}
-
+                            Hide table from other players to edit the table
                         </template>
                     </VTooltip>
                 </button>
@@ -127,6 +152,36 @@
                     </template>
                 </VTooltip>
             </Flex>
+            <!-- Undo Movement -->
+            <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
+                :class="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? '' : 'cursor-not-allowed opacity-50'"
+                @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? $emit('historyMovement', HistoryMovement.UNDO) : ''">
+                <VTooltip distance="22">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
+                        <path
+                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16ZM7.729 5.055A.5.5 0 0 1 8 5.5v1.886l3.21-2.293A.5.5 0 0 1 12 5.5v5a.5.5 0 0 1-.79.407L8 8.614V10.5a.5.5 0 0 1-.79.407l-3.5-2.5a.5.5 0 0 1 0-.814l3.5-2.5a.5.5 0 0 1 .519-.038Z" />
+                    </svg>
+                    <template #popper>
+                        Undo Card Movement
+                    </template>
+                </VTooltip>
+            </Flex>
+            <!-- Redo Movement -->
+            <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
+                :class="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? '' : 'cursor-not-allowed opacity-50'"
+                @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? $emit('historyMovement', HistoryMovement.REDO) : ''">
+                <VTooltip distance="22">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
+                        <path
+                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16ZM4.79 5.093 8 7.386V5.5a.5.5 0 0 1 .79-.407l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 8 10.5V8.614l-3.21 2.293A.5.5 0 0 1 4 10.5v-5a.5.5 0 0 1 .79-.407Z" />
+                    </svg>
+                    <template #popper>
+                        Redo Card Movement
+                    </template>
+                </VTooltip>
+            </Flex>
         </Flex>
         <Flex class="border-r h-full px-6" items="center" :gap="4">
             <!-- Open User List -->
@@ -166,6 +221,7 @@
 import { usePlayerStore } from '@/stores/PlayerStore';
 import { TableStatus } from '@/types/tables/TableStatus.enum';
 import Flex from './wrappers/Flex.vue';
+import { HistoryMovement } from '@/types/online-table/HIstoryMovement.enum'
 
 const playerStore = usePlayerStore();
 const emits = defineEmits([
@@ -176,7 +232,8 @@ const emits = defineEmits([
     'updateTableGameStatus',
     'showAllCards',
     'setNextPlayer',
-    'shuffleDeck'
+    'shuffleDeck',
+    'historyMovement'
 ]);
 
 const isAvailableShuffleDeck = () => {
@@ -197,5 +254,3 @@ const isAvailableShuffleDeck = () => {
 };
 
 </script>
-
-<style scoped></style>

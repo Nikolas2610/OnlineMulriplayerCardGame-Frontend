@@ -106,18 +106,15 @@ const register = async () => {
         if (response === 'success') {
             // Reset Errors Form
             v$.value.$reset();
-            // TODO: Success Notification and message: Check your email to activate your account
             toast.success(`Registration has been created successfully. We have send an email to ${userStore.userRegister.email} to verify your email address and activate your account.`, {
                 timeout: 10000
             })
             // Reset Register Form
             resetRegisterForm();
         } else {
-            // TODO: Error Notifications - Server error or email exists (messages from middleware)
-            toast.error(`Registation fail. \n${response}`);
+            toast.error(`Registration fail. \n${response}`);
         }
     } else {
-        // TODO: Error Notifications - Please complete correct the form
         toast.error(`Please complete correct the form`);
     }
     // Disable loading button

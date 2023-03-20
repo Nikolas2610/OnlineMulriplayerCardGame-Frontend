@@ -66,9 +66,9 @@ import DraggableCard from './DraggableCard.vue';
 import PlayerSettings from './PlayerSettings.vue';
 
 const playerStore = usePlayerStore();
-const height = ref(800);
-const width = ref(1000);
-const heightCell = ref(800)
+const height = ref(import.meta.env.VITE_GAME_HEIGHT);
+const width = ref(import.meta.env.VITE_GAME_WIDTH);
+const heightCell = ref(import.meta.env.VITE_GAME_HEIGHT)
 
 if (playerStore.table?.game) {
     heightCell.value = parseFloat((height.value / playerStore.table?.game.grid_rows).toFixed(1));
@@ -101,6 +101,7 @@ const addDeckToDropZone = (reference: HTMLElement | null, index: number) => {
 
 // DRAG EVENTS
 const zIndex = ref(2);
+// TODO: Add colors on the dropzone
 const onDragLeave = (event: any) => {
     // console.log('\x1b[32m%s\x1b[0m', 'onDragLeave');
 }
@@ -123,7 +124,7 @@ const onDrop = (event: DragEvent, tableDeckId: number | undefined, type: string)
 }
 // END DRAG
 
-// For Debug 
+// TODO: For Debug 
 watch(() => playerStore.table?.game?.grid_rows,
     () => {
         if (playerStore.table?.game) {

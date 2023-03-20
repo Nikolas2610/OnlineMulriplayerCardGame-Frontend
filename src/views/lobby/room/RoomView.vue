@@ -3,7 +3,8 @@
     <Flex class="relative one-page w-full bg-dark">
         <div class="w-5/6 overflow-auto text-white">
             <!-- Table playing status -->
-            <OnlineTable v-if="playerStore.table?.status === TableStatus.PLAYING" />
+            <OnlineTable v-if="playerStore.table?.status === TableStatus.PLAYING
+                || (playerStore.gameMaster && playerStore.table?.status === TableStatus.GAME_MASTER_EDIT)" />
             <!-- Table waiting status -->
             <Flex v-else class="h-full bg-dark" :items="'center'" :justify="'center'" :column="true">
                 <div class="rounded-2xl bg-primary px-12 py-6  text-4xl italic">
@@ -26,7 +27,8 @@
         @update-table-game-status="(status) => playerStore._updateTableGameStatus(status)"
         @show-all-cards="playerStore._showAllCards()"
         @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)"
-        @shuffle-deck="playerStore._shuffleDeck()" />
+        @shuffle-deck="playerStore._shuffleDeck()"
+        @history-movement="(movement) => playerStore.historyMovement(movement)" />
     <ModalFullPage :table-users="playerStore.table?.table_users" v-if="playerStore.gameMaster"
         :table-status="{ status: playerStore.table?.status }" :table="playerStore.table || undefined"
         :modal-open="modalOpen" @close-modal="modalOpen = false"
@@ -62,7 +64,7 @@ import { TableDeckType } from '@/types/tables/TableDeckType';
 import { TableStatus } from '@/types/tables/TableStatus.enum';
 import ModalViewAllCards from '@/components/modals/ModalViewAllCards.vue';
 import { useUserStore } from '@/stores/UserStore';
-import { useToast } from 'vue-toastification';
+import { POSITION, useToast } from 'vue-toastification';
 
 const route = useRoute();
 const playerStore = usePlayerStore();
@@ -95,10 +97,14 @@ onBeforeMount(() => {
 
     // update table users turn
     socket.on('getTurnTableUsers', (response: TableUsers[]) => {
-        console.log('getTurnTableUsers');
-
         if (playerStore.table && response) {
             playerStore.table.table_users = response;
+        }
+        const user = playerStore.table?.table_users?.find(user => user.playing === true);
+        if (user) {
+            toast.info(`Player ${user.user.username} is playing`, {
+                position: POSITION.TOP_CENTER, timeout: 3000
+            });
         }
     })
 
@@ -153,8 +159,6 @@ onBeforeMount(() => {
     });
 
     socket.on('getShuffleDeck', (response: TableCard[]) => {
-        console.log(response);
-        
         if (response) {
             response.forEach(card => {
                 updateCard(card);
@@ -165,10 +169,12 @@ onBeforeMount(() => {
 
 const updateCard = (cardResponse: TableCard) => {
     const cardIndex = playerStore.cards?.findIndex((card) => card.id === cardResponse.id);
-    if (cardIndex && cardIndex > -1) {
+    if (cardIndex && cardIndex > -1 && playerStore.cards) {
+        playerStore.updateHistory(playerStore.cards[cardIndex], cardResponse);
         playerStore.cards?.splice(cardIndex, 1); // Remove the card from the array
+        playerStore.cards?.push(cardResponse); // Add the updated card to the array
+        playerStore.removeRedoHistoryMovement();
     }
-    playerStore.cards?.push(cardResponse); // Add the updated card to the array
 }
 
 const extractTableDecksDetails = () => {
@@ -198,9 +204,12 @@ const extractTableDecksDetails = () => {
 
 onUnmounted(() => {
     // TODO: Solution to this
+    socket.off();
     playerStore.room = null;
     playerStore.gameMaster = false;
     playerStore.cards = null;
+    playerStore.refHistory = [];
+    playerStore.refHistoryRedo = [];
     playerStore._leaveTable();
 })
 </script>

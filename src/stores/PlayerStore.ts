@@ -11,6 +11,8 @@ import type { DeckItem } from "@/types/online-table/DeckItem";
 import { TableStatus } from "@/types/tables/TableStatus.enum";
 import { MovementRotateCard } from "@/types/online-table/RotateCard.enum";
 import type { Status } from "@/types/games/relations/status/Status";
+import type { RefHistory } from "@/types/online-table/RefHistory";
+import { HistoryMovement } from "@/types/online-table/HIstoryMovement.enum";
 
 const userStore = useUserStore();
 const toast = useToast();
@@ -35,7 +37,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 table: null as HTMLElement | null,
                 junk: null as HTMLElement | null,
                 user: null as HTMLElement | null
-            }
+            },
+            refHistory: [] as RefHistory[],
+            refHistoryRedo: [] as RefHistory[],
+            refHistoryCapacity: 10 as number,
         }
     },
     getters: {
@@ -44,7 +49,8 @@ export const usePlayerStore = defineStore('PlayerStore', {
         getTableDeckId: (state) => state.dropZones.table[0]?.tableDeckId,
         getExistPlayerPlayingStatus: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.playing,
         getExistTableUserId: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.id,
-        getTableExist: (state) => state.table?.game?.grid_cols && state.table?.game?.grid_rows ? state.table?.game?.grid_cols > 0 && state.table?.game?.grid_rows > 0 : false
+        getTableExist: (state) => state.table?.game?.grid_cols && state.table?.game?.grid_rows ? state.table?.game?.grid_cols > 0 && state.table?.game?.grid_rows > 0 : false, 
+        getRefHistoryCapacity: (state) => state.refHistoryCapacity
     },
     actions: {
         _joinTable(publicUrl: string) {
@@ -210,7 +216,8 @@ export const usePlayerStore = defineStore('PlayerStore', {
                             if (tableDeckId && card.table_deck.id !== tableDeckId) {
                                 dragCard.table_deck.id = tableDeckId;
                             }
-                            this.updateCard(dragCard);
+                            this.updateHistory(card, dragCard);
+                            this._updateCard(dragCard);
                         }
                     })
                 }
@@ -219,7 +226,14 @@ export const usePlayerStore = defineStore('PlayerStore', {
         getTableDeckIdOfUser(userId: number) {
             return this.$state.table?.table_decks?.find(deck => deck.user?.id === userId)?.id
         },
-        updateCard(card: TableCard) {
+        updateCardHistory(cardResponse: TableCard) {
+            const cardIndex = this.$state.cards?.findIndex((card) => card.id === cardResponse.id);
+            if (cardIndex && cardIndex > -1 && this.$state.cards) {
+                this.$state.cards?.splice(cardIndex, 1); // Remove the card from the array
+                this.$state.cards?.push(cardResponse); // Add the updated card to the array
+            }
+        },
+        _updateCard(card: TableCard) {
             socket.emit('updateCard', {
                 card, room: this.$state.room
             })
@@ -228,8 +242,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
             if (this.$state.clickCardId) {
                 this.$state.cards?.forEach(c => {
                     if (c.id === this.$state.clickCardId) {
+                        const previousCard = c;
                         c.hidden = !c.hidden;
-                        this.updateCard(c);
+                        this.updateHistory(previousCard, c);
+                        this._updateCard(c);
                     }
                 })
             }
@@ -238,6 +254,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
             if (this.$state.clickCardId) {
                 this.$state.cards?.forEach(card => {
                     if (card.id === this.$state.clickCardId) {
+                        const previousCard = card;
                         if (movement === MovementRotateCard.RIGHT) {
                             // If the movement is "right" and the degree is 270, set it to 0
                             if (card.rotate === 270) {
@@ -255,10 +272,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
                                 card.rotate -= 90;
                             }
                         }
-                        this.updateCard(card);
+                        this.updateHistory(previousCard, card);
+                        this._updateCard(card);
                     }
                 });
-                // this.updateCards();
             }
         },
         addStatusPlayer(status: Status | null) {
@@ -295,6 +312,13 @@ export const usePlayerStore = defineStore('PlayerStore', {
         _updateTableGameStatus(status: TableStatus) {
             socket.emit('updateTableGameStatus', {
                 table: this.$state.table, status, room: this.$state.room
+            }, (response: { status: number, message: string }) => {
+                if (response.status === 200 && status === TableStatus.GAME_MASTER_EDIT) {
+                    toast.success('Table is hide from other players')
+                }
+                if (response.status === 200 && status === TableStatus.PLAYING) {
+                    toast.success('Table is back to playing mode for all players')
+                }
             })
         },
         _showAllCards() {
@@ -327,8 +351,53 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 junk: [],
                 user: [],
             }
+        },
+        updateHistory(previous: TableCard, next: TableCard, historyMovement: boolean = false) {
+            if (this.$state.gameMaster) {
+                if (this.$state.refHistory.length > this.getRefHistoryCapacity) {
+                    this.$state.refHistory.shift();
+                }
+                this.$state.refHistory.push({ previous, next });
+                if (!historyMovement) {
+                    this.removeRedoHistoryMovement();
+                }
+            }
+        },
+        updateRedoHistory(previous: TableCard, next: TableCard) {
+            if (this.$state.gameMaster) {
+                if (this.$state.refHistoryRedo.length > this.getRefHistoryCapacity) {
+                    this.$state.refHistoryRedo.shift();
+                }
+                this.$state.refHistoryRedo.push({ previous, next });
+            }
+        },
+        removeRedoHistoryMovement(oneElement: boolean = false) {
+            if (this.$state.refHistoryRedo.length > 0) {
+                if (oneElement) {
+                    this.$state.refHistoryRedo.shift();
+                } else {
+                    this.$state.refHistoryRedo = [];
+                }
+            }
+        },
+        historyMovement(move: HistoryMovement) {
+            if (move === HistoryMovement.UNDO) {
+                const cardHistory = this.$state.refHistory.pop();
+                if (cardHistory) {
+                    this.updateRedoHistory(cardHistory.next, cardHistory.previous);
+                    this.updateCardHistory(cardHistory.previous)
+                    this._updateCard(cardHistory.previous);
+                }
+            } else {
+                const cardHistory = this.$state.refHistoryRedo.pop();
+                if (cardHistory) {
+                    this.updateHistory(cardHistory.next, cardHistory.previous, true)
+                    this.updateCardHistory(cardHistory.previous)
+                    this._updateCard(cardHistory.previous);
+                }
+            }
         }
-    }
+    },
 })
 
 // Update Store without refresh page

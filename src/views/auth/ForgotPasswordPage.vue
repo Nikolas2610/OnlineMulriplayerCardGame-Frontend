@@ -90,11 +90,9 @@ export default defineComponent({
                     toast.success(`An email has been send to ${forgotPassword.email} to reset your password`)
                     resetForgotPasswordForm();
                 } else {
-                    // TODO: Error Notifications - Server error or credentials (messages from middleware)
                     toast.error(`${response}`)
                 }
             } else {
-                // TODO: Error Notifications - Please complete correct the form
                 toast.error(`Please complete correct the form`)
             }
             // Disable loading button

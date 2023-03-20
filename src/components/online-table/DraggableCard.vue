@@ -1,6 +1,6 @@
 <template>
     <img ref="cardRef" :src="showCardImage(card)" alt="" :id="(card.id).toString()"
-        class="card-box cursor-pointer transition duration-300"
+        class="card-box cursor-pointer"
         @click="playerStore.clickCardId === card.id ? playerStore.clickCardId = null : playerStore.clickCardId = card.id"
         @dragstart="(event) => $emit('onDragStart', event, cardRef)" :class="[absolute ? 'absolute' : '', playerStore.clickCardId === card.id ? 'border-2 border-red-500' : 'hover:border hover:border-dark', rotate ? getRotateCardPosition(card.rotate) : '',
         playerDeck ? card.hidden ? 'opacity-50' : '' : '']" draggable="true">

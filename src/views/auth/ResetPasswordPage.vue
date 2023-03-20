@@ -124,15 +124,12 @@ export default defineComponent({
                     resetResetPasswordForm();
                     // Reset Errors Form
                     v$.value.$reset();
-                    // TODO: Success Notification and message: Check your email to activate your account
                     toast.success(`Your password has been changed!`)
                     router.push({ name: 'login' });
                 } else {
-                    // TODO: Error Notifications - Server error or email exists (messages from middleware)
                     toast.error(`Reset password fail!\n${response}`)
                 }
             } else {
-                // TODO: Error Notifications - Please complete correct the form
                 toast.error(`Please complete correct the form!`)
             }
             // Disable loading button
