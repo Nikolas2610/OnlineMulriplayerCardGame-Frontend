@@ -11,6 +11,7 @@ const props = defineProps({
     items: { type: String },
     gap: { type: Number },
     column: { type: Boolean }, 
+    columnReverse: { type: Boolean, default: false }, 
     wrap: { type: Boolean, default: false }
 })
 
@@ -30,6 +31,9 @@ const getClasses = () => {
     }
     if (props.wrap) {
         classes += `flex-wrap `
+    }
+    if (props.columnReverse) {
+        classes += `flex-col-reverse `
     }
     return classes;
 }

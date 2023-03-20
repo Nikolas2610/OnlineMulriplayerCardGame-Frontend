@@ -1,6 +1,6 @@
 <template>
     <Flex
-        class="border text-white fixed bottom-10 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[610px] hover:-translate-x-[20px]"
+        class="border text-white fixed bottom-32 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[610px] hover:-translate-x-[20px] z-[2147483639]"
         items="center" justify="center">
         <Flex class="border-r h-full px-6 pl-10" items="center" :gap="4">
             <!-- Play -->

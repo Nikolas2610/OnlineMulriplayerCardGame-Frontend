@@ -107,7 +107,8 @@ module.exports = {
     'h-[171.4px]',
     'h-[150.0px]',
     'h-[120px]',
-    'h-[109.1px]'
+    'h-[109.1px]',
+    'flex-col-reverse',
   ],
   theme: {
     extend: {
@@ -117,7 +118,8 @@ module.exports = {
         'dark': '#191A19',
         'dark-smooth': '#1e1e1e',
         'light': '#D8E9A8',
-        'info': '#87ceeb'
+        'info': '#87ceeb',
+        'light-blue': '#318F8A'
       },
       container: {
         padding: {
@@ -129,6 +131,9 @@ module.exports = {
         },
         center: true,
       },
+      transitionProperty: {
+        'width': 'width'
+    },
     },
   },
   plugins: [],
