@@ -1,7 +1,7 @@
 <template>
     <!-- Sidebar -->
     <Flex class="relative one-page w-full bg-dark">
-        <div class="w-5/6 overflow-auto text-white">
+        <div class="w-5/6 overflow-auto text-white relative">
             <!-- Table playing status -->
             <OnlineTable v-if="playerStore.table?.status === TableStatus.PLAYING
                 || (playerStore.gameMaster && playerStore.table?.status === TableStatus.GAME_MASTER_EDIT)" />
@@ -15,10 +15,14 @@
                         '...waiting from Game Master to start the game' }}
                 </div>
             </Flex>
+
+            <RoomChat />
         </div>
 
         <SideBarGame class="w-1/6 overflow-x-auto" />
     </Flex>
+
+   
 
     <!-- Game Master Options -->
     <GameMasterMenu v-if="playerStore.gameMaster"
@@ -65,6 +69,7 @@ import { TableStatus } from '@/types/tables/TableStatus.enum';
 import ModalViewAllCards from '@/components/modals/ModalViewAllCards.vue';
 import { useUserStore } from '@/stores/UserStore';
 import { POSITION, useToast } from 'vue-toastification';
+import RoomChat from '@/components/online-table/RoomChat.vue';
 
 const route = useRoute();
 const playerStore = usePlayerStore();
@@ -80,8 +85,20 @@ if (playerStore.table) {
 } else {
     router.push({ name: 'lobby' })
 }
+const webSocketsTableEvents = ref([
+    'getTurnTableUsers',
+    'getUpdateTableUser',
+    'getStartGameDetails',
+    'exitUsersFromTable',
+    'getTableGameStatus',
+    'getShowAllCards',
+    'getUpdateCard',
+    'getShuffleDeck',
+])
 
 onBeforeMount(() => {
+    console.log('\x1b[32m%s\x1b[0m', 'ROOM');
+    console.log(socket.connect());
     playerStore.setGameMaster();
     // SOCKET EVENTS
     // update table users online
@@ -204,12 +221,14 @@ const extractTableDecksDetails = () => {
 
 onUnmounted(() => {
     // TODO: Solution to this
-    socket.off();
     playerStore.room = null;
     playerStore.gameMaster = false;
     playerStore.cards = null;
     playerStore.refHistory = [];
     playerStore.refHistoryRedo = [];
     playerStore._leaveTable();
+    webSocketsTableEvents.value.forEach(event => {
+        socket.off(event);
+    })
 })
 </script>
