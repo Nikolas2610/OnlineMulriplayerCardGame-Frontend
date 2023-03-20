@@ -1,5 +1,5 @@
 <template>
-    <Container>
+    <Container v-if="width > gameWidth && height > gameHeight">
         <DarkTable :table-headers="tablesFields" v-if="filterTables.length > 0">
             <DarkTableRow v-for="(table, i) in filterTables" :key="`lobby-row-${table.id}`"
                 @click="handleSelectTable(i, table)" :class="selectTable === i ? 'bg-gray-700' : ''">
@@ -53,9 +53,13 @@
                 </Flex>
             </GridColItem>
         </GridCol>
-
     </Container>
 
+    <Container v-else>
+        <Flex class="bg-red-500 p-4" justify="center" items="center">
+            The game is supported on desktop computers
+        </Flex>
+    </Container>
     <CreateTableModal :is-modal-open="createTableModal" @close-modal="() => createTableModal = false"
         v-if="userStore.user.role !== Roles.guest" />
     <ModalSetGuestUsername :is-modal-open="isOpenModalSetGuestUsername" @close-modal="isOpenModalSetGuestUsername = false"
@@ -87,7 +91,11 @@ import { Roles } from '@/types/Roles.enum';
 import ModalSetPasswordTable from '@/components/modals/ModalSetPasswordTable.vue';
 import { useToast } from 'vue-toastification';
 import { TableStatus } from '@/types/tables/TableStatus.enum';
+import { useWindowSize } from '@vueuse/core'
 
+const { width, height } = useWindowSize();
+const gameHeight = ref(parseInt(import.meta.env.VITE_GAME_HEIGHT));
+const gameWidth = ref(parseInt(import.meta.env.VITE_GAME_WIDTH));
 
 const isOpenModalSetGuestUsername = ref(false);
 const isOpenModalSetTablePassword = ref(false);

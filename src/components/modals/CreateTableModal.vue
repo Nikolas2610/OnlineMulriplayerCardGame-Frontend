@@ -15,7 +15,6 @@ import Modal from '../Modal.vue';
 import TableForm from '../forms/TableForm.vue';
 import { useTableStore } from '@/stores/TableStore';
 
-// TODO: CLean code
 const tableStore = useTableStore();
 const props = defineProps({
     isModalOpen: { type: Boolean, required: true }

@@ -41,7 +41,6 @@ import Flex from '../wrappers/Flex.vue';
 import { loadImage } from '@/utils/Function';
 import { TableDeckType } from '@/types/tables/TableDeckType';
 
-// TODO: CLean code
 const props = defineProps({
     isModalOpen: { type: Boolean, required: true },
     tableDecks: { type: Array as PropType<TableDeck[] | null | undefined>, required: true },
@@ -68,5 +67,4 @@ const getCards = (tableDeckId: number) => {
 }
 
 const emits = defineEmits(['closeModal']);
-
 </script>
