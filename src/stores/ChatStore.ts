@@ -23,7 +23,6 @@ export const useChatStore = defineStore('ChatStore', {
     }, 
     actions: {
         _sendMessage() {
-            console.log(this.$state.message);
             if (this.$state.message.length > 0) {
                 const data = {
                     message: this.$state.message, room: this.$state.room, user: userStore.user
@@ -31,8 +30,6 @@ export const useChatStore = defineStore('ChatStore', {
                 socket.emit('sendMessage', {
                     data
                 }, (response: WebSocketResponse) => {
-                    console.log(response);
-                    
                     if (response.status === 200) {
                         this.$state.message = '';
                     }

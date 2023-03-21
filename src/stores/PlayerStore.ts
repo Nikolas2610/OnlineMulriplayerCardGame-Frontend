@@ -218,6 +218,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
                             }
                             this.updateHistory(card, dragCard);
                             this._updateCard(dragCard);
+                            this.$state.zIndex++
                         }
                     })
                 }

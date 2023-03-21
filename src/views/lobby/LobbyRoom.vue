@@ -112,15 +112,6 @@ const search = ref('');
 const createTableModal = ref(false);
 
 onBeforeMount(() => {
-
-    socket.on("*", function (event, data) {
-        console.log(event);
-        console.log(data);
-    });
-    console.log(socket.connected);
-    console.log(socket.connect());
-    console.log(socket.connected);
-
     if (!userStore.user.id) {
         isOpenModalSetGuestUsername.value = true;
     }

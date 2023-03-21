@@ -6,23 +6,40 @@
             <OnlineTable v-if="playerStore.table?.status === TableStatus.PLAYING
                 || (playerStore.gameMaster && playerStore.table?.status === TableStatus.GAME_MASTER_EDIT)" />
             <!-- Table waiting status -->
-            <Flex v-else class="h-full bg-dark" :items="'center'" :justify="'center'" :column="true">
+            <Flex v-for="{status, title, message} in tableStatusMessage" :key="status" items="center" justify="center" v-else>
+                <TableStatusMessage  :title="title" :message="message" v-if="playerStore.table?.status === status" />
+            </Flex>
+            <!-- <Flex v-if="playerStore.table?.status === TableStatus.PAUSE" class="h-full bg-dark" :items="'center'" :justify="'center'" :column="true">
                 <div class="rounded-2xl bg-primary px-12 py-6  text-4xl italic">
-                    {{ playerStore.table?.status === TableStatus.PAUSE ? 'Game Paused' : 'Game not started yet' }}
+                    Game Paused
                 </div>
                 <div class="mt-6 text-xl">
-                    {{ playerStore.table?.status === TableStatus.PAUSE ? '...waiting from Game Master to resume the game' :
-                        '...waiting from Game Master to start the game' }}
+                    ...waiting from Game Master to resume the game
                 </div>
             </Flex>
-
+            <Flex v-if="playerStore.table?.status === TableStatus.WAITING" class="h-full bg-dark" :items="'center'" :justify="'center'" :column="true">
+                <div class="rounded-2xl bg-primary px-12 py-6  text-4xl italic">
+                    Game not started yet
+                </div>
+                <div class="mt-6 text-xl">
+                    ...waiting from Game Master to start the game
+                </div>
+            </Flex>
+            <Flex v-if="playerStore.table?.status === TableStatus.WAITING" class="h-full bg-dark" :items="'center'" :justify="'center'" :column="true">
+                <div class="rounded-2xl bg-primary px-12 py-6  text-4xl italic">
+                    Game has ended
+                </div>
+                <div class="mt-6 text-xl">
+                    ...waiting from Game Master to start the game
+                </div>
+            </Flex> -->
             <RoomChat />
         </div>
 
         <SideBarGame class="w-1/6 overflow-x-auto" />
     </Flex>
 
-   
+
 
     <!-- Game Master Options -->
     <GameMasterMenu v-if="playerStore.gameMaster"
@@ -69,7 +86,8 @@ import { TableStatus } from '@/types/tables/TableStatus.enum';
 import ModalViewAllCards from '@/components/modals/ModalViewAllCards.vue';
 import { useUserStore } from '@/stores/UserStore';
 import { POSITION, useToast } from 'vue-toastification';
-import RoomChat from '@/components/online-table/RoomChat.vue';
+import RoomChat from '@/components/online-table/chat/RoomChat.vue';
+import TableStatusMessage from '@/components/online-table/TableStatusMessage.vue';
 
 const route = useRoute();
 const playerStore = usePlayerStore();
@@ -97,8 +115,6 @@ const webSocketsTableEvents = ref([
 ])
 
 onBeforeMount(() => {
-    console.log('\x1b[32m%s\x1b[0m', 'ROOM');
-    console.log(socket.connect());
     playerStore.setGameMaster();
     // SOCKET EVENTS
     // update table users online
@@ -107,6 +123,7 @@ onBeforeMount(() => {
             playerStore.table = tableGame;
             const user = playerStore.table.table_users?.find(user => user.user.id === userStore.user.id);
             if (!user) {
+                toast.info(`Player ${userStore.user.username} has remove from Game Master`)
                 router.push({ name: 'lobby' });
             }
         }
@@ -154,12 +171,25 @@ onBeforeMount(() => {
         playerStore.gameMaster = false;
         playerStore.table = null;
         playerStore.cards = null;
+        toast.info('Game master has remove you from the table')
         router.push({ name: 'lobby' })
     })
 
     socket.on('getTableGameStatus', (tableGame: Table) => {
         if (tableGame) {
             playerStore.table = tableGame;
+            if (tableGame.status === TableStatus.PAUSE) {
+                toast.info('Game has paused')
+            }
+            if (tableGame.status === TableStatus.PLAYING) {
+                toast.info('Game has start')
+            }
+            if (tableGame.status === TableStatus.GAME_MASTER_EDIT) {
+                toast.info('The game master is preparing the table')
+            }
+            if (tableGame.status === TableStatus.FINISH) {
+                toast.info('Game has end')
+            }
         }
     })
 
@@ -169,8 +199,9 @@ onBeforeMount(() => {
         }
     })
 
-    socket.on('getUpdateCard', (response) => {
+    socket.on('getUpdateCard', (response: TableCard) => {
         if (response) {
+            playerStore.zIndex = response.z_index + 1;
             updateCard(response);
         }
     });
@@ -218,6 +249,12 @@ const extractTableDecksDetails = () => {
     })
 }
 
+const tableStatusMessage = ref([
+    {status: TableStatus.WAITING, title: 'Game not started yet', message: '...waiting from Game Master to start the game'},
+    {status: TableStatus.PAUSE, title: 'Game Paused', message: '...waiting from Game Master to resume the game'},
+    {status: TableStatus.GAME_MASTER_EDIT, title: 'Game edit from Game Master', message: '..waiting from Game Master to finish with the configure of the table'},
+    {status: TableStatus.FINISH, title: 'Game has ended', message: '...waiting from Game Master to start the game'},
+])
 
 onUnmounted(() => {
     // TODO: Solution to this
