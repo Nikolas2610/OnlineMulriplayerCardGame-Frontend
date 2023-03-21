@@ -1,4 +1,4 @@
-import { TYPE, type PluginOptions } from "vue-toastification";
+import { POSITION, TYPE, type PluginOptions } from "vue-toastification";
 
 export const options: PluginOptions = {
     toastDefaults: {
@@ -11,6 +11,7 @@ export const options: PluginOptions = {
         },    
         [TYPE.INFO]: {
             timeout: 5000,
+            position: POSITION.TOP_CENTER
         },
         [TYPE.WARNING]: {
             timeout: 5000,

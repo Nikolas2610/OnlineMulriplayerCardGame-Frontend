@@ -62,17 +62,21 @@
 
 <script setup lang="ts">
 import { ref, onBeforeMount, watch, onUnmounted } from 'vue';
-import Flex from '../wrappers/Flex.vue';
+import Flex from '../../wrappers/Flex.vue';
 import ChatMessage from '@/components/online-table/chat/ChatMessage.vue'
 import { useChatStore } from '@/stores/ChatStore'
 import socket from '@/plugins/socket';
 import { useUserStore } from '@/stores/UserStore';
+import { usePlayerStore } from '@/stores/PlayerStore';
 
-const chatStore = useChatStore();
 const message = ref('')
+const chatStore = useChatStore();
 const userStore = useUserStore();
+const playerStore = usePlayerStore();
 
 onBeforeMount(() => {
+    chatStore.room = playerStore.room;
+    
     socket.on('getSendMessage', (response: any) => {
         if (response) {
             chatStore.messages.unshift(response);
@@ -91,5 +95,7 @@ watch(() => chatStore.message,
 onUnmounted(() => {
     socket.off('getSendMessage');
     chatStore.messages = [];
+    chatStore.message = '';
+    chatStore.unreadMessages = 0;
 })
 </script>

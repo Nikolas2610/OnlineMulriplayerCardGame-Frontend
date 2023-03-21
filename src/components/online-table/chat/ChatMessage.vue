@@ -6,7 +6,7 @@
                 {{ data?.message }}
             </div>
             <div class="text-gray-800 text-sm text-right">
-                {{ data?.created_at }}
+                <TimeAgo :created_at="data?.created_at.toString()" />
             </div>
         </Flex>
     </Flex>
@@ -16,9 +16,10 @@
 import Flex from '@/components/wrappers/Flex.vue';
 import type { Message } from '@/types/online-table/Message';
 import type { PropType } from 'vue';
+import TimeAgo from './TimeAgo.vue';
 
 const props = defineProps({
     isActiveUserMessage: { type: Boolean, default: false },
-    data: { type: Object as PropType<Message>}
+    data: { type: Object as PropType<Message>, required: true}
 })
 </script>
