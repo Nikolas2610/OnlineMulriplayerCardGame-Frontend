@@ -1,29 +1,17 @@
 import axiosUser from "@/plugins/axiosUser";
 import type { DeckReturn } from "@/types/decks/DeckReturn";
-import type CreateGame from "@/types/games/CreateGame";
+import { DeckType } from "@/types/decks/DeckType.enum";
 import type { CreateHandStartCards } from "@/types/games/CreateHandStartCards";
 import type Game from "@/types/games/Game";
+import { HandStartCardsRuleType } from "@/types/games/HandStartCardsRuleType.enum";
 import type CreateRole from "@/types/games/relations/roles/CreateRole";
 import type CreateStatus from "@/types/games/relations/status/CreateStatus";
 import type CreateTeam from "@/types/games/relations/teams/CreateTeam";
 import type { AxiosResponse } from "axios";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { useToast } from "vue-toastification";
+import { defaultHandStartCards, defaultRole, defaultExtraDecks, defaultGame } from "@/utils/GameDefaultObjects";
 const toast = useToast();
-
-const defaultGame = {
-    name: '',
-    description: '',
-    extra_roles: false,
-    status_player: false,
-    extra_teams: false,
-    rank: false,
-    private: false,
-    grid_rows: 1,
-    grid_cols: 1,
-    max_players: 1,
-    min_players: 1,
-} as Game;
 
 export const useGameStore = defineStore("GameStore", {
     state: () => {
@@ -33,17 +21,9 @@ export const useGameStore = defineStore("GameStore", {
                 game: { ...defaultGame } as Game,
                 teams: [] as CreateTeam[],
                 status: [] as CreateStatus[],
-                roles: [
-                    { name: 'Table' },
-                    { name: 'Player' },
-                ] as CreateRole[],
-                hand_start_cards: [{
-                    count_cards: 1,
-                    deck: 0,
-                    role: 0,
-                    hidden: true,
-                    repeat: 1
-                }] as CreateHandStartCards[],
+                roles: [{...defaultRole}] as CreateRole[],
+                hand_start_cards: [{ ...defaultHandStartCards }] as CreateHandStartCards[],
+                extraDecks: [...defaultExtraDecks] as Array<{ name: string }>,
                 selectedDecks: [] as Array<number>,
             },
             decks: [] as DeckReturn[],
@@ -90,16 +70,19 @@ export const useGameStore = defineStore("GameStore", {
             }
         },
         toggleEditGame(index: number) {
+            // Initialize settings
             this.$state.createGame.game = { ...this.$state.games[index] };
             this.$state.editGame = !this.$state.editGame;
             this.$state.createGame.selectedDecks = [];
             this.$state.stepForm.change = [false, false, false];
-            const selectedDecks = this.$state.createGame.game.deck?.map(deck => deck.id);
+            // Initialize select decks
+            const selectedDecks = this.$state.createGame.game.deck?.filter(d => d.type === DeckType.DECK).map(deck => deck.id);
             selectedDecks?.forEach(item => {
                 if (item) {
                     this.$state.createGame.selectedDecks.push(item)
                 }
             });
+            // Initialize roles
             this.$state.createGame.roles = [];
             const roles = this.$state.createGame.game.roles?.map(role => role.name)
             roles?.forEach(role => {
@@ -107,6 +90,7 @@ export const useGameStore = defineStore("GameStore", {
                     this.$state.createGame.roles.push({ name: role });
                 }
             })
+            // Initialize teams
             this.$state.createGame.teams = [];
             const teams = this.$state.createGame.game.teams?.map(team => team.name)
             teams?.forEach(team => {
@@ -114,6 +98,7 @@ export const useGameStore = defineStore("GameStore", {
                     this.$state.createGame.teams.push({ name: team });
                 }
             })
+            // Initialize status
             this.$state.createGame.status = [];
             const status = this.$state.createGame.game.status?.map(s => s.name)
             status?.forEach(s => {
@@ -121,20 +106,38 @@ export const useGameStore = defineStore("GameStore", {
                     this.$state.createGame.status.push({ name: s });
                 }
             })
+            // Initialize extra empty decks
+            this.$state.createGame.extraDecks = [];
+            const extraDecks = this.$state.createGame.game.deck?.filter(d => d.type === DeckType.EXTRA_DECK);
+            extraDecks?.forEach(deck => {
+                if (deck) {
+                    this.$state.createGame.extraDecks.push({ name: deck.name });
+                }
+            })
+            // Initialize hand start card rules
             this.$state.createGame.hand_start_cards = [];
-            this.$state.createGame.game.hand_start_cards?.forEach(item => {
-                if (item && item.deck && item.deck?.id) {
-                    const deckIndex = this.$state.createGame.selectedDecks.indexOf(item.deck.id)
-                    const roleIndex = this.$state.createGame.roles.map(role => role.name).indexOf(item.role.name)
+            this.$state.createGame.game.hand_start_cards?.forEach(rule => {
+                if (rule && rule.deck && rule.deck?.id) {
+                    // const deckIndex = this.$state.createGame.selectedDecks.indexOf(rule.deck.id)
+                    // const roleIndex = this.$state.createGame.roles.map(role => role.name).indexOf(rule.role?.name)
                     this.$state.createGame.hand_start_cards.push({
-                        count_cards: item.count_cards,
-                        deck: deckIndex,
-                        role: roleIndex,
-                        hidden: item.hidden,
-                        repeat: item.repeat
+                        count_cards: rule.count_cards,
+                        deck: rule.deck.id,
+                        role: rule.role?.id ? rule.role?.id : -1,
+                        hidden: rule.hidden,
+                        type: rule.type,
+                        toDeck: rule.toDeck?.id ? rule.toDeck?.id : -1,
                     });
                 }
             })
+        },
+        addExtraDeck() {
+            this.$state.createGame.extraDecks.push({ name: '' });
+        },
+        deleteExtraDeck(id: number) {
+            if (this.$state.createGame.extraDecks.length > 2) {
+                this.$state.createGame.extraDecks = this.$state.createGame.extraDecks.filter((team, index) => index !== id);
+            }
         },
         addTeam() {
             this.$state.createGame.teams.push({ name: '' });
@@ -148,7 +151,7 @@ export const useGameStore = defineStore("GameStore", {
             this.$state.createGame.roles.push({ name: '' });
         },
         deleteRole(id: number) {
-            if (this.$state.createGame.roles.length > 2) {
+            if (this.$state.createGame.roles.length > 1) {
                 this.$state.createGame.roles = this.$state.createGame.roles.filter((team, index) => index !== id);
             }
         },
@@ -161,25 +164,40 @@ export const useGameStore = defineStore("GameStore", {
             }
         },
         addHandStartCardsRow() {
-            this.$state.createGame.hand_start_cards.push({
-                count_cards: 1,
-                hidden: false,
-                repeat: 1,
-                deck: 0,
-                role: 0,
-            })
+            this.$state.createGame.hand_start_cards.push({ ...defaultHandStartCards })
         },
         deleteHandStartCardsRow(id: number) {
             if (this.$state.createGame.hand_start_cards) {
                 this.$state.createGame.hand_start_cards = this.$state.createGame.hand_start_cards.filter((item, index) => index !== id);
             }
         },
+        validateHandStartingCards() {
+            let validate = true;
+            this.$state.createGame.hand_start_cards.forEach(rule => {
+                if (rule.role === -1 && rule.type === HandStartCardsRuleType.ROLE) {
+                    toast.error('Role is empty');
+                    validate = false;
+                    return
+                }
+                if (rule.toDeck === -1 && rule.type === HandStartCardsRuleType.DECK) {
+                    toast.error('To deck is empty');
+                    validate = false;
+                    return
+                }
+                if (rule.deck === -1) {
+                    toast.error('From deck is empty')
+                    validate = false;
+                    return
+                }
+            })
+            return validate;
+        },
         validateMoreSettings() {
             let error = false;
             if (this.$state.createGame.teams.length > 0) {
                 this.$state.createGame.teams.forEach(team => {
                     if (team.name === '') {
-                        toast.error('Team names is required');
+                        toast.error('Team name is required');
                         error = true;
                     }
                 })
@@ -187,7 +205,7 @@ export const useGameStore = defineStore("GameStore", {
             if (this.$state.createGame.roles.length > 0) {
                 this.$state.createGame.roles.forEach(role => {
                     if (role.name === '') {
-                        toast.error('Role names is required');
+                        toast.error('Role name is required');
                         error = true;
                     }
                 })
@@ -195,7 +213,15 @@ export const useGameStore = defineStore("GameStore", {
             if (this.$state.createGame.status.length > 0) {
                 this.$state.createGame.status.forEach(status => {
                     if (status.name === '') {
-                        toast.error('Status names is required');
+                        toast.error('Status name is required');
+                        error = true;
+                    }
+                })
+            }
+            if (this.$state.createGame.extraDecks.length > 0) {
+                this.$state.createGame.extraDecks.forEach(deck => {
+                    if (deck.name === '') {
+                        toast.error('Extra deck name is required');
                         error = true;
                     }
                 })
@@ -216,6 +242,7 @@ export const useGameStore = defineStore("GameStore", {
                             this.$state.createGame.game = gameResponse.data;
                             this.$state.stepForm.submitted[this.$state.stepForm.value - 1] = true
                             this.$state.stepForm.change[this.$state.stepForm.value - 1] = false;
+                            this.$state.stepForm.change[this.$state.stepForm.value] = true;
                             this.$state.stepForm.value++;
                         }
                         this.$state.stepForm.loading = false;
@@ -226,6 +253,7 @@ export const useGameStore = defineStore("GameStore", {
                             roles: this.$state.createGame.roles,
                             status: this.$state.createGame.status,
                             teams: this.$state.createGame.teams,
+                            extra_decks: this.$state.createGame.extraDecks
                         });
                         if (moreSettingsResponse.status === 201) {
                             this.$state.createGame.game = moreSettingsResponse.data;
@@ -235,6 +263,7 @@ export const useGameStore = defineStore("GameStore", {
                         this.$state.stepForm.loading = false;
                         break;
                     case 3:
+                        this.prepareHandStartCardsRequest();
                         const handStartCardsResponse: AxiosResponse = await axiosUser.post('game/hand-start-games', {
                             game: this.$state.createGame.game,
                             hand_start_cards: this.$state.createGame.hand_start_cards,
@@ -268,7 +297,10 @@ export const useGameStore = defineStore("GameStore", {
 
                         if (gameResponse.status === 200) {
                             this.$state.createGame.game = gameResponse.data;
+                            this.$state.createGame.extraDecks = [...defaultExtraDecks];
+                            this.$state.createGame.roles = [{...defaultRole}];
                             this.$state.stepForm.change[this.$state.stepForm.value - 1] = false;
+                            this.$state.stepForm.change[this.$state.stepForm.value] = true;
                             this.$state.stepForm.submitted[this.$state.stepForm.value - 1] = true
                             this.$state.stepForm.value++;
                         }
@@ -280,9 +312,11 @@ export const useGameStore = defineStore("GameStore", {
                             roles: this.$state.createGame.roles,
                             status: this.$state.createGame.status,
                             teams: this.$state.createGame.teams,
+                            extra_decks: this.$state.createGame.extraDecks
                         });
                         if (moreSettingsResponse.status === 200) {
                             this.$state.createGame.game = moreSettingsResponse.data;
+                            this.$state.createGame.hand_start_cards = [];
                             this.$state.stepForm.change[this.$state.stepForm.value - 1] = false;
                             this.$state.stepForm.submitted[this.$state.stepForm.value - 1] = true
                             this.$state.stepForm.value++;
@@ -290,6 +324,7 @@ export const useGameStore = defineStore("GameStore", {
                         this.$state.stepForm.loading = false;
                         break;
                     case 3:
+                        this.prepareHandStartCardsRequest();
                         const handStartCardsResponse: AxiosResponse = await axiosUser.patch('game/hand-start-games', {
                             game: this.$state.createGame.game,
                             hand_start_cards: this.$state.createGame.hand_start_cards,
@@ -308,10 +343,18 @@ export const useGameStore = defineStore("GameStore", {
                         break;
                 }
             } catch (error: any) {
-                console.log(error)
                 this.$state.stepForm.loading = false;
                 toast.error(error.response ? error.response?.data?.message : 'Something went wrong')
             }
+        },
+        prepareHandStartCardsRequest() {
+            this.$state.createGame.hand_start_cards.forEach(rule => {
+                if (rule.type === HandStartCardsRuleType.DECK) {
+                    rule.role = -1;
+                } else {
+                    rule.toDeck = -1;
+                }
+            })
         },
         async _delete(id: number | null) {
             if (!id) {
@@ -340,18 +383,10 @@ export const useGameStore = defineStore("GameStore", {
         },
         clearFormData() {
             this.$state.createGame.game = { ...defaultGame };
-            this.$state.createGame.roles = [
-                { name: 'Table' },
-                { name: 'Player' },
-            ];
-            this.$state.createGame.hand_start_cards = [{
-                count_cards: 1,
-                deck: 0,
-                role: 0,
-                hidden: true,
-                repeat: 1
-            }]
+            this.$state.createGame.roles = [{...defaultRole}];
+            this.$state.createGame.hand_start_cards = [{ ...defaultHandStartCards }]
             this.$state.createGame.status = [];
+            this.$state.createGame.extraDecks = [...defaultExtraDecks];
             this.$state.createGame.teams = [];
             this.$state.createGame.selectedDecks = [];
             this.$state.stepForm.submitted = [false, false, false];
@@ -362,7 +397,7 @@ export const useGameStore = defineStore("GameStore", {
         },
         stepFormChange() {
             this.$state.stepForm.change[this.$state.stepForm.value - 1] = true;
-        }, 
+        },
         unMountedDashboard() {
             this.$state.games = [];
             this.$state.decks = [];

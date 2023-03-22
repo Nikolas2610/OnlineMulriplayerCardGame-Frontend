@@ -3,7 +3,7 @@
     <select id="countries" :disabled="disable" v-model="selectValue" @change="$emit('update', selectValue)"
         class="border border-gray-300 file:after:text-sm rounded-md focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
         :class="dark ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500' : 'bg-gray-50  text-gray-900'">
-        <option :value="null">--Empty--</option>
+        <option :value="null" v-if="emptyValue">--Empty--</option>
         <option :value="item.id" v-for="(item, index) in options" :key="index">{{ item.name }}</option>
     </select>
     <div v-for="error in errors" :key="error.$uid" class="text-rose-700 text-base font-medium mt-1 px-2">
@@ -29,8 +29,9 @@ const props = defineProps({
     titleShow: { type: Boolean, default: true },
     title: { type: String },
     input: { type: Object as PropType<Input | null>, default: null },
-    dark: { type: Boolean, default: false }, 
+    dark: { type: Boolean, default: false },
     errors: { type: Object },
+    emptyValue: { type: Boolean, default: true }
 });
 
 const emits = defineEmits(['update'])

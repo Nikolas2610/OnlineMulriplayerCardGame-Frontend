@@ -10,7 +10,7 @@ export const options: PluginOptions = {
             timeout: 5000,
         },    
         [TYPE.INFO]: {
-            timeout: 5000,
+            timeout: 3000,
             position: POSITION.TOP_CENTER
         },
         [TYPE.WARNING]: {

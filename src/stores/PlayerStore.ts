@@ -160,12 +160,12 @@ export const usePlayerStore = defineStore('PlayerStore', {
             })
         },
         getCards(tableDeckId: number | undefined) {
-            if (tableDeckId) {
+            if (tableDeckId && this.$state.cards?.length) {
                 return this.$state.cards?.filter(card => card.table_deck.id === tableDeckId);
             }
         },
         onDrop(event: DragEvent, tableDeckId: number | undefined, type: string, zIndex: number) {
-            if (this.$state.table?.status === TableStatus.PLAYING || this.$state.table?.status === TableStatus.WAITING) {
+            if (this.$state.table?.status === TableStatus.PLAYING || this.$state.table?.status === TableStatus.GAME_MASTER_EDIT) {
                 if (event.dataTransfer) {
                     const card: TableCard = JSON.parse(event.dataTransfer.getData('card'));
                     const topBox = parseInt(event.dataTransfer.getData('top'), 10);
