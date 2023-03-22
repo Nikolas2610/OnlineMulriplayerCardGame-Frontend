@@ -1,12 +1,12 @@
 <template>
-    <SubTitle class="mt-8">
+    <SubTitle class="mt-4">
         {{ title }}
         <template v-slot:button>
             <PrimaryButton :title="buttonTitle" @click="$emit('addItem'); gameStore.stepFormChange();"></PrimaryButton>
         </template>
     </SubTitle>
 
-    <Flex class="mt-4" :items="'center'" :justify="'center'" :gap="4" v-for="(item, index) in items" :key="index"
+    <Flex :items="'center'" :justify="'center'" :gap="2" v-for="(item, index) in items" :key="index"
         v-if="items.length > 0">
         <div class="w-11/12">
             <InputField :title="itemsTitle" :input="item.name" :disabled="disableItem(index)"
@@ -18,7 +18,7 @@
         </div>
     </Flex>
 
-    <Alert class="my-8" v-else>
+    <Alert class="my-2" v-else>
         {{ message }}
     </Alert>
 </template>
@@ -37,6 +37,7 @@ const props = defineProps({
     items: { type: Array<{ name: string }>, required: true },
     itemsTitle: { type: String, required: true },
     disabledItems: { type: Boolean, default: false },
+    countDisabledItems: { type: Number, default: 1 },
     title: { type: String },
     message: { type: String },
     buttonTitle: { type: String, required: true },
@@ -45,6 +46,6 @@ const props = defineProps({
 const gameStore = useGameStore();
 const emits = defineEmits(['deleteItem', 'update', 'addItem']);
 const disableItem = (index: number) => {
-    return props.disabledItems && (index === 0 || index === 1);
+    return props.disabledItems && (index < props.countDisabledItems);
 }
 </script>

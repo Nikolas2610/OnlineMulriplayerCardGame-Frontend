@@ -1,10 +1,9 @@
 <template>
     <form class="px-4 py-8" @submit.prevent="submit" v-if="!gameStore.loading">
         <StepForm :active-item="gameStore.stepForm.value" :loading="gameStore.stepForm.loading"
-            @decrease="(value) => gameStore.stepForm.value = value"
-            @increase="(value) => gameStore.stepForm.value = value">
+            @decrease="(value) => gameStore.stepForm.value = value" @increase="(value) => gameStore.stepForm.value = value">
             <div v-if="gameStore.stepForm.value === 1">
-                <GridCol :all="2" :gap_x="2" class="mt-8" v-if="gameStore.createGame.game">
+                <GridCol :all="2" :gap_x="4" class="mt-8" v-if="gameStore.createGame.game">
                     <GridColItem :xs="2">
                         <InputField :input="gameStore.createGame.game.name"
                             @change="(e) => { gameStore.createGame.game.name = e; gameStore.stepFormChange() }"
@@ -55,19 +54,24 @@
                     :message="'No roles'" @add-item="gameStore.addRole()" :itemsTitle="'Role name'"
                     @update="(value, index) => { gameStore.createGame.roles[index].name = value; gameStore.stepFormChange() }"
                     @deleteItem="(index) => gameStore.deleteRole(index)" :disabled-items="true" />
-                <MoreItems :items="gameStore.createGame.teams" :title="'Teams'" :button-title="'Add a Team'"
-                    :message="'No teams'" @add-item="gameStore.addTeam()" :itemsTitle="'Team name'"
-                    @update="(value, index) => { gameStore.createGame.teams[index].name = value; gameStore.stepFormChange() }"
-                    @deleteItem="(index) => gameStore.deleteTeam(index)" />
+                <MoreItems :items="gameStore.createGame.extraDecks" :title="'Empty decks'" :button-title="'Add a Deck'"
+                    :message="'No empty decks'" @add-item="gameStore.addExtraDeck()" :itemsTitle="'Deck name'" :count-disabled-items="2" :disabled-items="true"
+                    @update="(value, index) => { gameStore.createGame.extraDecks[index].name = value; gameStore.stepFormChange() }"
+                    @deleteItem="(index) => gameStore.deleteExtraDeck(index)" />
                 <MoreItems :items="gameStore.createGame.status" :title="'Status'" :button-title="'Add a Status'"
                     :message="'No status'" @add-item="gameStore.addStatus()" :itemsTitle="'Status name'"
                     @update="(value, index) => { gameStore.createGame.status[index].name = value; gameStore.stepFormChange() }"
                     @deleteItem="(index) => gameStore.deleteStatus(index)" />
+                <MoreItems :items="gameStore.createGame.teams" :title="'Teams'" :button-title="'Add a Team'"
+                    :message="'No teams'" @add-item="gameStore.addTeam()" :itemsTitle="'Team name'"
+                    @update="(value, index) => { gameStore.createGame.teams[index].name = value; gameStore.stepFormChange() }"
+                    @deleteItem="(index) => gameStore.deleteTeam(index)" />
             </div>
             <div v-if="gameStore.stepForm.value === 3">
                 <CreateHandStartCardsForm />
             </div>
-            <div v-if="gameStore.editGame && gameStore.stepForm.value !== 3" class="mt-6 italic text-red-500">Note: If you edit the game settings the
+            <div v-if="gameStore.editGame && gameStore.stepForm.value !== 3" class="mt-6 italic text-red-500">Note: If you
+                edit the game settings the
                 cards rules will be erase</div>
         </StepForm>
     </form>
@@ -83,7 +87,7 @@ import CheckBoxField from '../ui/CheckBoxField.vue';
 import TextAreaFiled from '../ui/TextAreaFiled.vue';
 import InputField from '@/components/ui/InputField.vue';
 import { useGameStore } from '@/stores/GameStore'
-import { computed, ref } from 'vue';
+import { computed, ref, onUnmounted } from 'vue';
 import { required, numeric, minLength } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import { useUserStore } from '@/stores/UserStore';
@@ -127,7 +131,10 @@ const submit = async () => {
             }
             break;
         case 3:
-            emits('submit');
+            // Validation form step 3
+            if (gameStore.validateHandStartingCards()) {
+                emits('submit');
+            }
             break;
         default:
             break;
@@ -137,5 +144,9 @@ const submit = async () => {
 gameStore.fetchDecks().then(decks => {
     userDecks.value = decks.filter((deck: DeckReturn) => deck.creator === userStore.user.username);
     publicDecks.value = decks.filter((deck: DeckReturn) => deck.creator !== userStore.user.username);
+})
+
+onUnmounted(() => {
+    gameStore.clearFormData();
 })
 </script>

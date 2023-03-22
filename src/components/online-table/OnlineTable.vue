@@ -1,24 +1,25 @@
 <template>
     <!-- Decks -->
     <Flex :justify="'center'">
-        <Flex :class="`w-[${width}px] h-[120px]`" class="bg-secondary border px-4" :items="'center'" :justify="'between'">
+        <Flex :class="`w-[${width}px] h-[120px]`" class="bg-secondary border px-4 divide-x-2 h-full" items="center" justify="center">
             <Flex v-if="playerStore.cards">
-                <TableDecks :deck="{ tableDeckId: deck.tableDeckId, index, cards: playerStore.getCards(deck.tableDeckId), deckName: playerStore.table?.table_decks?.find(d => d.id === deck.tableDeckId)?.deck?.name }"
+                <TableDecks :deck="{ tableDeckId: deck.tableDeckId, index, cards: playerStore.getCards(deck.tableDeckId), deckName: playerStore.table?.table_decks?.find(d => d.id === deck.tableDeckId)?.deck?.name, deckType: playerStore.table?.table_decks?.find(d => d.id === deck.tableDeckId)?.deck?.type }"
                     :index="index" v-for="(deck, index) in playerStore.dropZones.deck" :key="deck.tableDeckId"
                     @deck-create="(reference) => addDeckToDropZone(reference, index)"
                     @on-drag-start="(event, cardRef, card) => onDragStart(event, cardRef, card)"
                     @on-drag-enter="(event) => onDragEnter(event)" @on-drag-leave="(event) => onDragLeave(event)"
                     @on-drop="(event, index) => onDrop(event, index, 'deck')" />
             </Flex>
-            <Flex :column="true" :items="'center'" :gap="1" v-if="playerStore.cards">
-                <div class="card-box border cursor-pointer relative" ref="tableDeckTrashReference"
+            <Flex class="h-full px-4" :column="true" justify="center" items="center" :gap="1" v-if="playerStore.cards">
+                <div class="card-box cursor-pointer relative" ref="tableDeckTrashReference"
+                :class="playerStore.getCards(playerStore.getJunkTableDeckId)?.length ? '' : 'border'"
                     @drop="(event) => onDrop(event, playerStore.getJunkTableDeckId, 'junk')" @dragover.prevent
                     @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
                     <DraggableCard :card="card"
                         v-for="(card, index) in playerStore.getCards(playerStore.getJunkTableDeckId)" :key="index"
                         @on-drag-start="(event, cardRef) => onDragStart(event, cardRef, card)" />
                 </div>
-                <div>Table Deck</div>
+                <div class="text-sm">Junk Deck</div>
             </Flex>
         </Flex>
     </Flex>

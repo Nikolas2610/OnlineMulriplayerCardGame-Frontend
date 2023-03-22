@@ -206,11 +206,13 @@ onBeforeMount(() => {
         }
     });
 
-    socket.on('getShuffleDeck', (response: TableCard[]) => {
+    socket.on('getShuffleDeck', (response: TableCard[], tableDeckId: number) => {
         if (response) {
             response.forEach(card => {
                 updateCard(card);
             })
+            const deckName = playerStore.table?.table_decks?.find(d => d.id === tableDeckId)?.deck?.name
+            toast.info(`Game Master has shuffle the deck "${deckName}"`)
         }
     });
 });
