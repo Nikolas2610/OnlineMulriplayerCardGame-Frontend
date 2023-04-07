@@ -1,7 +1,7 @@
 <template>
     <Flex :gap="4" class="my-2 mx-8">
         <Flex :column="true" :items="'center'" :gap="1">
-            <div class="relative card-box" ref="deckReference"
+            <div class="relative card-box dropZone" ref="deckReference"
             :class="deck.cards?.length ? '' : 'border'"
             @drop="(event) => $emit('onDrop', event, deck.tableDeckId)" @dragover.prevent @dragleave="(event) => $emit('onDragLeave', event)"
                     @dragenter.prevent="(event) => $emit('onDragEnter', event)">

@@ -1,9 +1,11 @@
 <template>
     <!-- Decks -->
     <Flex :justify="'center'">
-        <Flex :class="`w-[${width}px] h-[120px]`" class="bg-secondary border px-4 divide-x-2 h-full" items="center" justify="center">
+        <Flex :class="`w-[${width}px] h-[120px]`" class="bg-secondary border px-4 divide-x-2 h-full" items="center"
+            justify="center">
             <Flex v-if="playerStore.cards">
-                <TableDecks :deck="{ tableDeckId: deck.tableDeckId, index, cards: playerStore.getCards(deck.tableDeckId), deckName: playerStore.table?.table_decks?.find(d => d.id === deck.tableDeckId)?.deck?.name, deckType: playerStore.table?.table_decks?.find(d => d.id === deck.tableDeckId)?.deck?.type }"
+                <TableDecks
+                    :deck="{ tableDeckId: deck.tableDeckId, index, cards: playerStore.getCards(deck.tableDeckId), deckName: playerStore.table?.table_decks?.find(d => d.id === deck.tableDeckId)?.deck?.name, deckType: playerStore.table?.table_decks?.find(d => d.id === deck.tableDeckId)?.deck?.type }"
                     :index="index" v-for="(deck, index) in playerStore.dropZones.deck" :key="deck.tableDeckId"
                     @deck-create="(reference) => addDeckToDropZone(reference, index)"
                     @on-drag-start="(event, cardRef, card) => onDragStart(event, cardRef, card)"
@@ -11,8 +13,8 @@
                     @on-drop="(event, index) => onDrop(event, index, 'deck')" />
             </Flex>
             <Flex class="h-full px-4" :column="true" justify="center" items="center" :gap="1" v-if="playerStore.cards">
-                <div class="card-box cursor-pointer relative" ref="tableDeckTrashReference"
-                :class="playerStore.getCards(playerStore.getJunkTableDeckId)?.length ? '' : 'border'"
+                <div class="card-box cursor-pointer relative dropZone" ref="tableDeckTrashReference" id="junkDeck"
+                    :class="playerStore.getCards(playerStore.getJunkTableDeckId)?.length ? '' : 'border'"
                     @drop="(event) => onDrop(event, playerStore.getJunkTableDeckId, 'junk')" @dragover.prevent
                     @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
                     <DraggableCard :card="card"
@@ -25,9 +27,8 @@
     </Flex>
 
     <!-- Table -->
-
     <Flex :justify="'center'" v-if="playerStore.cards && playerStore.getTableExist">
-        <div class="grid bg-dark relative" :class="`grid-cols-${playerStore.table?.game?.grid_cols} grid-rows-${playerStore.table?.game?.grid_rows} h-[${height}px] w-[${width}px]`
+        <div id="tableDeck" class="grid bg-dark relative dropZone" :class="`grid-cols-${playerStore.table?.game?.grid_cols} grid-rows-${playerStore.table?.game?.grid_rows} h-[${height}px] w-[${width}px]` 
         " ref="tableDeckReference" @drop="(event) => onDrop(event, playerStore.getTableDeckId, 'table')"
             @dragover.prevent @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
             <div class="col-span-1" v-for="index in playerStore.table?.game?.grid_cols">
@@ -35,20 +36,22 @@
                     v-for="index in playerStore.table?.game?.grid_rows"></div>
             </div>
             <DraggableCard :card="card" v-for="(card, index) in playerStore.getCards(playerStore.getTableDeckId)"
-                :key="index" @on-drag-start="(event, cardRef) => onDragStart(event, cardRef, card)" :absolute="true" :rotate="true" />
+                :key="index" @on-drag-start="(event, cardRef) => onDragStart(event, cardRef, card)" :absolute="true"
+                :rotate="true" />
         </div>
     </Flex>
 
     <!-- Player Deck -->
     <Flex :justify="'center'" v-if="playerStore.cards">
-        <div :class="`w-[${width}px] h-[150px]`" class="bg-secondary border relative" ref="playerDeckReference"
+        <div :class="`w-[${width}px] h-[150px]`" class="bg-secondary border relative dropZone" id="playerDeck" ref="playerDeckReference"
             @drop="(event) => onDrop(event, playerStore.getExistPlayerTableDeckId, 'user')" @dragover.prevent
             @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
             <div>
                 <Flex class="border w-full h-full">
                     <DraggableCard :card="card"
                         v-for="(card, index) in playerStore.getCards(playerStore.getExistPlayerTableDeckId)" :key="index"
-                        @on-drag-start="(event, cardRef) => onDragStart(event, cardRef, card)" :absolute="true" :rotate="true" :show-cards="true" :player-deck="true" />
+                        @on-drag-start="(event, cardRef) => onDragStart(event, cardRef, card)" :absolute="true"
+                        :rotate="true" :show-cards="true" :player-deck="true" />
                 </Flex>
             </div>
         </div>
@@ -105,9 +108,37 @@ const zIndex = ref(2);
 // TODO: Add colors on the dropzone
 const onDragLeave = (event: any) => {
     // console.log('\x1b[32m%s\x1b[0m', 'onDragLeave');
+    // if (event.target.className.includes("dropZone")) {
+    //     event.target.classList.remove('opacity-50');
+    //     console.log('\x1b[31m%s\x1b[0m', '1');
+    //     return 
+    // }
+    // if (event.target.parentElement.className.includes("dropZone")) {
+    //     event.target.parentElement.classList.remove('opacity-50');
+    //     console.log('\x1b[31m%s\x1b[0m', '2');
+    //     return 
+    // }
+    // if (event.target.parentElement.parentElement.className.includes("dropZone")) {
+    //     event.target.parentElement.parentElement.classList.remove('opacity-50');
+    //     console.log('\x1b[31m%s\x1b[0m', '3');
+    //     return 
+    // }
 }
 const onDragEnter = (event: any) => {
     // console.log('\x1b[31m%s\x1b[0m', 'onDragEnter');
+    // if (event.target.className.includes("dropZone")) {
+    //     event.target.classList.add('opacity-50');
+    //     return 
+    // }
+    // if (event.target.parentElement.className.includes("dropZone")) {
+    //     event.target.parentElement.classList.add('opacity-50');
+    //     return 
+    // }
+    // if (event.target.parentElement.parentElement.className.includes("dropZone")) {
+    //     event.target.parentElement.parentElement.classList.add('opacity-50');
+    //     return 
+    // }
+
 }
 
 const onDragStart = (event: any, item: HTMLElement, card: TableCard) => {

@@ -38,7 +38,11 @@ const user = ref({
 });
 const props = defineProps({
     isModalOpen: { type: Boolean, required: true },
+    username: { type: String, default: ''}
 });
+if (props.username) {
+    user.value.username = props.username;
+}
 const emits = defineEmits(['closeModal', 'registerGuest']);
 
 const rules = computed(() => {

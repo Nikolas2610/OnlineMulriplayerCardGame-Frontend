@@ -49,7 +49,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
         getTableDeckId: (state) => state.dropZones.table[0]?.tableDeckId,
         getExistPlayerPlayingStatus: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.playing,
         getExistTableUserId: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.id,
-        getTableExist: (state) => state.table?.game?.grid_cols && state.table?.game?.grid_rows ? state.table?.game?.grid_cols > 0 && state.table?.game?.grid_rows > 0 : false, 
+        getTableExist: (state) => state.table?.game?.grid_cols && state.table?.game?.grid_rows ? state.table?.game?.grid_cols > 0 && state.table?.game?.grid_rows > 0 : false,
         getRefHistoryCapacity: (state) => state.refHistoryCapacity
     },
     actions: {
@@ -218,6 +218,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
                             }
                             this.updateHistory(card, dragCard);
                             this._updateCard(dragCard);
+                            this.$state.clickCardId = dragCard.id;
                             this.$state.zIndex++
                         }
                     })
@@ -235,6 +236,8 @@ export const usePlayerStore = defineStore('PlayerStore', {
             }
         },
         _updateCard(card: TableCard) {
+            console.log(card.hidden);
+            
             socket.emit('updateCard', {
                 card, room: this.$state.room
             })
@@ -358,7 +361,9 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 if (this.$state.refHistory.length > this.getRefHistoryCapacity) {
                     this.$state.refHistory.shift();
                 }
-                this.$state.refHistory.push({ previous, next });
+                const previousCard = { ...previous };
+                const nextCard = { ...next };
+                this.$state.refHistory.push({ previous: previousCard, next: nextCard });
                 if (!historyMovement) {
                     this.removeRedoHistoryMovement();
                 }
@@ -369,7 +374,9 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 if (this.$state.refHistoryRedo.length > this.getRefHistoryCapacity) {
                     this.$state.refHistoryRedo.shift();
                 }
-                this.$state.refHistoryRedo.push({ previous, next });
+                const previousCard = { ...previous };
+                const nextCard = { ...next };
+                this.$state.refHistoryRedo.push({ previous: previousCard, next: nextCard });
             }
         },
         removeRedoHistoryMovement(oneElement: boolean = false) {

@@ -6,11 +6,11 @@
                     class="self-center text-xl font-semibold whitespace-nowrap text-white hover:text-primary">OMCD</span>
             </RouterLink>
             <div class="flex lg:order-2">
-                <RouterLink :to="{ name: 'login' }" type="button" v-if="!userStore.authToken"
+                <RouterLink :to="{ name: 'login' }" type="button" v-if="!userStore.isUser"
                     class="text-white border-primary border hover:bg-primary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 lg:mr-0">
                     Login
                 </RouterLink>
-                <RouterLink :to="{ name: 'register' }" type="button" v-if="!userStore.authToken"
+                <RouterLink :to="{ name: 'register' }" type="button" v-if="!userStore.isUser"
                     class="text-white bg-primary hover:bg-secondary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 lg:mr-0 ml-2">
                     Register
                 </RouterLink>
