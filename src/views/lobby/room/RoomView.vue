@@ -9,37 +9,11 @@
             <Flex v-for="{status, title, message} in tableStatusMessage" :key="status" items="center" justify="center" v-else>
                 <TableStatusMessage  :title="title" :message="message" v-if="playerStore.table?.status === status" />
             </Flex>
-            <!-- <Flex v-if="playerStore.table?.status === TableStatus.PAUSE" class="h-full bg-dark" :items="'center'" :justify="'center'" :column="true">
-                <div class="rounded-2xl bg-primary px-12 py-6  text-4xl italic">
-                    Game Paused
-                </div>
-                <div class="mt-6 text-xl">
-                    ...waiting from Game Master to resume the game
-                </div>
-            </Flex>
-            <Flex v-if="playerStore.table?.status === TableStatus.WAITING" class="h-full bg-dark" :items="'center'" :justify="'center'" :column="true">
-                <div class="rounded-2xl bg-primary px-12 py-6  text-4xl italic">
-                    Game not started yet
-                </div>
-                <div class="mt-6 text-xl">
-                    ...waiting from Game Master to start the game
-                </div>
-            </Flex>
-            <Flex v-if="playerStore.table?.status === TableStatus.WAITING" class="h-full bg-dark" :items="'center'" :justify="'center'" :column="true">
-                <div class="rounded-2xl bg-primary px-12 py-6  text-4xl italic">
-                    Game has ended
-                </div>
-                <div class="mt-6 text-xl">
-                    ...waiting from Game Master to start the game
-                </div>
-            </Flex> -->
             <RoomChat />
         </div>
 
         <SideBarGame class="w-1/6 overflow-x-auto" />
     </Flex>
-
-
 
     <!-- Game Master Options -->
     <GameMasterMenu v-if="playerStore.gameMaster"
@@ -146,6 +120,13 @@ onBeforeMount(() => {
         if (response) {
             const index = playerStore.table?.table_users?.map(user => user.id).indexOf(response.id);
             if (playerStore.table && index !== undefined) {
+                if (
+                    (!playerStore.table.table_users![index]?.status && response?.status)
+                || (playerStore.table.table_users![index].status?.id !== response?.status?.id)) {
+                    const message = response.status?.name ? `${response.user.username} update his status to "${response.status?.name}"`
+                    : `${response.user.username} has remove his status`
+                    toast.info(message);
+                }
                 playerStore.table.table_users![index] = response;
             }
         }
@@ -201,6 +182,8 @@ onBeforeMount(() => {
 
     socket.on('getUpdateCard', (response: TableCard) => {
         if (response) {
+            console.log('get Update Card');
+            
             playerStore.zIndex = response.z_index + 1;
             updateCard(response);
         }

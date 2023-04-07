@@ -1,5 +1,25 @@
 <template>
     <Container v-if="width > gameWidth && height > gameHeight">
+        <Flex justify="between" items="end" class="mb-8">
+            <MyTitle>Lobby</MyTitle>
+            <button class="bg-black text-white h-12 px-4 rounded-xl hover:bg-primary transition duration-300"
+            v-if="userStore.user.email === null" @click="isOpenModalSetGuestUsername = true">{{ userStore.user.username ? 'Change Nickname' : 'Add Nickname' }}</button>
+        </Flex>
+        <GridCol :all="2" class="mt-3 px-2">
+            <GridColItem :all="1">
+                <InputField :input="search" :placeholder="'Search a Table..'" @change="(value) => search = value" />
+            </GridColItem>
+            <GridColItem :all="1">
+                <Flex :justify="'center'" :gap="2">
+                    <PrimaryButton :title="'Create Table'" @click="createTableModal = true"
+                        v-if="userStore.user.role !== Roles.guest"></PrimaryButton>
+                    <PrimaryButton :title="'Join Table'" :disable="selectTable === -1" @click="joinRoom()"></PrimaryButton>
+                    <RemoveButton v-if="playerStore.table?.creator?.id === userStore.user.id"
+                        @click="playerStore._removeTable()" />
+                </Flex>
+            </GridColItem>
+        </GridCol>
+
         <DarkTable :table-headers="tablesFields" v-if="filterTables.length > 0">
             <DarkTableRow v-for="(table, i) in filterTables" :key="`lobby-row-${table.id}`"
                 @click="handleSelectTable(i, table)" :class="selectTable === i ? 'bg-gray-700' : ''">
@@ -41,20 +61,7 @@
             </DarkTableRow>
         </DarkTable>
 
-        <GridCol :all="2" class="mt-3 px-2">
-            <GridColItem :all="1">
-                <InputField :input="search" :placeholder="'Search a Table..'" @change="(value) => search = value" />
-            </GridColItem>
-            <GridColItem :all="1">
-                <Flex :justify="'center'" :gap="2">
-                    <PrimaryButton :title="'Create Table'" @click="createTableModal = true"
-                        v-if="userStore.user.role !== Roles.guest"></PrimaryButton>
-                    <PrimaryButton :title="'Join Table'" :disable="selectTable === -1" @click="joinRoom()"></PrimaryButton>
-                    <RemoveButton v-if="playerStore.table?.creator?.id === userStore.user.id"
-                        @click="playerStore._removeTable()" />
-                </Flex>
-            </GridColItem>
-        </GridCol>
+
     </Container>
 
     <Container v-else>
@@ -64,7 +71,7 @@
     </Container>
     <CreateTableModal :is-modal-open="createTableModal" @close-modal="() => createTableModal = false"
         v-if="userStore.user.role !== Roles.guest" />
-    <ModalSetGuestUsername :is-modal-open="isOpenModalSetGuestUsername" @close-modal="isOpenModalSetGuestUsername = false"
+    <ModalSetGuestUsername :is-modal-open="isOpenModalSetGuestUsername" :username="userStore.user.username ? userStore.user.username : ''" @close-modal="isOpenModalSetGuestUsername = false"
         @register-guest="(username: string) => registerGuest(username)" />
     <ModalSetPasswordTable :is-modal-open="isOpenModalSetTablePassword" @close-modal="isOpenModalSetTablePassword = false"
         @set-password-table="(password: string) => validatePassword(password)" />
@@ -94,6 +101,7 @@ import ModalSetPasswordTable from '@/components/modals/ModalSetPasswordTable.vue
 import { useToast } from 'vue-toastification';
 import { TableStatus } from '@/types/tables/TableStatus.enum';
 import { useWindowSize } from '@vueuse/core'
+import MyTitle from '@/components/MyTitle.vue';
 
 const { width, height } = useWindowSize();
 const gameHeight = ref(parseInt(import.meta.env.VITE_GAME_HEIGHT));
@@ -140,6 +148,10 @@ onBeforeMount(() => {
 
 const joinRoom = () => {
     if (playerStore.table) {
+        if (!userStore.user.id) {
+            isOpenModalSetGuestUsername.value = true;
+            return
+        }
         if (playerStore.table.private) {
             isOpenModalSetTablePassword.value = true;
         } else {

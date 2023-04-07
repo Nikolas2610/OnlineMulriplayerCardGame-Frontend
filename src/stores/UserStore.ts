@@ -23,8 +23,10 @@ export const useUserStore = defineStore("UserStore", {
                 role: null
             } as UserState,
             userLogin: {
-                email: 'admin@omcg.com',
-                password: 'CardGame-0',
+                email: '',
+                password: '',
+                // email: 'admin@omcg.com',
+                // password: 'CardGame-0',
             } as UserLogin,
             userRegister: {
                 username: '',
@@ -38,7 +40,8 @@ export const useUserStore = defineStore("UserStore", {
         authToken: (state) => state.user.token === null ? false : true,
         isAdmin: (state) => state.user.role === 'admin',
         getToken: (state) => state.user.token,
-        userLoginCredentials: (state) => state.userLogin
+        userLoginCredentials: (state) => state.userLogin, 
+        isUser: (state) => state.user.role === 'admin' || state.user.role === 'user'
     },
     actions: {
         async register() {
@@ -69,6 +72,8 @@ export const useUserStore = defineStore("UserStore", {
                 })
                 if (response.data.affected === 1) {
                     this.resetValues();
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('id');
                     await router.push({ name: 'home' });
                 }
             } catch (error) {
@@ -150,6 +155,7 @@ export const useUserStore = defineStore("UserStore", {
             this.$state.user.username = null;
             this.$state.user.email = null;
             this.$state.user.role = null;
+            this.$state.user.id = null;
         }
     }
 })
