@@ -28,13 +28,17 @@
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/UserStore';
 import { useRouter } from 'vue-router';
+import joystickIcon from '@/assets/icons/sidebar/joystick.svg'
+import gamesIcon from '@/assets/icons/sidebar/games.svg'
+import decksIcon from '@/assets/icons/sidebar/decks.svg'
+import cardsIcon from '@/assets/icons/sidebar/cards.svg'
 
 const router = useRouter();
 const userStore = useUserStore();
 const items = ref([
-    { id: 1, name: 'Lobby', icon: '/src/assets/icons/sidebar/joystick.svg', router: 'lobby-room', requireAuth: false },
-    { id: 2, name: 'Create Game', icon: '/src/assets/icons/sidebar/games.svg', router: 'create-game', requireAuth: true },
-    { id: 3, name: 'Create Deck', icon: '/src/assets/icons/sidebar/decks.svg', router: 'create-deck', requireAuth: true },
-    { id: 4, name: 'Create Card', icon: '/src/assets/icons/sidebar/cards.svg', router: 'create-card', requireAuth: true },
+    { id: 1, name: 'Lobby', icon: joystickIcon, router: 'lobby-room', requireAuth: false },
+    { id: 2, name: 'Create Game', icon: gamesIcon, router: 'create-game', requireAuth: true },
+    { id: 3, name: 'Create Deck', icon: decksIcon, router: 'create-deck', requireAuth: true },
+    { id: 4, name: 'Create Card', icon: cardsIcon, router: 'create-card', requireAuth: true },
 ])
 </script>

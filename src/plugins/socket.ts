@@ -3,7 +3,7 @@ import { io } from 'socket.io-client'
 import { useToast } from 'vue-toastification'
 
 const playerStore = usePlayerStore();
-const socket = io('http://localhost:3000')
+const socket = io(import.meta.env.VITE_SOCKET_URL)
 const toast = useToast();
 socket.on('connect_error', (response) => {
     console.log('\x1b[31m%s\x1b[0m', 'connect_error');
