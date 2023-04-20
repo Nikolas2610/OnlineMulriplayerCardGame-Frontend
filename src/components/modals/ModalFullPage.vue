@@ -20,7 +20,7 @@
                             @click="selectedMenuItem = item.id"
                             :class="selectedMenuItem === item.id ? 'bg-primary' : 'bg-transparent'">{{ item.name }}</div>
                     </Flex>
-                    <Flex class="w-full">
+                    <Flex class="w-full overflow-x-auto">
                         <div class="container my-10">
                             <div v-if="selectedMenuItem === 1">
                                 <Flex class="text-2xl underline underline-offset-4 mb-6 w-full" justify="between">
@@ -129,8 +129,7 @@
                                             :class="tableStatus?.status === TableStatus.WAITING ? 'cursor-not-allowed' : ''">
                                             <Flex :justify="'center'" :items="'center'">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    fill="currentColor" class="w-6 h-6 mr-3"
-                                                    viewBox="0 0 16 16">
+                                                    fill="currentColor" class="w-6 h-6 mr-3" viewBox="0 0 16 16">
                                                     <path
                                                         d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16ZM7.729 5.055A.5.5 0 0 1 8 5.5v1.886l3.21-2.293A.5.5 0 0 1 12 5.5v5a.5.5 0 0 1-.79.407L8 8.614V10.5a.5.5 0 0 1-.79.407l-3.5-2.5a.5.5 0 0 1 0-.814l3.5-2.5a.5.5 0 0 1 .519-.038Z" />
                                                 </svg>
@@ -142,8 +141,7 @@
                                             :class="tableStatus?.status === TableStatus.WAITING ? 'cursor-not-allowed' : ''">
                                             <Flex :justify="'center'" :items="'center'">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    fill="currentColor" class="w-6 h-6 mr-3"
-                                                    viewBox="0 0 16 16">
+                                                    fill="currentColor" class="w-6 h-6 mr-3" viewBox="0 0 16 16">
                                                     <path
                                                         d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16ZM4.79 5.093 8 7.386V5.5a.5.5 0 0 1 .79-.407l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 8 10.5V8.614l-3.21 2.293A.5.5 0 0 1 4 10.5v-5a.5.5 0 0 1 .79-.407Z" />
                                                 </svg>
@@ -200,6 +198,10 @@
                                     </VueDraggableNext>
                                 </Flex>
                             </div>
+
+                            <div v-if="selectedMenuItem === 3">
+                                <RankTable />
+                            </div>
                         </div>
                     </Flex>
                 </Flex>
@@ -213,12 +215,12 @@ import { ref, watch, type PropType } from 'vue';
 import { onClickOutside } from '@vueuse/core'
 import Flex from '../wrappers/Flex.vue';
 import { VueDraggableNext } from 'vue-draggable-next'
-import PrimaryButton from '../buttons/PrimaryButton.vue';
 import type { TableUsers } from '@/types/lobby/TableUsers'
 import SelectField from '../ui/SelectField.vue';
 import type { Table } from '@/types/tables/Table'
 import { TableStatus } from '@/types/tables/TableStatus.enum';
 import CheckBoxField from '../ui/CheckBoxField.vue';
+import RankTable from '../game-master/RankTable.vue';
 
 const emit = defineEmits([
     'closeModal',
@@ -248,8 +250,10 @@ const modal = ref(null)
 const menuItems = ref([
     { id: 1, name: 'Game' },
     { id: 2, name: 'Players' },
+    { id: 3, name: 'Rank Table' },
 ])
-const selectedMenuItem = ref(1);
+const selectedMenuItem = ref(3);
+
 
 const updateTurn = (event: any) => {
     emit('updateTurnTableUsers');
@@ -275,4 +279,5 @@ watch(() => props.menuTab,
 .modal-leave-to {
     opacity: 0;
     transform: scale(1.1);
-}</style>
+}
+</style>

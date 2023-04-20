@@ -6,8 +6,9 @@
             <OnlineTable v-if="playerStore.table?.status === TableStatus.PLAYING
                 || (playerStore.gameMaster && playerStore.table?.status === TableStatus.GAME_MASTER_EDIT)" />
             <!-- Table waiting status -->
-            <Flex v-for="{status, title, message} in tableStatusMessage" :key="status" items="center" justify="center" v-else>
-                <TableStatusMessage  :title="title" :message="message" v-if="playerStore.table?.status === status" />
+            <Flex v-for="{ status, title, message } in tableStatusMessage" :key="status" items="center" justify="center"
+                v-else>
+                <TableStatusMessage :title="title" :message="message" v-if="playerStore.table?.status === status" />
             </Flex>
             <RoomChat />
         </div>
@@ -62,6 +63,8 @@ import { useUserStore } from '@/stores/UserStore';
 import { POSITION, useToast } from 'vue-toastification';
 import RoomChat from '@/components/online-table/chat/RoomChat.vue';
 import TableStatusMessage from '@/components/online-table/TableStatusMessage.vue';
+import { useRankStore } from '@/stores/RankStore';
+import type { Rank } from '@/types/online-table/Rank';
 
 const route = useRoute();
 const playerStore = usePlayerStore();
@@ -70,6 +73,7 @@ const modalOpen = ref(false)
 const modalOpenViewAllCards = ref(false);
 const modalFullPageMenuTabProp = ref(1);
 const toast = useToast();
+const rankStore = useRankStore();
 
 playerStore.room = route.params.id.toString();
 if (playerStore.table) {
@@ -86,10 +90,21 @@ const webSocketsTableEvents = ref([
     'getShowAllCards',
     'getUpdateCard',
     'getShuffleDeck',
-])
+    'getUpdateRankRow',
+]);
+
+const initializeRankStore = () => {
+    // Initialize game store data
+    rankStore.room = playerStore.room ?? '';
+    rankStore.tableId = playerStore.table?.id ?? null
+
+    rankStore.addTableUsers(playerStore.table?.table_users ?? []);
+}
 
 onBeforeMount(() => {
+    // Initialize game master of the room
     playerStore.setGameMaster();
+
     // SOCKET EVENTS
     // update table users online
     socket.on('getTableUsers', (tableGame: Table) => {
@@ -122,9 +137,9 @@ onBeforeMount(() => {
             if (playerStore.table && index !== undefined) {
                 if (
                     (!playerStore.table.table_users![index]?.status && response?.status)
-                || (playerStore.table.table_users![index].status?.id !== response?.status?.id)) {
+                    || (playerStore.table.table_users![index].status?.id !== response?.status?.id)) {
                     const message = response.status?.name ? `${response.user.username} update his status to "${response.status?.name}"`
-                    : `${response.user.username} has remove his status`
+                        : `${response.user.username} has remove his status`
                     toast.info(message);
                 }
                 playerStore.table.table_users![index] = response;
@@ -134,14 +149,29 @@ onBeforeMount(() => {
 
     socket.on('getStartGameDetails', (response: Table, cards: TableCard[]) => {
         if (response) {
+            // Catch previous status of the table
+            const isPreviousWaitingTable = playerStore.table?.status === TableStatus.WAITING;
             playerStore.table = response;
             extractTableDecksDetails();
+
+            // Catch the new status of the table
+            const isPlayingTable = playerStore.table?.status === TableStatus.PLAYING;
+
+            // If the table is from waiting to playing (status) update the rank table with new players
+            if (isPlayingTable && isPreviousWaitingTable) {
+                initializeRankStore();
+            }
+
+            // Get the elements of the decks
             if (playerStore.deckReferences.junk) {
-                playerStore.dropZones.junk[0].element = playerStore.deckReferences.junk
-                playerStore.dropZones.user[0].element = playerStore.deckReferences.user
-                playerStore.dropZones.table[0].element = playerStore.deckReferences.table
+                [playerStore.dropZones.junk[0].element, playerStore.dropZones.user[0].element, playerStore.dropZones.table[0].element] = [
+                    playerStore.deckReferences.junk,
+                    playerStore.deckReferences.user,
+                    playerStore.deckReferences.table,
+                ];
             }
         }
+
         if (cards) {
             playerStore.cards = cards;
         }
@@ -183,7 +213,7 @@ onBeforeMount(() => {
     socket.on('getUpdateCard', (response: TableCard) => {
         if (response) {
             console.log('get Update Card');
-            
+
             playerStore.zIndex = response.z_index + 1;
             updateCard(response);
         }
@@ -198,6 +228,27 @@ onBeforeMount(() => {
             toast.info(`Game Master has shuffle the deck "${deckName}"`)
         }
     });
+
+    // Update rank table
+    socket.on('getUpdateRankRow', (response: Rank[] | null, row: number) => {
+        if (!response) {
+            // Delete table row
+            const index = rankStore.rankPoints.findIndex(rankRow => rankRow.some(rank => rank.row === row))
+            rankStore.rankPoints = rankStore.rankPoints.filter((row, i) => i !== index);
+        } else {
+            if (row === rankStore.nextRow) {
+                // Add new table row
+                rankStore.rankPoints.push(response);
+            } else {
+                // Update table row
+                const index = rankStore.rankPoints.findIndex(rankRow => rankRow.some(rank => rank.row === row))
+                rankStore.rankPoints[index] = response;
+            }
+        }
+
+        // Show to the user notification for the rank
+        playerStore.rank.notification = true;
+    })
 });
 
 const updateCard = (cardResponse: TableCard) => {
@@ -235,10 +286,10 @@ const extractTableDecksDetails = () => {
 }
 
 const tableStatusMessage = ref([
-    {status: TableStatus.WAITING, title: 'Game not started yet', message: '...waiting from Game Master to start the game'},
-    {status: TableStatus.PAUSE, title: 'Game Paused', message: '...waiting from Game Master to resume the game'},
-    {status: TableStatus.GAME_MASTER_EDIT, title: 'Game edit from Game Master', message: '..waiting from Game Master to finish with the configure of the table'},
-    {status: TableStatus.FINISH, title: 'Game has ended', message: '...waiting from Game Master to start the game'},
+    { status: TableStatus.WAITING, title: 'Game not started yet', message: '...waiting from Game Master to start the game' },
+    { status: TableStatus.PAUSE, title: 'Game Paused', message: '...waiting from Game Master to resume the game' },
+    { status: TableStatus.GAME_MASTER_EDIT, title: 'Game edit from Game Master', message: '..waiting from Game Master to finish with the configure of the table' },
+    { status: TableStatus.FINISH, title: 'Game has ended', message: '...waiting from Game Master to start the game' },
 ])
 
 onUnmounted(() => {

@@ -28,7 +28,7 @@
 
     <!-- Table -->
     <Flex :justify="'center'" v-if="playerStore.cards && playerStore.getTableExist">
-        <div id="tableDeck" class="grid bg-dark relative dropZone" :class="`grid-cols-${playerStore.table?.game?.grid_cols} grid-rows-${playerStore.table?.game?.grid_rows} h-[${height}px] w-[${width}px]` 
+        <div id="tableDeck" class="grid bg-dark relative dropZone" :class="`grid-cols-${playerStore.table?.game?.grid_cols} grid-rows-${playerStore.table?.game?.grid_rows} h-[${height}px] w-[${width}px]`
         " ref="tableDeckReference" @drop="(event) => onDrop(event, playerStore.getTableDeckId, 'table')"
             @dragover.prevent @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
             <div class="col-span-1" v-for="index in playerStore.table?.game?.grid_cols">
@@ -43,9 +43,9 @@
 
     <!-- Player Deck -->
     <Flex :justify="'center'" v-if="playerStore.cards">
-        <div :class="`w-[${width}px] h-[150px]`" class="bg-secondary border relative dropZone" id="playerDeck" ref="playerDeckReference"
-            @drop="(event) => onDrop(event, playerStore.getExistPlayerTableDeckId, 'user')" @dragover.prevent
-            @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
+        <div :class="`w-[${width}px] h-[150px]`" class="bg-secondary border relative dropZone" id="playerDeck"
+            ref="playerDeckReference" @drop="(event) => onDrop(event, playerStore.getExistPlayerTableDeckId, 'user')"
+            @dragover.prevent @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
             <div>
                 <Flex class="border w-full h-full">
                     <DraggableCard :card="card"
@@ -58,6 +58,27 @@
     </Flex>
 
     <PlayerSettings />
+    <Modal :modal-open="playerStore.rank.isRankModalOpen" @close-modal="playerStore.rank.isRankModalOpen = false">
+        <template v-slot:modal_header>
+            <div class="text-black">
+                Rank Table
+            </div>
+        </template>
+
+        <template v-slot:body>
+            <DarkTable :table-headers="rankStore.tableHeaders" class="border border-gray-700 rounded-lg overflow-y-auto"
+                v-if="rankStore.rankPoints.length > 0">
+                <DarkTableRow v-for="(row, index) in rankStore.rankPoints" :key="`rankRow-${row}`">
+                    <DarkTableCell v-for="rank in row" :key="rank.id">
+                        {{ rank.type === RankType.TITLE ? rank.title : rank.points }}
+                    </DarkTableCell>
+                </DarkTableRow>
+            </DarkTable>
+            <div class="bg-red-500 p-4 my-4 rounded italic" v-else>
+                The rank table is empty
+            </div>
+        </template>
+    </Modal>
 </template>
 
 <script setup lang="ts">
@@ -68,11 +89,18 @@ import { ref, watch, onMounted } from 'vue';
 import type { TableCard } from '@/types/tables/TableCard';
 import DraggableCard from './DraggableCard.vue';
 import PlayerSettings from './PlayerSettings.vue';
+import Modal from '../Modal.vue';
+import { useRankStore } from '@/stores/RankStore';
+import { RankType } from '@/types/online-table/RankType.enum';
+import DarkTable from '../table/DarkTable.vue';
+import DarkTableRow from '../table/DarkTableRow.vue';
+import DarkTableCell from '../table/DarkTableCell.vue';
 
 const playerStore = usePlayerStore();
 const height = ref(import.meta.env.VITE_GAME_HEIGHT);
 const width = ref(import.meta.env.VITE_GAME_WIDTH);
-const heightCell = ref(import.meta.env.VITE_GAME_HEIGHT)
+const heightCell = ref(import.meta.env.VITE_GAME_HEIGHT);
+const rankStore = useRankStore();
 
 if (playerStore.table?.game) {
     heightCell.value = parseFloat((height.value / playerStore.table?.game.grid_rows).toFixed(1));
