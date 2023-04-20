@@ -1,7 +1,7 @@
 <template>
     <div class="mx-auto mt-4">
         <div class="flex flex-col">
-            <div class="overflow-x-auto shadow-md sm:rounded-lg">
+            <div class="relative overflow-x-auto shadow-md rounded-lg">
                 <div class="inline-block min-w-full align-middle">
                     <div class="overflow-hidden ">
                         <table class="min-w-full divide-y table-fixed divide-gray-700">

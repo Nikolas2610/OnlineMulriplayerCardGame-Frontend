@@ -8,9 +8,6 @@ import { Roles } from './types/Roles.enum';
 const userStore = useUserStore();
 const isModalOpen = ref<Boolean>(false);
 
-console.log(import.meta.env.VITE_TEST);
-
-
 // Get the JWT token from local storage if user close the browser 
 onMounted(() => {
   if (localStorage.getItem('token')) {

@@ -23,10 +23,10 @@ export const useUserStore = defineStore("UserStore", {
                 role: null
             } as UserState,
             userLogin: {
-                email: '',
-                password: '',
-                // email: 'admin@omcg.com',
-                // password: 'CardGame-0',
+                // email: '',
+                // password: '',
+                email: 'admin@omcg.com',
+                password: 'CardGame-0',
             } as UserLogin,
             userRegister: {
                 username: '',

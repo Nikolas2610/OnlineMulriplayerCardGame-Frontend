@@ -41,6 +41,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
             refHistory: [] as RefHistory[],
             refHistoryRedo: [] as RefHistory[],
             refHistoryCapacity: 10 as number,
+            rank: {
+                notification: false,
+                isRankModalOpen: false
+            }
         }
     },
     getters: {

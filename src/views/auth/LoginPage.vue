@@ -10,7 +10,7 @@
             <!-- Login Form -->
             <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div class="bg-primary py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form class="space-y-6">
+                    <form class="space-y-6" @submit.prevent="login()">
                         <!-- Email Input -->
                         <div>
                             <InputField :title="'Email Address'" :input="userStore.userLogin.email" :errors="v$.email.$errors" :type="'email'" class="text-white" @change="(value) => userStore.userLogin.email = value" />
@@ -29,7 +29,7 @@
                         </div>
                         <!-- Submit Form -->
                         <div>
-                            <div @click="login()" class="mt-14 btn-black">
+                            <button type="submit" class="mt-14 btn-black">
                                 <!-- Loading Animation -->
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" v-if="loadingButton"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@
                                     </path>
                                 </svg>
                                 <div v-else>Login</div>
-                            </div>
+                            </button>
                         </div>
                     </form>
                 </div>

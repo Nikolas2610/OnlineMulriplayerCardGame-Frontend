@@ -1,7 +1,7 @@
 <template>
     <button
-        class="flex items-center justify-center rounded-md border border-transparent bg-primary text-white px-8 py-2 text-base font-medium hover:bg-secondary hover:text-white md:px-10 md:text-lg transition duration-150"
-        :class="[`w-${width}`, disable ? 'cursor-not-allowed' : 'cursor-pointer']" :type="type === 'button' ? 'button' : 'submit'" :disabled="disable">
+        class="flex items-center justify-center rounded-md border border-transparent bg-primary text-white px-8 py-2 text-base font-medium hover:bg-secondary hover:text-white md:px-10 md:text-base transition duration-150"
+        :class="[`w-${width}`, disable ? 'cursor-not-allowed bg-opacity-50' : 'cursor-pointer']" :type="type === 'button' ? 'button' : 'submit'" :disabled="disable">
         <svg class="animate-spin -ml-1 h-7 w-7 text-white" v-if="loading" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
