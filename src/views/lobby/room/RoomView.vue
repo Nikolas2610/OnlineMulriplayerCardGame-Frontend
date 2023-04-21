@@ -212,8 +212,6 @@ onBeforeMount(() => {
 
     socket.on('getUpdateCard', (response: TableCard) => {
         if (response) {
-            console.log('get Update Card');
-
             playerStore.zIndex = response.z_index + 1;
             updateCard(response);
         }
