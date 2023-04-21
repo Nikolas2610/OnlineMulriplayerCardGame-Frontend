@@ -10,7 +10,7 @@ const toast = useToast();
 export const useRankStore = defineStore('RankStore', {
     state: () => {
         return {
-            tableHeaders: [],
+            tableHeaders: ['Round'],
             rankPoints: [] as Rank[][],
             tableUsers: [] as TableUsers[],
             tableId: 167 as number | null,
@@ -106,7 +106,9 @@ export const useRankStore = defineStore('RankStore', {
             this.$state.tableUsers = tableUsers.sort((a, b) => a.id - b.id);
             this.$state.tableHeaders = ['Round']
             this.$state.tableUsers.forEach(user => {
-                this.$state.tableHeaders.push(user.user.username ?? '');
+                if (user.user.username) {
+                    this.$state.tableHeaders.push(user.user.username);
+                }
             })
             this._fetchRankPoints();
         }

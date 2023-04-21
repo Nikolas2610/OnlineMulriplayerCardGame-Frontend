@@ -1,0 +1,1 @@
+import{_ as o}from"./_plugin-vue_export-helper.cdc0426e.js";import{o as r,c as s,h as t,M as c}from"./index.e533216c.js";const a={},n={class:"mt-4 lg:w-3/12 w-1/2"},_={class:"text-2xl border-b-4 border-primary py-4 px-2"};function d(e,l){return r(),s("div",n,[t("div",_,[c(e.$slots,"default")])])}const p=o(a,[["render",d]]);export{p as M};

@@ -160,10 +160,13 @@ onBeforeMount(() => {
             // If the table is from waiting to playing (status) update the rank table with new players
             if (isPlayingTable && isPreviousWaitingTable) {
                 initializeRankStore();
+                // Erase history
+                playerStore.refUndoHistory = [];
+                playerStore.refRedoHistory = [];
             }
 
             // Get the elements of the decks
-            if (playerStore.deckReferences.junk) {
+            if (isPlayingTable && playerStore.deckReferences.junk) {
                 [playerStore.dropZones.junk[0].element, playerStore.dropZones.user[0].element, playerStore.dropZones.table[0].element] = [
                     playerStore.deckReferences.junk,
                     playerStore.deckReferences.user,
@@ -250,11 +253,11 @@ onBeforeMount(() => {
 });
 
 const updateCard = (cardResponse: TableCard) => {
-    const cardIndex = playerStore.cards?.findIndex((card) => card.id === cardResponse.id);
-    if (cardIndex && cardIndex > -1 && playerStore.cards) {
-        playerStore.updateHistory(playerStore.cards[cardIndex], cardResponse);
-        playerStore.cards?.splice(cardIndex, 1); // Remove the card from the array
-        playerStore.cards?.push(cardResponse); // Add the updated card to the array
+    // Update card in cards array
+    const previousCard = playerStore.replaceCard(cardResponse);
+    // Add card to history
+    if (previousCard) {
+        playerStore.updateUndoHistory(previousCard);
         playerStore.removeRedoHistoryMovement();
     }
 }
@@ -295,8 +298,8 @@ onUnmounted(() => {
     playerStore.room = null;
     playerStore.gameMaster = false;
     playerStore.cards = null;
-    playerStore.refHistory = [];
-    playerStore.refHistoryRedo = [];
+    playerStore.refUndoHistory = [];
+    playerStore.refRedoHistory = [];
     playerStore._leaveTable();
     webSocketsTableEvents.value.forEach(event => {
         socket.off(event);
