@@ -13,6 +13,8 @@ import { MovementRotateCard } from "@/types/online-table/RotateCard.enum";
 import type { Status } from "@/types/games/relations/status/Status";
 import type { RefHistory } from "@/types/online-table/RefHistory";
 import { HistoryMovement } from "@/types/online-table/HIstoryMovement.enum";
+import type { TableDeck } from "@/types/tables/TableDeck";
+import { TableDeckType } from "@/types/tables/TableDeckType";
 
 const userStore = useUserStore();
 const toast = useToast();
@@ -245,6 +247,28 @@ export const usePlayerStore = defineStore('PlayerStore', {
             socket.emit('updateCard', {
                 card, room: this.$state.room
             })
+        },
+        cardsToDeck(previousDeck: number | undefined, newDeck: TableDeck | undefined) {
+            if (previousDeck && newDeck) {
+                let width = 50;
+                this.$state.cards?.forEach(card => {
+                    if (card.table_deck.id === previousDeck) {
+                        card.table_deck.id = newDeck.id;
+                        if (newDeck.type === TableDeckType.DECK || newDeck.type === TableDeckType.JUNK) {
+                            // For the decks set position to 0
+                            card.position_x = 0;
+                            card.position_y = 0;
+                            card.rotate = 0;
+                        } else {
+                            // For table and user deck add cords next to other cards
+                            card.position_x = 20;
+                            card.position_y = width;
+                            width += 50;
+                        }
+                        this._updateCard(card);
+                    }
+                })
+            }
         },
         toggleCardVisibility() {
             if (this.$state.clickCardId) {
