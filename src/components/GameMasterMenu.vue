@@ -1,6 +1,6 @@
 <template>
     <Flex
-        class="border text-white fixed bottom-32 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[640px] hover:-translate-x-[20px] z-[2147483639]"
+        class="border text-white fixed bottom-32 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[685px] hover:-translate-x-[20px] z-[2147483639]"
         items="center" justify="center">
         <Flex class="border-r h-full px-6 pl-10" items="center" :gap="4">
             <!-- Play -->
@@ -63,8 +63,8 @@
             </Flex>
             <!-- Stop -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
-                @click="$emit('stopGame')"
-                :class="playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed opacity-50' : ''">
+                @click="playerStore.table?.status !== TableStatus.WAITING ? $emit('stopGame') : ''"
+                :class="playerStore.table?.status === TableStatus.WAITING || playerStore.table?.status === TableStatus.FINISH ? 'cursor-not-allowed opacity-50' : ''">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -111,7 +111,9 @@
         </Flex>
         <Flex class="border-r h-full px-6" items="center" :gap="4">
             <!-- Previous Player -->
-            <Flex :justify="'center'" :items="'center'" @click="$emit('setNextPlayer', false)"
+            <Flex :justify="'center'" :items="'center'"
+                @click="playerStore.table?.status === TableStatus.PLAYING ? $emit('setNextPlayer', false) : ''"
+                :class="playerStore.table?.status === TableStatus.PLAYING ? '' : 'cursor-not-allowed opacity-50'"
                 class="hover:text-primary duration-300 transition">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -125,8 +127,10 @@
                 </VTooltip>
             </Flex>
             <!-- Next Player -->
-            <Flex :justify="'center'" :items="'center'" @click="$emit('setNextPlayer', true)"
-                class="hover:text-primary duration-300 transition">
+            <Flex :justify="'center'" :items="'center'"
+                @click="playerStore.table?.status === TableStatus.PLAYING ? $emit('setNextPlayer', true) : ''"
+                class="hover:text-primary duration-300 transition"
+                :class="playerStore.table?.status === TableStatus.PLAYING ? '' : 'cursor-not-allowed opacity-50'">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -172,8 +176,8 @@
             </Flex>
             <!-- Undo Movement -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
-                :class="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? '' : 'cursor-not-allowed opacity-50'"
-                @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? $emit('historyMovement', HistoryMovement.UNDO) : ''">
+                :class="(playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT) && playerStore.refUndoHistory.length > 0 ? '' : 'cursor-not-allowed opacity-50'"
+                @click="(playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT) && playerStore.refUndoHistory.length > 0 ? $emit('historyMovement', HistoryMovement.UNDO) : ''">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -187,8 +191,8 @@
             </Flex>
             <!-- Redo Movement -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
-                :class="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? '' : 'cursor-not-allowed opacity-50'"
-                @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? $emit('historyMovement', HistoryMovement.REDO) : ''">
+                :class="(playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT) && playerStore.refRedoHistory.length > 0 ? '' : 'cursor-not-allowed opacity-50'"
+                @click="(playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT) && playerStore.refRedoHistory.length > 0 ? $emit('historyMovement', HistoryMovement.REDO) : ''">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -213,6 +217,21 @@
                     </svg>
                     <template #popper>
                         Open User List
+                    </template>
+                </VTooltip>
+            </Flex>
+            <!-- Edit Rank Table -->
+            <Flex :justify="'center'" :items="'center'" @click="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING  ? '' : $emit('openSettings', 3)"
+                :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING  ? 'cursor-not-allowed opacity-50' : ''"
+                class="hover:text-primary duration-300 transition">
+                <VTooltip distance="22">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
+                        <path
+                            d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z" />
+                    </svg>
+                    <template #popper>
+                        Edit Rank Table
                     </template>
                 </VTooltip>
             </Flex>

@@ -252,7 +252,7 @@ const menuItems = ref([
     { id: 2, name: 'Players' },
     { id: 3, name: 'Rank Table' },
 ])
-const selectedMenuItem = ref(3);
+const selectedMenuItem = ref(1);
 
 
 const updateTurn = (event: any) => {
