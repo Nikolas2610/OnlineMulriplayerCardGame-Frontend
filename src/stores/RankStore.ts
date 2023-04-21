@@ -86,8 +86,6 @@ export const useRankStore = defineStore('RankStore', {
             const maxRow: number = this.nextRow;
 
             if (this.$state.tableId) {
-                const table = this.$state.tableId;
-
                 this.$state.form.header = {
                     title: 'Round ' + maxRow.toString(),
                     row: maxRow,

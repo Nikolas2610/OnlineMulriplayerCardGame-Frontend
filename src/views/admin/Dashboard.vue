@@ -14,6 +14,12 @@ import router from '@/router';
 import type MenuItem from '@/types/MenuItem';
 import { useGameStore } from '@/stores/GameStore'
 import { useTableStore } from '@/stores/TableStore'
+import decks from '@/assets/icons/sidebar/decks.svg'
+import dashboard from '@/assets/icons/sidebar/dashboard.svg'
+import table from '@/assets/icons/sidebar/tables.svg'
+import games from '@/assets/icons/sidebar/games.svg'
+import cards from '@/assets/icons/sidebar/cards.svg'
+import people from '@/assets/icons/sidebar/people.svg'
 
 const gameStore = useGameStore();
 const tableStore = useTableStore();
@@ -21,12 +27,12 @@ const userStore = useUserStore();
 
 // Menu list items
 const menuItems = ref<MenuItem[]>([
-    { name: 'Dashboard', icon: '/src/assets/icons/sidebar/dashboard.svg', router: 'admin-overview' },
-    { name: 'Users', icon: '/src/assets/icons/sidebar/people.svg', router: 'admin-users' },
-    { name: 'Tables', icon: '/src/assets/icons/sidebar/tables.svg', router: 'admin-tables' },
-    { name: 'Games', icon: '/src/assets/icons/sidebar/games.svg', router: 'admin-games' },
-    { name: 'Decks', icon: '/src/assets/icons/sidebar/decks.svg', router: 'admin-decks' },
-    { name: 'Cards', icon: '/src/assets/icons/sidebar/cards.svg', router: 'admin-cards' },
+    { name: 'Dashboard', icon: dashboard, router: 'admin-overview' },
+    { name: 'Users', icon: people, router: 'admin-users' },
+    { name: 'Tables', icon: table, router: 'admin-tables' },
+    { name: 'Games', icon: games, router: 'admin-games' },
+    { name: 'Decks', icon: decks, router: 'admin-decks' },
+    { name: 'Cards', icon: cards, router: 'admin-cards' },
 ])
 
 onMounted(() => {
