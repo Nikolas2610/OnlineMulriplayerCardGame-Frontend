@@ -13,11 +13,15 @@
                     <form class="space-y-6" @submit.prevent="login()">
                         <!-- Email Input -->
                         <div>
-                            <InputField :title="'Email Address'" :input="userStore.userLogin.email" :errors="v$.email.$errors" :type="'email'" class="text-white" @change="(value) => userStore.userLogin.email = value" />
+                            <InputField :title="'Email Address'" :input="userStore.userLogin.email"
+                                :errors="v$.email.$errors" :type="'email'" class="text-white"
+                                @change="(value) => userStore.userLogin.email = value" />
                         </div>
                         <!-- Password Input -->
                         <div>
-                            <InputField :title="'Password'" :input="userStore.$state.userLogin.password" :errors="v$.password.$errors" :type="'password'" class="text-white" @change="(value) => userStore.$state.userLogin.password = value" />
+                            <InputField :title="'Password'" :input="userStore.$state.userLogin.password"
+                                :errors="v$.password.$errors" :type="'password'" class="text-white"
+                                @change="(value) => userStore.$state.userLogin.password = value" />
                         </div>
                         <!-- Forgot Password Link -->
                         <div class="flex items-center justify-between">
@@ -50,7 +54,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { required, email } from '@vuelidate/validators';
 import { computed } from '@vue/reactivity';
 import { useVuelidate } from '@vuelidate/core'
@@ -58,15 +62,35 @@ import { useUserStore } from '@/stores/UserStore'
 import router from '@/router';
 import { useToast } from "vue-toastification";
 import InputField from '@/components/ui/InputField.vue';
+import { setOnlineSocketUser } from '@/utils/sockets/helpers';
 
 const toast = useToast();
 const userStore = useUserStore();
+const debugInput = ref("");
 // Redirect to home page if the user has login
 onMounted(() => {
     if (userStore.authToken) {
         router.push({ name: 'home' })
     }
+    window.addEventListener('keydown', handleKeyDown);
 })
+
+onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleKeyDown);
+});
+
+// Easy login for dev
+const handleKeyDown = (event: any) => {
+    debugInput.value += event.key;
+    if (debugInput.value === 'asdf') {
+        userStore.userLogin.email = "player@omcg.com";
+        userStore.userLogin.password = "CardGame-0";
+    }
+    if (debugInput.value.length > 3 || event.key === "Control") {
+        debugInput.value = ""
+    }
+};
+
 // Loading Button
 const loadingButton = ref<Boolean>(false);
 // Login Form rules
@@ -89,10 +113,10 @@ const login = async () => {
     // Check for error forms
     if (!v$.value.$error) {
         // Success Form
-        // ***Import axios
         const response: string = await userStore.login();
         // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error
         if (response === 'success') {
+            setOnlineSocketUser(userStore.user.id);
             resetLoginForm();
             v$.value.$reset();
             router.push({ name: 'lobby' })

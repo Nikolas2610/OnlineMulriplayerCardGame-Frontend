@@ -29,7 +29,7 @@
     <!-- Table -->
     <Flex :justify="'center'" v-if="playerStore.cards && playerStore.getTableExist">
         <div id="tableDeck" class="grid bg-dark relative dropZone" :class="`grid-cols-${playerStore.table?.game?.grid_cols} grid-rows-${playerStore.table?.game?.grid_rows} h-[${height}px] w-[${width}px]`
-        " ref="tableDeckReference" @drop="(event) => onDrop(event, playerStore.getTableDeckId, 'table')"
+            " ref="tableDeckReference" @drop="(event) => onDrop(event, playerStore.getTableDeckId, 'table')"
             @dragover.prevent @dragleave="(event) => onDragLeave(event)" @dragenter.prevent="(event) => onDragEnter(event)">
             <div class="col-span-1" v-for="index in playerStore.table?.game?.grid_cols">
                 <div class="row-span-1 bg-primary border w-full" :class="`h-[${heightCell}px]`"
@@ -111,6 +111,7 @@ const tableDeckReference = ref<HTMLElement | null>(null);
 const tableDeckTrashReference = ref<HTMLElement | null>(null);
 
 onMounted(() => {
+    // Set the decks div elements as card dropdowns
     if (tableDeckTrashReference.value) {
         playerStore.deckReferences.junk = tableDeckTrashReference.value;
         playerStore.dropZones.junk[0].element = tableDeckTrashReference.value

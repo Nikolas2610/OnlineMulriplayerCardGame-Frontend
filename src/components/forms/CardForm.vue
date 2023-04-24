@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import type CreateCard from '@/types/cards/CreateCard';
 import { ref, watch, onMounted } from 'vue';
-import { loadImage } from '@/utils/Function';
+import { loadImage } from '@/utils/helpers';
 
 onMounted(() => {
     if (props.cardData) {

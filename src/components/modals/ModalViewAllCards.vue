@@ -38,7 +38,7 @@ import type { PropType } from 'vue';
 import type { TableDeck } from '@/types/tables/TableDeck';
 import type { TableCard } from '@/types/tables/TableCard';
 import Flex from '../wrappers/Flex.vue';
-import { loadImage } from '@/utils/Function';
+import { loadImage } from '@/utils/helpers';
 import { TableDeckType } from '@/types/tables/TableDeckType';
 
 const props = defineProps({

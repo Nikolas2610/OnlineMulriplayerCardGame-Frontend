@@ -49,6 +49,14 @@ const router = createRouter({
           }
         },
         {
+          path: 'logout',
+          name: 'logout',
+          component: () => import('../views/auth/Logout.vue'),
+          meta: {
+            title: `${appName} | Logout`
+          }
+        },
+        {
           path: 'forgot-password',
           name: 'forgot-password',
           component: () => import('../views/auth/ForgotPasswordPage.vue'),
