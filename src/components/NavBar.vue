@@ -2,8 +2,7 @@
     <nav class="bg-dark border-gray-200 px-2 sm:px-4 py-2.5" style="height: 3.8rem;">
         <div class="container flex flex-wrap justify-between items-center mx-auto">
             <RouterLink :to="{ name: 'home' }" class="flex items-center">
-                <span
-                    class="self-center text-xl font-semibold whitespace-nowrap text-white hover:text-primary">OMCD</span>
+                <span class="self-center text-xl font-semibold whitespace-nowrap text-white hover:text-primary">OMCD</span>
             </RouterLink>
             <div class="flex lg:order-2">
                 <RouterLink :to="{ name: 'login' }" type="button" v-if="!userStore.isUser"
@@ -14,10 +13,12 @@
                     class="text-white bg-primary hover:bg-secondary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 lg:mr-0 ml-2">
                     Register
                 </RouterLink>
-                <div type="button" v-if="userStore.$state.user.token" @click="userStore.logout"
-                    class="text-white cursor-pointer bg-primary hover:bg-secondary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 lg:mr-0 ml-2">
-                    Logout
-                </div>
+                <RouterLink :to="{ name: 'logout' }" type="button">
+                    <div v-if="userStore.$state.user.token"
+                        class="text-white cursor-pointer bg-primary hover:bg-secondary transition duration-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 lg:mr-0 ml-2">
+                        Logout
+                    </div>
+                </RouterLink>
 
 
                 <button data-collapse-toggle="navbar-cta" type="button" @click="openNavMenu"
@@ -37,8 +38,7 @@
                 <ul
                     class="flex flex-col my-4 lg:my-0 rounded-lg lg:flex-row lg:space-x-8 lg:mt-0 lg:text-sm lg:font-medium lg:border-0">
                     <li v-for="{ id, title, path, registerUser } in navbar_items" :key="id" class="cursor-pointer">
-                        <RouterLink :to="{ name: path }"
-                            v-if="registerUser ? (userStore.authToken ? true : false) : true"
+                        <RouterLink :to="{ name: path }" v-if="registerUser ? (userStore.authToken ? true : false) : true"
                             class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0"
                             aria-current="page">
                             {{ title }}
@@ -100,9 +100,4 @@ const openNavMenu = () => {
 const closeNavbar = () => {
     openNavMenu();
 }
-
 </script>
-
-<style scoped>
-
-</style>

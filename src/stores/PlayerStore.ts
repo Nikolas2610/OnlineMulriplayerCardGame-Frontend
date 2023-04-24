@@ -14,6 +14,7 @@ import type { Status } from "@/types/games/relations/status/Status";
 import { HistoryMovement } from "@/types/online-table/HIstoryMovement.enum";
 import type { TableDeck } from "@/types/tables/TableDeck";
 import { TableDeckType } from "@/types/tables/TableDeckType";
+import { SocketStatus } from "@/types/online-table/SocketStatus.enum";
 
 const userStore = useUserStore();
 const toast = useToast();
@@ -21,7 +22,7 @@ const toast = useToast();
 export const usePlayerStore = defineStore('PlayerStore', {
     state: () => {
         return {
-            socket: null as string | null,
+            socket: userStore.getSocketId as string | null,
             table: null as Table | null,
             gameMaster: false,
             room: null as string | null,
@@ -45,7 +46,11 @@ export const usePlayerStore = defineStore('PlayerStore', {
             rank: {
                 notification: false,
                 isRankModalOpen: false
-            }
+            },
+            leaverPlayer: {
+                table: null as Table | null,
+                loading: false,
+            },
         }
     },
     getters: {
@@ -59,22 +64,20 @@ export const usePlayerStore = defineStore('PlayerStore', {
     },
     actions: {
         _joinTable(publicUrl: string) {
-            const userId = userStore.user.id
-
-            if (userId) {
-                socket.emit('joinTable', {
-                    userId, publicUrl, tableId: this.$state.table?.id
-                }, (response: any) => {
-                    // Catch the error
-                    if (response.error) {
-                        this.$state.room = null;
-                        router.push({ name: 'lobby' })
-                    }
-                });
-            } else {
-                toast.warning('You have to login or set guest nickname');
-                router.push({ name: 'lobby' })
+            // Not mount OnlineTable until get the leave player all the game data
+            if (this.$state.leaverPlayer.table) {
+                this.$state.leaverPlayer.loading = true;
             }
+            // Join the table
+            socket.emit('joinTable', {
+                publicUrl, tableId: this.$state.table?.id
+            }, (response: any) => {
+                // Catch the error
+                if (response.error) {
+                    this.$state.room = null;
+                    router.push({ name: 'lobby' })
+                }
+            });
         },
         async _validateTablePassword(password: string): Promise<any> {
             return new Promise((resolve, reject) => {
@@ -95,7 +98,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
             const userId = userStore.user.id;
             socket.emit('leaveTable', {
                 userId, tableId: this.$state.table?.id, publicUrl: this.$state.table?.public_url
-            }, (response: any) => {
+            }, (response: TableUsers | any) => {
+                if (response.socket_status === SocketStatus.LEAVE) {
+                    this.$state.leaverPlayer.table = response.table;
+                }
                 // Catch the error
                 if (response.error) {
                     this.$state.table = null;
@@ -438,7 +444,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
         },
         replaceCard(cardHistory: TableCard) {
             const cardIndex = this.$state.cards?.findIndex(card => card.id === cardHistory.id);
-            if (cardIndex !== -1 && cardIndex) {
+            if (cardIndex !== undefined && cardIndex !== -1 && cardIndex >= 0) {
                 const currentCard = this.$state.cards?.splice(cardIndex, 1)[0];
                 if (currentCard) {
                     this.$state.cards?.push(cardHistory);

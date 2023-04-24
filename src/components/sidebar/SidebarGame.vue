@@ -64,7 +64,7 @@ import Flex from '../wrappers/Flex.vue';
 import GameUserItem from '@/components/sidebar/GameUserItem.vue';
 import BackButton from '@/components/buttons/BackButton.vue';
 import backCardImage from '@/assets/images/close-card.png'
-import { loadImage } from '@/utils/Function';
+import { loadImage } from '@/utils/helpers';
 import { ref, watch } from 'vue';
 import { TableStatus } from '@/types/tables/TableStatus.enum';
 

@@ -69,7 +69,7 @@ import { ref, watch, onMounted, onBeforeMount } from 'vue';
 import type Card from '@/types/cards/Card';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
-import { loadImage } from '@/utils/Function';
+import { loadImage } from '@/utils/helpers';
 
 const cardsPublic = ref('user');
 const isModalOpen = ref<Boolean>(false);

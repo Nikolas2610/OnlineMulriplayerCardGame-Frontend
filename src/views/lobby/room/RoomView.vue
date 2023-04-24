@@ -3,8 +3,8 @@
     <Flex class="relative one-page w-full bg-dark">
         <div class="w-5/6 overflow-auto text-white relative">
             <!-- Table playing status -->
-            <OnlineTable v-if="playerStore.table?.status === TableStatus.PLAYING
-                || (playerStore.gameMaster && playerStore.table?.status === TableStatus.GAME_MASTER_EDIT)" />
+            <OnlineTable v-if="(playerStore.table?.status === TableStatus.PLAYING
+                || (playerStore.gameMaster && playerStore.table?.status === TableStatus.GAME_MASTER_EDIT))" />
             <!-- Table waiting status -->
             <Flex v-for="{ status, title, message } in tableStatusMessage" :key="status" items="center" justify="center"
                 v-else>
@@ -39,7 +39,7 @@
         @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)" />
     <ModalViewAllCards :is-modal-open="modalOpenViewAllCards" :cards="playerStore.cards"
         :table-decks="playerStore.table?.table_decks" @close-modal="modalOpenViewAllCards = false"
-        v-if="playerStore.cards" />
+        v-if="playerStore.cards && playerStore.table?.table_decks" />
 </template>
 
 <script setup lang="ts">
@@ -74,6 +74,7 @@ const modalOpenViewAllCards = ref(false);
 const modalFullPageMenuTabProp = ref(1);
 const toast = useToast();
 const rankStore = useRankStore();
+const forceQuit = ref(false);
 
 playerStore.room = route.params.id.toString();
 if (playerStore.table) {
@@ -185,6 +186,7 @@ onBeforeMount(() => {
         playerStore.gameMaster = false;
         playerStore.table = null;
         playerStore.cards = null;
+        forceQuit.value = true;
         toast.info('Game master has remove you from the table')
         router.push({ name: 'lobby' })
     })
@@ -203,6 +205,12 @@ onBeforeMount(() => {
             }
             if (tableGame.status === TableStatus.FINISH) {
                 toast.info('Game has end')
+            }
+            if (tableGame.status === TableStatus.PLAYER_LEAVE) {
+                toast.info('Player has leave the game')
+            }
+            if (tableGame.status === TableStatus.PLAYER_DISCONNECTED) {
+                toast.info('Player has lost his connection')
             }
         }
     })
@@ -291,16 +299,20 @@ const tableStatusMessage = ref([
     { status: TableStatus.PAUSE, title: 'Game Paused', message: '...waiting from Game Master to resume the game' },
     { status: TableStatus.GAME_MASTER_EDIT, title: 'Game edit from Game Master', message: '..waiting from Game Master to finish with the configure of the table' },
     { status: TableStatus.FINISH, title: 'Game has ended', message: '...waiting from Game Master to start the game' },
+    { status: TableStatus.PLAYER_LEAVE, title: 'Player has leave the game', message: '...waiting for player to join or to Game Master to start new game' },
+    { status: TableStatus.PLAYER_DISCONNECTED, title: 'Player has lost his connection', message: '...waiting for player to join or to Game Master to start new game' },
 ])
 
 onUnmounted(() => {
-    // TODO: Solution to this
     playerStore.room = null;
     playerStore.gameMaster = false;
     playerStore.cards = null;
     playerStore.refUndoHistory = [];
     playerStore.refRedoHistory = [];
-    playerStore._leaveTable();
+    if (!forceQuit.value) {
+        console.log('\x1b[33m%s\x1b[0m', 'forceQuit');
+        playerStore._leaveTable();
+    }
     webSocketsTableEvents.value.forEach(event => {
         socket.off(event);
     })

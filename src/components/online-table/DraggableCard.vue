@@ -20,7 +20,7 @@
 import type { TableCard } from '@/types/tables/TableCard';
 import { onMounted, ref, type PropType, watch } from 'vue';
 import backCardImage from '@/assets/images/close-card.png'
-import { loadImage } from '@/utils/Function';
+import { loadImage } from '@/utils/helpers';
 import { usePlayerStore } from '@/stores/PlayerStore';
 import { RotateCard } from '@/types/online-table/RotateCard.enum';
 

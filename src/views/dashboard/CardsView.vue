@@ -97,7 +97,7 @@ import { useToast } from "vue-toastification";
 import type CreateCard from '@/types/cards/CreateCard';
 import { useUserStore } from '@/stores/UserStore';
 import { useRoute } from 'vue-router';
-import { loadImage } from '@/utils/Function';
+import { loadImage } from '@/utils/helpers';
 
 const userStore = useUserStore();
 const route = useRoute()
