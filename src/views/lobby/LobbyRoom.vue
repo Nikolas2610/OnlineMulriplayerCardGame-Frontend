@@ -1,7 +1,7 @@
 <template>
     <Container v-if="width > gameWidth && height > gameHeight">
         <!-- Title -->
-        <Flex justify="between" items="end" class="mb-8">
+        <Flex justify="between" items="end" class="mb-4">
             <MyTitle>Lobby</MyTitle>
             <button class="bg-black text-white h-12 px-4 rounded-xl hover:bg-primary transition duration-300"
                 v-if="userStore.user.email === null" @click="isOpenModalSetGuestUsername = true">{{ userStore.user.username
@@ -20,7 +20,7 @@
         </Flex>
 
         <!-- Users online -->
-        <Flex justify="center" class="mt-6 p-4 text-xl" v-if="usersOnline" :gap="8">
+        <Flex justify="center" class="mt-3 p-4 text-xl" v-if="usersOnline" :gap="8">
             <Flex items="center" :gap="2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-people text-primary h-8 w-8 "
                     viewBox="0 0 16 16">
@@ -44,23 +44,24 @@
         </Flex>
 
         <!-- Search Game -->
-        <GridCol :all="2" class="mt-3 px-2">
+        <GridCol :all="2" class="my-3 px-2">
             <GridColItem :all="1">
                 <InputField :input="search" :placeholder="'Search a Table..'" @change="(value) => search = value" />
             </GridColItem>
+            <!-- Table Actions -->
             <GridColItem :all="1">
-                <Flex :justify="'center'" :gap="2">
-                    <PrimaryButton :title="'Create Table'" @click="createTableModal = true"
-                        v-if="userStore.user.role !== Roles.guest"></PrimaryButton>
-                    <PrimaryButton :title="'Join Table'" :disable="selectTable === -1" @click="joinRoom()"></PrimaryButton>
+                <Flex justify="end" :gap="2">
                     <RemoveButton v-if="playerStore.table?.creator?.id === userStore.user.id"
                         @click="playerStore._removeTable()" />
+                    <PrimaryButton :title="'Create Table'" @click="openCreateTableModal()"
+                        v-if="userStore.user.role !== Roles.guest"></PrimaryButton>
+                    <PrimaryButton :title="'Join Table'" :disable="selectTable === -1" @click="joinRoom()"></PrimaryButton>
                 </Flex>
             </GridColItem>
         </GridCol>
 
         <!-- Online tables -->
-        <DarkTable :table-headers="tablesFields" v-if="filterTables.length > 0">
+        <DarkTable :table-headers="tablesFields" v-if="filterTables.length > 0" class="max-h-[490px] overflow-x-auto">
             <DarkTableRow v-for="(table, i) in filterTables" :key="`lobby-row-${table.id}`"
                 @click="handleSelectTable(i, table)" :class="selectTable === i ? 'bg-gray-700' : ''">
                 <DarkTableCell>
@@ -70,7 +71,7 @@
                     {{ table.game?.name }}
                 </DarkTableCell>
                 <DarkTableCell>
-                    {{ table.table_users?.length ? table.table_users.length : 0 }}
+                    {{ table.table_users?.length ? table.table_users.length : 0 }} / {{ table.game?.max_players }}
                 </DarkTableCell>
                 <DarkTableCell>
                     <Flex>
@@ -93,10 +94,12 @@
                 <DarkTableCell>
                     {{ table.creator?.username }}
                 </DarkTableCell>
-                <DarkTableCell
-                    :class="[table.status === TableStatus.WAITING ? 'text-blue-500' : '', table.status === TableStatus.PLAYING ? 'text-primary' : '', table.status === TableStatus.PAUSE ? 'text-yellow-500' : '']"
-                    class="capitalize">
-                    {{ table.status }}
+                <DarkTableCell :class="[
+                    table.status === TableStatus.WAITING ? 'text-blue-500' : '',
+                    table.status === TableStatus.PLAYING ? 'text-primary' : '',
+                    table.status === TableStatus.PLAYER_DISCONNECTED || table.status === TableStatus.PLAYER_LEAVE ? 'text-red-500' : ''
+                ]" class="capitalize">
+                    {{ (StatusTable.find(item => item.id === table.status)?.name) || 'Unknown' }}
                 </DarkTableCell>
             </DarkTableRow>
         </DarkTable>
@@ -147,6 +150,8 @@ import { useWindowSize } from '@vueuse/core'
 import MyTitle from '@/components/MyTitle.vue';
 import type { CountUsers } from '@/types/online-table/CountUsers'
 import { setOnlineSocketUser } from '@/utils/sockets/helpers';
+import { useTableStore } from '@/stores/TableStore';
+import { StatusTable } from '@/utils/StatusTable';
 
 const { width, height } = useWindowSize();
 const gameHeight = ref(parseInt(import.meta.env.VITE_GAME_HEIGHT));
@@ -161,6 +166,7 @@ const tables = ref<Table[]>([]);
 const filterTables = ref<Table[]>([]);
 const toast = useToast();
 const playerStore = usePlayerStore();
+const tableStore = useTableStore();
 const search = ref('');
 const createTableModal = ref(false);
 const usersOnline = ref<CountUsers>({
@@ -216,7 +222,13 @@ const joinRoom = () => {
         if (playerStore.table.private) {
             isOpenModalSetTablePassword.value = true;
         } else {
-            router.push({ name: 'room', params: { id: playerStore.table.public_url } })
+            if (playerStore.table.game?.max_players && playerStore.table?.table_users) {
+                if (playerStore.table?.table_users?.length < playerStore.table.game?.max_players) {
+                    router.push({ name: 'room', params: { id: playerStore.table.public_url } })
+                } else {
+                    toast.error('The table is full')
+                };
+            }
         }
     }
 }
@@ -233,6 +245,14 @@ const validatePassword = async (password: string) => {
             toast.error('Wrong Password')
         }
     })
+}
+
+const openCreateTableModal = () => {
+    if (tableStore.games.length === 0) {
+        toast.warning('You have to create a game first');
+    } else {
+        createTableModal.value = true
+    }
 }
 
 const tablesFields = ref([

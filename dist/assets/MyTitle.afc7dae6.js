@@ -1,0 +1,1 @@
+import{_ as s,o as t,c as o,i as r,M as c}from"./index.6223a65c.js";const a={},n={class:"mt-4 lg:w-3/12 w-1/2"},_={class:"text-2xl border-b-4 border-primary py-4 px-2"};function d(e,l){return t(),o("div",n,[r("div",_,[c(e.$slots,"default")])])}const p=s(a,[["render",d]]);export{p as M};

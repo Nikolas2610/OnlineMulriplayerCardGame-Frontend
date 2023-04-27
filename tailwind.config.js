@@ -18,6 +18,8 @@ module.exports = {
     'gap-2',
     'gap-x-2',
     'gap-x-4',
+    'gap-y-2',
+    'gap-y-4',
     'gap-4',
     'gap-6',
     'gap-8',

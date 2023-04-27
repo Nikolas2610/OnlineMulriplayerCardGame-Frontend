@@ -11,7 +11,7 @@
             <!-- Register Form -->
             <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div class="bg-primary py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form class="space-y-6">
+                    <form class="space-y-6" @submit.prevent="register()">
                         <!-- Username input -->
                         <InputField class="text-white" :input="userStore.userRegister.username"
                             :errors="v$.username.$errors" :title="'Username'"
@@ -30,8 +30,8 @@
                             @change="(e) => userStore.userRegister.confirmPassword = e" />
                         <!-- Submit Form -->
                         <div>
-                            <div @click="register()"
-                                class="mt-14 flex w-full justify-center rounded-md cursor-pointer border border-transparent bg-dark py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary">
+                            <button
+                                class="mt-6 flex w-full justify-center rounded-md cursor-pointer border border-transparent bg-dark py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary">
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" v-if="loadingButton"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
@@ -41,7 +41,7 @@
                                     </path>
                                 </svg>
                                 <div v-else>Register</div>
-                            </div>
+                            </button>
                         </div>
                     </form>
                 </div>

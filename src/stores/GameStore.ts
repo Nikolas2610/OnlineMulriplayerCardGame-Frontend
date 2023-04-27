@@ -11,6 +11,7 @@ import type { AxiosResponse } from "axios";
 import { acceptHMRUpdate, defineStore } from "pinia";
 import { useToast } from "vue-toastification";
 import { defaultHandStartCards, defaultRole, defaultExtraDecks, defaultGame } from "@/utils/GameDefaultObjects";
+import router from "@/router";
 const toast = useToast();
 
 export const useGameStore = defineStore("GameStore", {
@@ -62,6 +63,12 @@ export const useGameStore = defineStore("GameStore", {
             try {
                 this.$state.loading = true;
                 const { data: decks }: AxiosResponse = await axiosUser.get(this.$state.role === 'user' ? "deck/private-public" : 'admin/decks');
+                // If decks are empty redirect to deck form
+                if (decks.length === 0) {
+                    toast.warning("First you have to create deck before create game");
+                    router.push({name: 'create-deck'})
+                } 
+                    
                 this.$state.decks = decks;
                 this.$state.loading = false;
                 return decks;
@@ -363,7 +370,7 @@ export const useGameStore = defineStore("GameStore", {
             }
             try {
                 // Pass the ID of the game
-                const response: AxiosResponse = await axiosUser.delete(`user/delete/game`, {
+                const response: AxiosResponse = await axiosUser.delete(`${this.$state.role}/games`, {
                     data: {
                         game_id: id
                     }

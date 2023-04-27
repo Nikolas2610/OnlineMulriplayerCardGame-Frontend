@@ -30,7 +30,7 @@
                                                 {{ game.name }}
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                                {{ game.min_players }} - {{ game.max_players }}
+                                                {{ game.max_players }}
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                                 {{ game.grid_rows }}
@@ -114,8 +114,10 @@ const role = ref<string | null>('user');
 const isDeleteModalOpen = ref<Boolean>(false);
 const selectedGameId = ref<number | null>(null)
 const tablesFields = ref([
-    'No', 'NAME', 'PLAYERS', 'GRID', 'PRIVATE'
+    'No', 'NAME', 'MAX PLAYERS', 'GRID', 'PRIVATE'
 ]);
+
+route.meta.admin ? gameStore.setUserRole('admin') :gameStore.setUserRole('user');
 
 // Get game data when component add to the DOM
 onMounted(async () => {

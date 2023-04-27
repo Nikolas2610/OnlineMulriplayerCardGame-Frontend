@@ -42,6 +42,7 @@ export const useUserStore = defineStore("UserStore", {
         userLoginCredentials: (state) => state.userLogin, 
         isUser: (state) => state.user.role === 'admin' || state.user.role === 'user', 
         getSocketId: (state) => state.socket_id,
+        isGuest: (state) => state.user.role === 'guest',
     },
     actions: {
         async register() {

@@ -5,7 +5,7 @@
         </template>
 
         <template v-slot:body>
-            <TableForm />
+            <TableForm @closeModal="$emit('closeModal')" />
         </template>
     </Modal>
 </template>

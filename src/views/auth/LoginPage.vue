@@ -33,7 +33,7 @@
                         </div>
                         <!-- Submit Form -->
                         <div>
-                            <button type="submit" class="mt-14 btn-black">
+                            <button type="submit" class="mt-6 btn-black">
                                 <!-- Loading Animation -->
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" v-if="loadingButton"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

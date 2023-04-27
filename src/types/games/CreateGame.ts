@@ -4,11 +4,9 @@ export default interface CreateGame {
     extra_roles: boolean;
     status_player: boolean;
     extra_teams: boolean;
-    rank: boolean;
     private: boolean;
     grid_rows: number;
     grid_cols: number;
     max_players: number;
-    min_players: number;
     hand_start_cards: boolean;
 }

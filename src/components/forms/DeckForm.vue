@@ -30,7 +30,7 @@
 
     </form>
 
-    <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal">
+    <Modal :modalOpen="isModalOpen" @closeModal="deactivateModal">
         <template v-slot:modal_header>
             Add or Remove Cards
         </template>
@@ -55,7 +55,7 @@
         <template v-slot:modal_footer>
             <button
                 class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
-                @click="deactiveteModal">
+                @click="deactivateModal">
                 Close
             </button>
         </template>
@@ -70,6 +70,7 @@ import type Card from '@/types/cards/Card';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { loadImage } from '@/utils/helpers';
+import { useToast } from 'vue-toastification';
 
 const cardsPublic = ref('user');
 const isModalOpen = ref<Boolean>(false);
@@ -77,6 +78,7 @@ const cards = ref<Card[]>();
 const selectedCards = ref<number[]>([]);
 const emit = defineEmits(['sendData', 'closeEditMode']);
 const props = defineProps(['successResponse', 'deckData', 'edit']);
+const toast = useToast();
 
 const deck = ref<CreateDeck>({
     name: '',
@@ -97,7 +99,7 @@ onBeforeMount(() => {
 })
 
 // Close view details modal
-const deactiveteModal = () => {
+const deactivateModal = () => {
     isModalOpen.value = false;
 }
 
@@ -110,6 +112,9 @@ const getCards = async () => {
     try {
         const response: AxiosResponse = await axiosUser.get(`card/${cardsPublic.value}`);
         cards.value = response.data;
+        if (cards.value?.length === 0) {
+            toast.warning('First you have to create card before choose cards for the deck')
+        }
     } catch (error) {
         console.log(error);
     }
