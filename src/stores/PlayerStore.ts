@@ -442,6 +442,19 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 }
             }
         },
+        cardToPlayer(deckId: number) {
+            if (this.$state.clickCardId) {
+                const card = this.$state.cards?.find(c => c.id === this.$state.clickCardId);
+                if (card && card.table_deck) {
+                    if (card.table_deck.id !== undefined) {
+                        this.$state.clickCardId = null;
+                        card.table_deck.id = deckId;
+                        this.updateUndoHistory({ ...card });
+                        this._updateCard(card);
+                    }
+                }
+            }
+        },
         replaceCard(cardHistory: TableCard) {
             const cardIndex = this.$state.cards?.findIndex(card => card.id === cardHistory.id);
             if (cardIndex !== undefined && cardIndex !== -1 && cardIndex >= 0) {

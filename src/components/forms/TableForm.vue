@@ -1,7 +1,7 @@
 <template>
     <form class="px-4 py-8" @submit.prevent="submit" v-if="!tableStore.loadingStatus">
         <div class="grid grid-cols-2" v-if="table">
-            <div class="col-span-2">
+            <div class="col-span-2 mb-3">
                 <InputField :input="table.name" :title="'Name'" :errors="v$.name.$errors" @change="(e) => table.name = e" />
             </div>
             <div class="col-span-2">
@@ -24,8 +24,8 @@
             </div>
         </div>
         <div v-if="tableStore.editTable">
-            <PrimaryButton :title="'Delete Table Settings'" v-if="tableStore.role === 'admin'"
-                @click="tableStore._deleteTableDetails()" />
+            <button :title="'Delete Table Settings'" v-if="tableStore.role === 'admin'" class="text-red-500 cursor-pointer hover:text-red-700"
+                @click="tableStore._deleteTableDetails()">Delete table data (users, decks, cards) expect the table</button>
             <div class="flex justify-center mt-8">
                 <button class="mr-2 btn-grey" type="button" @click="tableStore.editTable = false">Back</button>
                 <button class="btn-green" type="submit">Submit</button>
@@ -36,7 +36,7 @@
                 class="rounded-md w-full border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
                 Submit
             </button>
-            <button
+            <button type="button"
                 class="rounded-md w-full border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
                 @click="$emit('closeModal')">
                 Close
@@ -65,7 +65,7 @@ const tableStore = useTableStore();
 const table = computed(() => {
     return tableStore.editTable ? tableStore.edit : tableStore.table;
 })
-const emits = defineEmits(['submit']);
+const emits = defineEmits(['submit', 'closeModal']);
 
 
 const rules = computed(() => {

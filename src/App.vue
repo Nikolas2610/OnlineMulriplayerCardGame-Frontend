@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import NavBar from '@/components/NavBar.vue'
+import Footer from './components/Footer.vue';
 import { onMounted, ref } from 'vue';
 import { useUserStore } from './stores/UserStore'
 import { Roles } from './types/Roles.enum';
@@ -40,6 +41,5 @@ const deactiveteModal = () => {
 <template>
   <NavBar />
   <RouterView />
+  <Footer v-if="userStore.isGuest" />
 </template>
-
-<style scoped></style>

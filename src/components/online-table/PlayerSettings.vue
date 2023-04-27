@@ -102,7 +102,7 @@
                 </VTooltip>
             </div>
             <!-- Set status PLayer -->
-            <div class="py-1" v-if="playerStore.table?.game?.status">
+            <div class="py-1" v-if="playerStore.table?.game?.status?.length !== 0">
                 <VMenu placement="top">
                     <div class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -124,7 +124,7 @@
                                         --Empty--
                                     </div>
                                     <div
-                                        v-if="playerStore.table.table_users?.find(user => user.id === playerStore.getExistTableUserId)?.status === null">
+                                        v-if="playerStore.table?.table_users?.find(user => user.id === playerStore.getExistTableUserId)?.status === null">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                             class="w-6 h-6" viewBox="0 0 16 16">
                                             <path
@@ -141,7 +141,7 @@
                                         {{ status.name }}
                                     </div>
                                     <div
-                                        v-if="playerStore.table.table_users?.find(user => user.id === playerStore.getExistTableUserId)?.status?.id === status.id">
+                                        v-if="playerStore.table?.table_users?.find(user => user.id === playerStore.getExistTableUserId)?.status?.id === status.id">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                             class="w-6 h-6" viewBox="0 0 16 16">
                                             <path
@@ -160,12 +160,12 @@
                     <button class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative"
                         @click="playerStore.rank.isRankModalOpen = true; playerStore.rank.notification = false;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class="[gamePlaying ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed']"
+                            :class=" [gamePlaying ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed'] "
                             class="w-6 h-6 transition duration-300" viewBox="0 0 16 16">
                             <path
                                 d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z" />
                         </svg>
-                        <div v-if="playerStore.rank.notification"
+                        <div v-if=" playerStore.rank.notification "
                             class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -right-2 dark:border-gray-900">
                             !
                         </div>
@@ -176,17 +176,15 @@
                 </VTooltip>
             </div>
             <!-- Get cards from deck -->
-            <div class="py-1" v-if="playerStore.table?.game?.status">
+            <div class="py-1">
                 <VMenu placement="top">
                     <button class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative"
-                        @click="playerStore.rank.isRankModalOpen = true; playerStore.rank.notification = false;">
+                        @click=" playerStore.rank.isRankModalOpen = true; playerStore.rank.notification = false; ">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class="[gamePlaying ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed']"
+                            :class=" [gamePlaying ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed'] "
                             class="w-6 h-6 transition duration-300" viewBox="0 0 16 16">
                             <path
-                                d="M1.5 2A1.5 1.5 0 0 0 0 3.5v2h6a.5.5 0 0 1 .5.5c0 .253.08.644.306.958.207.288.557.542 1.194.542.637 0 .987-.254 1.194-.542.226-.314.306-.705.306-.958a.5.5 0 0 1 .5-.5h6v-2A1.5 1.5 0 0 0 14.5 2h-13z" />
-                            <path
-                                d="M16 6.5h-5.551a2.678 2.678 0 0 1-.443 1.042C9.613 8.088 8.963 8.5 8 8.5c-.963 0-1.613-.412-2.006-.958A2.679 2.679 0 0 1 5.551 6.5H0v6A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-6z" />
+                                d="M8.5 1.75v2.716l.047-.002c.312-.012.742-.016 1.051.046.28.056.543.18.738.288.273.152.456.385.56.642l.132-.012c.312-.024.794-.038 1.158.108.37.148.689.487.88.716.075.09.141.175.195.248h.582a2 2 0 0 1 1.99 2.199l-.272 2.715a3.5 3.5 0 0 1-.444 1.389l-1.395 2.441A1.5 1.5 0 0 1 12.42 16H6.118a1.5 1.5 0 0 1-1.342-.83l-1.215-2.43L1.07 8.589a1.517 1.517 0 0 1 2.373-1.852L5 8.293V1.75a1.75 1.75 0 0 1 3.5 0z" />
                         </svg>
                     </button>
                     <template #popper>
@@ -195,9 +193,10 @@
                                 Get all cards from:
                             </div>
                             <div class="p-2 mt-2 cursor-pointer hover:bg-white hover:text-black transition duration-300"
-                                v-for="deck in playerStore.table?.table_decks?.filter(deck => deck.type !== TableDeckType.USER)"
-                                :key="deck.id" @click="playerStore.cardsToDeck(deck.id, playerStore.table?.table_decks?.find(deck => deck.id === playerStore.getExistPlayerTableDeckId))">
-                                <Flex :justify="'between'" :items="'center'">
+                                v-for="   deck    in    playerStore.table?.table_decks?.filter(deck => deck.type !== TableDeckType.USER)   "
+                                :key=" deck.id "
+                                @click=" playerStore.cardsToDeck(deck.id, playerStore.table?.table_decks?.find(deck => deck.id === playerStore.getExistPlayerTableDeckId)) ">
+                                <Flex :justify=" 'between' " :items=" 'center' ">
                                     <div>
                                         {{ deck.deck?.name }}
                                     </div>
@@ -208,12 +207,12 @@
                 </VMenu>
             </div>
             <!-- Move Cards to deck -->
-            <div class="py-1" v-if="playerStore.table?.game?.status">
+            <div class="py-1">
                 <VMenu placement="top">
                     <button class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative"
-                        @click="playerStore.rank.isRankModalOpen = true; playerStore.rank.notification = false;">
+                        @click=" playerStore.rank.isRankModalOpen = true; playerStore.rank.notification = false; ">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class="[gamePlaying ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed']"
+                            :class=" [gamePlaying ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed'] "
                             class="w-6 h-6 transition duration-300" viewBox="0 0 56 56">
                             <path
                                 d="M57.832,26.926l-8-12c-0.186-0.278-0.498-0.445-0.832-0.445H9c-0.335,0-0.646,0.167-0.832,0.445l-8,12
@@ -224,12 +223,38 @@
                     <template #popper>
                         <div class="cursor-default bg-black py-2 text-white">
                             <div class="border-b p-2">
-                                Move table cards to:
+                                Move cards from table to:
                             </div>
                             <div class="p-2 mt-2 cursor-pointer hover:bg-white hover:text-black transition duration-300"
-                                v-for="deck in playerStore.table?.table_decks?.filter(deck => deck.type === TableDeckType.JUNK || deck.type === TableDeckType.DECK)"
-                                :key="deck.id" @click="playerStore.cardsToDeck(playerStore.getTableDeckId, deck)">
+                                v-for="   deck    in    playerStore.table?.table_decks?.filter(deck => deck.type === TableDeckType.JUNK || deck.type === TableDeckType.DECK)   "
+                                :key=" deck.id " @click=" playerStore.cardsToDeck(playerStore.getTableDeckId, deck) ">
                                 {{ deck.deck?.name }}
+                            </div>
+                        </div>
+                    </template>
+                </VMenu>
+            </div>
+            <!-- Card to player -->
+            <div class="py-1" v-if=" playerStore.table?.game?.status ">
+                <VMenu placement="top">
+                    <button class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                            :class=" [playerStore.clickCardId ? 'group-hover:text-dark' : 'opacity-50'] "
+                            class="w-6 h-6 transition duration-300" viewBox="0 0 16 16">
+                            <path
+                                d="M11.5 12.5a3.493 3.493 0 0 1-2.684-1.254 19.92 19.92 0 0 0 1.582 2.907c.231.35-.02.847-.438.847H6.04c-.419 0-.67-.497-.438-.847a19.919 19.919 0 0 0 1.582-2.907 3.5 3.5 0 1 1-2.538-5.743 3.5 3.5 0 1 1 6.708 0A3.5 3.5 0 1 1 11.5 12.5z" />
+                        </svg>
+                    </button>
+                    <template #popper>
+                        <div class="cursor-default bg-black py-2 text-white">
+                            <div class="border-b p-2">
+                                Give card to player:
+                            </div>
+                            <div class="p-2 mt-2 cursor-pointer hover:bg-white hover:text-black transition duration-300"
+                                v-for="deck in playerStore.table?.table_decks?.filter(deck => deck.type === TableDeckType.USER)   "
+                                :key=" deck.id "
+                                @click=" playerStore.clickCardId ? playerStore.cardToPlayer(deck.id) : '' ">
+                                {{ deck.user?.username }}
                             </div>
                         </div>
                     </template>
@@ -246,7 +271,6 @@ import { useDraggable } from '@vueuse/core'
 import { usePlayerStore } from '@/stores/PlayerStore';
 import { MovementRotateCard } from '@/types/online-table/RotateCard.enum';
 import { TableDeckType } from '@/types/tables/TableDeckType';
-import type { TableDeck } from '@/types/tables/TableDeck';
 
 const playerStore = usePlayerStore();
 const el = ref<HTMLElement | null>(null);

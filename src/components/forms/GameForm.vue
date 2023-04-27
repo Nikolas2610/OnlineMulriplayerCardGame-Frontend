@@ -3,16 +3,11 @@
         <StepForm :active-item="gameStore.stepForm.value" :loading="gameStore.stepForm.loading"
             @decrease="(value) => gameStore.stepForm.value = value" @increase="(value) => gameStore.stepForm.value = value">
             <div v-if="gameStore.stepForm.value === 1">
-                <GridCol :all="2" :gap_x="4" class="mt-8" v-if="gameStore.createGame.game">
-                    <GridColItem :xs="2">
+                <GridCol :all="2" :gap_x="4" :gap_y="4" class="mt-8" v-if="gameStore.createGame.game">
+                    <GridColItem :xs="1">
                         <InputField :input="gameStore.createGame.game.name"
                             @change="(e) => { gameStore.createGame.game.name = e; gameStore.stepFormChange() }"
                             :title="'Name'" :errors="v$.name.$errors" />
-                    </GridColItem>
-                    <GridColItem :xs="1">
-                        <InputField :input="gameStore.createGame.game.min_players"
-                            @change="(e) => { gameStore.createGame.game.min_players = e; gameStore.stepFormChange() }"
-                            :title="'Min Players'" :max="10" :min="1" :type="'number'" :errors="v$.min_players.$errors" />
                     </GridColItem>
                     <GridColItem :xs="1">
                         <InputField :input="gameStore.createGame.game.max_players"
@@ -42,10 +37,6 @@
                     <GridColItem :xs="2">
                         <CheckBoxField :title="'Private'" :input="gameStore.createGame.game.private" class="py-2"
                             @change="(e) => { gameStore.createGame.game.private = e; gameStore.stepFormChange() }" />
-                    </GridColItem>
-                    <GridColItem :xs="2">
-                        <CheckBoxField :title="'Rank'" :input="gameStore.createGame.game.rank" class="py-2"
-                            @change="(e) => { gameStore.createGame.game.rank = e; gameStore.stepFormChange() }" />
                     </GridColItem>
                 </GridCol>
             </div>
@@ -103,7 +94,6 @@ const deckErrors = ref<String | null>(null);
 const validationGameDetailsRules = computed(() => {
     return {
         name: { required },
-        min_players: { required, numeric, minLength: minLength(1) },
         max_players: { required, numeric, minLength: minLength(1) },
         grid_rows: { required, numeric, minLength: minLength(1) },
         grid_cols: { required, numeric, minLength: minLength(1) },

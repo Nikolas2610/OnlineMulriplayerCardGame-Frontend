@@ -26,10 +26,8 @@ export const defaultGame = {
     extra_roles: false,
     status_player: false,
     extra_teams: false,
-    rank: false,
     private: false,
     grid_rows: 1,
     grid_cols: 1,
     max_players: 1,
-    min_players: 1,
 } as Game;

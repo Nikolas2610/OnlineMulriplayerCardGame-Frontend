@@ -1,5 +1,5 @@
 <template>
-    <div class="mb-3 w-full">
+    <div class="w-full">
         <!-- Input Label -->
         <label class="block text-sm font-medium" v-if="titleShow">{{ title }}</label>
         <div class="mt-1">
