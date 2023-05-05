@@ -22,8 +22,8 @@
                         </div>
                     </Flex>
                     <div class="italic font-bold"
-                        :class="playerStore.table.game_master.id === user.user.id && user.playing ? 'text-dark' : 'text-primary'"
-                        v-if="playerStore.table?.game_master?.id === user.user.id">Game Master</div>
+                        :class="playerStore.table.game_master.id === user.user?.id && user.playing ? 'text-dark' : 'text-primary'"
+                        v-if="playerStore.table?.game_master?.id === user.user?.id">Game Master</div>
                     <div class="p-2 mt-2 shadow-2xl rounded-xl border-dashed border" v-if="isOpenUserCard(user.id) &&
                         (user.team?.name || user.role?.name || user.status?.name)">
                         <Flex v-if="user.team?.name">

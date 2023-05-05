@@ -51,6 +51,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 table: null as Table | null,
                 loading: false,
             },
+            isCardDetailsModalOpen: false,
         }
     },
     getters: {
@@ -58,9 +59,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
         getJunkTableDeckId: (state) => state.dropZones.junk[0]?.tableDeckId,
         getTableDeckId: (state) => state.dropZones.table[0]?.tableDeckId,
         getExistPlayerPlayingStatus: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.playing,
-        getExistTableUserId: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id)?.id,
+        getExistTableUser: (state) => state.table?.table_users?.find(user => user.user.id === userStore.user.id),
         getTableExist: (state) => state.table?.game?.grid_cols && state.table?.game?.grid_rows ? state.table?.game?.grid_cols > 0 && state.table?.game?.grid_rows > 0 : false,
-        getRefHistoryCapacity: (state) => state.refHistoryCapacity
+        getRefHistoryCapacity: (state) => state.refHistoryCapacity,
+        getClickedCard: (state) => state.cards?.find(card => card.id === state.clickCardId) ?? null as TableCard | null
     },
     actions: {
         _joinTable(publicUrl: string) {
@@ -165,8 +167,8 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 table: this.$state.table, room: this.$state.room
             })
         },
-        _leaveGame() {
-            socket.emit('leaveGame', {
+        _exitTable() {
+            socket.emit('exitTable', {
                 table: this.$state.table, room: this.$state.room
             })
         },
@@ -175,66 +177,75 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 return this.$state.cards?.filter(card => card.table_deck.id === tableDeckId);
             }
         },
-        onDrop(event: DragEvent, tableDeckId: number | undefined, type: string, zIndex: number) {
+        onDrop(event: DragEvent, tableDeckId: number | undefined, type: string) {
+            // Check if the table status is in PLAYING or GAME_MASTER_EDIT mode
             if (this.$state.table?.status === TableStatus.PLAYING || this.$state.table?.status === TableStatus.GAME_MASTER_EDIT) {
+                // Check if the dataTransfer object exists
                 if (event.dataTransfer) {
+                    // Get the card object from dataTransfer
                     const card: TableCard = JSON.parse(event.dataTransfer.getData('card'));
+
+                    // If the player is not playing or not a game master, and the card is not a share card, return
+                    if ((!this.getExistTableUser?.playing && !this.gameMaster) && (card.table_deck.id !== this.getExistPlayerTableDeckId || type !== TableDeckType.USER)) {
+                        toast.warning('Turn on your turn to be able to play')
+                        return;
+                    }
+
+                    // Get drag-related information from dataTransfer
                     const topBox = parseInt(event.dataTransfer.getData('top'), 10);
                     const leftBox = parseInt(event.dataTransfer.getData('left'), 10);
                     const cardWidth = parseInt(event.dataTransfer.getData('cardWidth'), 10);
                     const cardHeight = parseInt(event.dataTransfer.getData('cardHeight'), 10);
+
+                    // Find the drop zone where the card is being dropped
                     const dropZone = this.$state.dropZones[type]?.find((item: DeckItem) => item.tableDeckId === tableDeckId);
                     const dropZoneRect = dropZone.element.getBoundingClientRect();
+
+                    // Calculate the offset positions of the card within the drop zone
                     const offsetY = event.y - dropZoneRect.y - topBox;
                     const offsetX = event.x - dropZoneRect.x - leftBox;
+
+                    // Get the dimensions of the drop zone
                     const { offsetHeight, offsetWidth } = dropZone.element;
+
+                    // Loop through the cards in the state
                     this.$state.cards?.forEach(dragCard => {
+                        // Check if the current card is the one being dragged
                         if (dragCard.id === card.id) {
-                            // Update the top position of the dropped box
-                            if (offsetY > offsetHeight - cardHeight) {
-                                // Card is too big, adjust it to fit inside the drop zone
-                                dragCard.position_x = offsetHeight - cardHeight;
-                            } else if (offsetY < 0) {
-                                // Card is partially outside the drop zone at the top, adjust it to fit inside
-                                dragCard.position_x = 0;
-                            } else {
-                                // Card is fully inside the drop zone, position it at the current y coordinate
-                                dragCard.position_x = offsetY;
-                            }
-                            // Update the left position of the dropped box
-                            if (offsetX > offsetWidth - cardWidth) {
-                                // Card is too big, adjust it to fit inside the drop zone
-                                dragCard.position_y = offsetWidth - cardWidth
-                            } else if (offsetX < 0) {
-                                // Card is partially outside the drop zone at the left, adjust it to fit inside
-                                dragCard.position_y = 0;
-                            } else {
-                                // Card is fully inside the drop zone, position it at the current x coordinate
-                                dragCard.position_y = offsetX;
-                            }
+                            // Update the card position within the drop zone based on the offsets
+                            dragCard.position_x = Math.max(0, Math.min(offsetHeight - cardHeight, offsetY));
+                            dragCard.position_y = Math.max(0, Math.min(offsetWidth - cardWidth, offsetX));
+
+                            // Update the z-index of the card
                             dragCard.z_index = this.$state.zIndex;
-                            if (type === 'junk') {
+
+                            // Update the card's table deck type
+                            dragCard.table_deck.type = type as TableDeckType;
+
+                            // Update card visibility based on the table deck type
+                            if (type === TableDeckType.JUNK) {
                                 dragCard.hidden = false;
+                            } else if (type === TableDeckType.USER) {
+                                const userDeck = this.$state.dropZones.deck.find(deck => deck.tableDeckId === dragCard.table_deck.id);
+                                dragCard.hidden = !!userDeck;
                             }
 
-                            if (type === 'user') {
-                                this.$state.dropZones.deck.forEach(deck => {
-                                    if (deck.tableDeckId === dragCard.table_deck.id) {
-                                        dragCard.hidden = true;
-                                    }
-                                })
-                            }
+                            // Update the card's table deck ID if it has changed
                             if (tableDeckId && card.table_deck.id !== tableDeckId) {
                                 dragCard.table_deck.id = tableDeckId;
                             }
+
+                            // Update the undo history and card state if the card movement is not within the player's deck
                             if (!this.isCardMovementInPlayerDeck(card, dragCard)) {
                                 this.updateUndoHistory(card);
                                 this._updateCard(dragCard);
                             }
+
+                            // Update the state with the clicked card ID and increment the z-index
                             this.$state.clickCardId = dragCard.id;
-                            this.$state.zIndex++
+                            this.$state.zIndex++;
                         }
-                    })
+                    });
                 }
             }
         },
@@ -276,7 +287,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
             }
         },
         toggleCardVisibility() {
-            if (this.$state.clickCardId) {
+            if (this.$state.clickCardId && this.isCardAvailableForAction()) {
                 this.$state.cards?.forEach(card => {
                     if (card.id === this.$state.clickCardId) {
                         const previousCard = { ...card };
@@ -287,8 +298,11 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 })
             }
         },
+        isCardAvailableForAction() {
+            return (this.getExistTableUser?.playing || this.$state.gameMaster || this.getClickedCard?.table_deck.id === this.getExistPlayerTableDeckId)
+        },
         rotateCard(movement: MovementRotateCard) {
-            if (this.$state.clickCardId) {
+            if (this.$state.clickCardId && this.isCardAvailableForAction()) {
                 this.$state.cards?.forEach(card => {
                     if (card.id === this.$state.clickCardId) {
                         const previousCard = { ...card };
@@ -443,11 +457,16 @@ export const usePlayerStore = defineStore('PlayerStore', {
             }
         },
         cardToPlayer(deckId: number) {
-            if (this.$state.clickCardId) {
+            if (this.$state.clickCardId && this.isCardAvailableForAction()) {
                 const card = this.$state.cards?.find(c => c.id === this.$state.clickCardId);
                 if (card && card.table_deck) {
                     if (card.table_deck.id !== undefined) {
                         this.$state.clickCardId = null;
+                        // Set zero values at card position
+                        if (card.table_deck.type === TableDeckType.TABLE) {
+                            card.position_x = 0;
+                            card.position_y = 0;
+                        }
                         card.table_deck.id = deckId;
                         this.updateUndoHistory({ ...card });
                         this._updateCard(card);

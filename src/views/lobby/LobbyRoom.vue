@@ -97,7 +97,8 @@
                 <DarkTableCell :class="[
                     table.status === TableStatus.WAITING ? 'text-blue-500' : '',
                     table.status === TableStatus.PLAYING ? 'text-primary' : '',
-                    table.status === TableStatus.PLAYER_DISCONNECTED || table.status === TableStatus.PLAYER_LEAVE ? 'text-red-500' : ''
+                    table.status === TableStatus.PLAYER_DISCONNECTED || table.status === TableStatus.PLAYER_LEAVE ? 'text-red-500' : '',
+                    table.status === TableStatus.PAUSE || table.status === TableStatus.GAME_MASTER_EDIT ? 'text-orange-500' : '',
                 ]" class="capitalize">
                     {{ (StatusTable.find(item => item.id === table.status)?.name) || 'Unknown' }}
                 </DarkTableCell>
@@ -121,6 +122,8 @@
         @register-guest="(username: string) => registerGuest(username)" />
     <ModalSetPasswordTable :is-modal-open="isOpenModalSetTablePassword" @close-modal="isOpenModalSetTablePassword = false"
         @set-password-table="(password: string) => validatePassword(password)" />
+
+    <Footer v-if="userStore.isGuest" />
 </template>
 
 <script setup lang="ts">
@@ -152,6 +155,7 @@ import type { CountUsers } from '@/types/online-table/CountUsers'
 import { setOnlineSocketUser } from '@/utils/sockets/helpers';
 import { useTableStore } from '@/stores/TableStore';
 import { StatusTable } from '@/utils/StatusTable';
+import Footer from '@/components/Footer.vue';
 
 const { width, height } = useWindowSize();
 const gameHeight = ref(parseInt(import.meta.env.VITE_GAME_HEIGHT));
@@ -179,14 +183,14 @@ onBeforeMount(() => {
         isOpenModalSetGuestUsername.value = true;
     }
     // Get active tables
-    socket.emit('findAllOnlineTable', {}, (response: { tables: Table[], countUsers: CountUsers }) => {
+    socket.emit('getAllOnlineTable', {}, (response: { tables: Table[], countUsers: CountUsers }) => {
         tables.value = filterTables.value = response.tables;
         usersOnline.value = response.countUsers;
     });
 
     // Load the previous game of the leaver
     socket.on('getLastGame', (table: Table) => {
-        playerStore.leaverPlayer.table = playerStore.table = table;
+        playerStore.leaverPlayer.table = playerStore.table = { ...table };
     })
 
     // Get online users
@@ -195,12 +199,12 @@ onBeforeMount(() => {
     })
 
     // Add a new table - Update list
-    socket.on('addNewTable', (response: Table) => {
+    socket.on('getOnlineTable', (response: Table) => {
         response.table_users = [];
         tables.value.unshift(response);
     });
     // Remove table - Update list
-    socket.on('removeOldTable', (response) => {
+    socket.on('getRemoveTable', (response) => {
         tables.value = filterTables.value = tables.value.filter(table => table.id !== response);
     })
     // Update players to the tables
@@ -211,19 +215,49 @@ onBeforeMount(() => {
             tables.value[index].table_users = tableGame.table_users ?? null;
         }
     })
+
+    // Update table status
+    socket.on('getUpdateTable', (tableGame: Table) => {
+        // Find the table in the table list if exists
+        const tableIndex = tables.value.map(table => table.id).indexOf(tableGame?.id);
+
+        if (tableIndex === -1) {
+            // If the table not exists to the tables add it to the list
+            tables.value.push(tableGame);
+        } else {
+            if (tableGame.status === TableStatus.FINISH) {
+                // Remove table if is finish
+                tables.value.splice(tableIndex, 1);
+            } else {
+                // Update table
+                tables.value[tableIndex] = tableGame;
+            }
+        }
+
+
+        // Insert tables to the filter tables
+        filterTables.value = tables.value.filter(
+            table => table.name.toLocaleLowerCase()
+                .includes(search.value.toLocaleLowerCase()))
+
+    })
 })
 
 const joinRoom = () => {
     if (playerStore.table) {
+        // Check if there is a user before join the room
         if (!userStore.user.id) {
             isOpenModalSetGuestUsername.value = true;
             return
         }
+        // Check if the table is private
         if (playerStore.table.private) {
             isOpenModalSetTablePassword.value = true;
         } else {
             if (playerStore.table.game?.max_players && playerStore.table?.table_users) {
                 if (playerStore.table?.table_users?.length < playerStore.table.game?.max_players) {
+                    // Remove previous table if exists
+                    playerStore.leaverPlayer.table = null;
                     router.push({ name: 'room', params: { id: playerStore.table.public_url } })
                 } else {
                     toast.error('The table is full')
@@ -273,7 +307,7 @@ const handleSelectTable = (index: number, table: Table) => {
         playerStore.table = null;
     } else {
         selectTable.value = index;
-        playerStore.table = table;
+        playerStore.table = { ...table };
     }
 }
 

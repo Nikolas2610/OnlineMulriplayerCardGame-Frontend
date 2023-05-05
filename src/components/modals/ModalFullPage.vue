@@ -74,7 +74,7 @@
                                         </button>
                                         <button
                                             class="p-3 w-1/4 transition duration-300 text-lg bg-primary rounded-3xl text-white hover:bg-dark-smooth border border-primary"
-                                            @click="$emit('leaveGame')">
+                                            @click="$emit('exitTable')">
                                             <Flex :justify="'center'" :items="'center'">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     fill="currentColor" class="w-6 h-6 mr-3" viewBox="0 0 16 16">
@@ -229,7 +229,7 @@ const emit = defineEmits([
     'updateStatus',
     'updateTeam',
     'stopGame',
-    'leaveGame',
+    'exitTable',
     'newGame',
     'updateTableGameStatus',
     'showAllCards',

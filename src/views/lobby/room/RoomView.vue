@@ -19,7 +19,7 @@
     <!-- Game Master Options -->
     <GameMasterMenu v-if="playerStore.gameMaster"
         @open-settings="(value) => { modalFullPageMenuTabProp = value; modalOpen = true; }"
-        @stop-game="playerStore._stopGame()" @leave-game="playerStore._leaveGame()" @new-game="playerStore._newGame()"
+        @stop-game="playerStore._stopGame()" @exit-table="playerStore._exitTable()" @new-game="playerStore._newGame()"
         @update-table-game-status="(status) => playerStore._updateTableGameStatus(status)"
         @show-all-cards="playerStore._showAllCards()"
         @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)"
@@ -32,7 +32,7 @@
         @update-role="(value, user) => playerStore._setRoleTableUser(value, user)"
         @update-status="(value, user) => playerStore._setStatusTableUser(value, user)"
         @update-team="(value, user) => playerStore._setTeamTableUser(value, user)" @stop-game="playerStore._stopGame()"
-        @leave-game="playerStore._leaveGame()" @new-game="playerStore._newGame()"
+        @exit-table="playerStore._exitTable()" @new-game="playerStore._newGame()"
         @update-table-game-status="(status) => playerStore._updateTableGameStatus(status)"
         @show-all-cards="playerStore._showAllCards()" :menu-tab="modalFullPageMenuTabProp"
         @remove-player="(userId) => playerStore._removePlayer(userId)"
@@ -110,7 +110,7 @@ onBeforeMount(() => {
     // update table users online
     socket.on('getTableUsers', (tableGame: Table) => {
         if (tableGame.public_url === playerStore.room && tableGame.table_users) {
-            playerStore.table = tableGame;
+            playerStore.table = { ...tableGame };
             const user = playerStore.table.table_users?.find(user => user.user.id === userStore.user.id);
             if (!user) {
                 toast.info(`Player ${userStore.user.username} has remove from Game Master`)
@@ -152,7 +152,7 @@ onBeforeMount(() => {
         if (response) {
             // Catch previous status of the table
             const isPreviousWaitingTable = playerStore.table?.status === TableStatus.WAITING;
-            playerStore.table = response;
+            playerStore.table = { ...response };
             extractTableDecksDetails();
 
             // Catch the new status of the table
@@ -191,9 +191,9 @@ onBeforeMount(() => {
         router.push({ name: 'lobby' })
     })
 
-    socket.on('getTableGameStatus', (tableGame: Table) => {
-        if (tableGame) {
-            playerStore.table = tableGame;
+    socket.on('getTableGameStatus', (tableGame: Table, room: string) => {
+        if (tableGame && room === playerStore.room) {
+            playerStore.table = { ...tableGame };
             if (tableGame.status === TableStatus.PAUSE) {
                 toast.info('Game has paused')
             }
@@ -299,7 +299,7 @@ const tableStatusMessage = ref([
     { status: TableStatus.PAUSE, title: 'Game Paused', message: '...waiting from Game Master to resume the game' },
     { status: TableStatus.GAME_MASTER_EDIT, title: 'Game edit from Game Master', message: '..waiting from Game Master to finish with the configure of the table' },
     { status: TableStatus.FINISH, title: 'Game has ended', message: '...waiting from Game Master to start the game' },
-    { status: TableStatus.PLAYER_LEAVE, title: 'Player has leave the game', message: '...waiting for player to join or to Game Master to start new game' },
+    { status: TableStatus.PLAYER_LEAVE, title: 'Player has left the game', message: '...waiting for player to join or to Game Master to start new game' },
     { status: TableStatus.PLAYER_DISCONNECTED, title: 'Player has lost his connection', message: '...waiting for player to join or to Game Master to start new game' },
 ])
 
@@ -310,7 +310,6 @@ onUnmounted(() => {
     playerStore.refUndoHistory = [];
     playerStore.refRedoHistory = [];
     if (!forceQuit.value) {
-        console.log('\x1b[33m%s\x1b[0m', 'forceQuit');
         playerStore._leaveTable();
     }
     webSocketsTableEvents.value.forEach(event => {
