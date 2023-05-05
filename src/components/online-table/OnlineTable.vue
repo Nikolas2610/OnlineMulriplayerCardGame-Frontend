@@ -21,7 +21,10 @@
                         v-for="(card, index) in playerStore.getCards(playerStore.getJunkTableDeckId)" :key="index"
                         @on-drag-start="(event, cardRef) => onDragStart(event, cardRef, card)" />
                 </div>
-                <div class="text-sm">Junk Deck</div>
+                <div class="text-sm text-center">Junk Deck</div>
+                <div v-if="playerStore.getCards(playerStore.getJunkTableDeckId)" class="text-primary text-sm">
+                    {{ playerStore.getCards(playerStore.getJunkTableDeckId)?.length }}
+                </div>
             </Flex>
         </Flex>
     </Flex>
@@ -58,7 +61,34 @@
     </Flex>
 
     <PlayerSettings />
-    <Modal :modal-open="playerStore.rank.isRankModalOpen" @close-modal="playerStore.rank.isRankModalOpen = false">
+
+    <!-- Modal Zoom Card -->
+    <Modal :modal-open="playerStore.isCardDetailsModalOpen" @close-modal="playerStore.isCardDetailsModalOpen = false">
+        <template v-slot:modal_header>
+            <div class="text-black">
+                Card Details
+            </div>
+        </template>
+
+        <template v-slot:body>
+            <Flex justify="center">
+                <img
+                    :src="loadImage(playerStore.cards?.find(card => card.id === playerStore.clickCardId)?.card.image || '')">
+            </Flex>
+        </template>
+
+        <template v-slot:modal_footer>
+            <button
+                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
+                @click="playerStore.isCardDetailsModalOpen = false">
+                Close
+            </button>
+        </template>
+    </Modal>
+
+    <!-- Modal View Player Rank -->
+    <Modal :modal-open="playerStore.rank.isRankModalOpen" @close-modal="playerStore.rank.isRankModalOpen = false"
+        class="z-[2147483641]">
         <template v-slot:modal_header>
             <div class="text-black">
                 Rank Table
@@ -95,6 +125,7 @@ import { RankType } from '@/types/online-table/RankType.enum';
 import DarkTable from '../table/DarkTable.vue';
 import DarkTableRow from '../table/DarkTableRow.vue';
 import DarkTableCell from '../table/DarkTableCell.vue';
+import { loadImage } from '@/utils/helpers';
 
 const playerStore = usePlayerStore();
 const height = ref(import.meta.env.VITE_GAME_HEIGHT);
@@ -181,7 +212,7 @@ const onDragStart = (event: any, item: HTMLElement, card: TableCard) => {
 }
 
 const onDrop = (event: DragEvent, tableDeckId: number | undefined, type: string) => {
-    playerStore.onDrop(event, tableDeckId, type, zIndex.value++);
+    playerStore.onDrop(event, tableDeckId, type);
 }
 // END DRAG
 

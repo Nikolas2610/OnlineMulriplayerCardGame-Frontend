@@ -68,7 +68,7 @@ export const useTableStore = defineStore('TableStore', {
             const user_id = userStore.user.id;
             socket.emit('createOnlineTable', { user_id, table: this.$state.table }, (response: Table) => {
                 if (response.id) {
-                    playerStore.table = response;
+                    playerStore.table = { ...response };
                     this.$state.table.game = null;
                     this.$state.table.name = '';
                     this.$state.table.password = '';
@@ -123,7 +123,7 @@ export const useTableStore = defineStore('TableStore', {
             try {
                 this.toggleLoading();
                 const response: AxiosResponse = await axiosUser.delete(`${this.$state.role}/table/users`,
-                { data: { id: this.$state.edit.id } });
+                    { data: { id: this.$state.edit.id } });
                 if (response.status === 200) {
                     toast.success('Table users has been successfully deleted');
                     this.toggleLoading();

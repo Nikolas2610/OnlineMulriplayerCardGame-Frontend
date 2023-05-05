@@ -1,6 +1,6 @@
 <template>
     <Flex :gap="4" class="my-2 mx-8">
-        <Flex :column="true" :items="'center'" :gap="1">
+        <Flex :column="true" :items="'center'">
             <div class="relative card-box dropZone" ref="deckReference"
             :class="deck.cards?.length ? '' : 'border'"
             @drop="(event) => $emit('onDrop', event, deck.tableDeckId)" @dragover.prevent @dragleave="(event) => $emit('onDragLeave', event)"
@@ -8,7 +8,8 @@
                     <DraggableCard :card="card" v-for="(card, index) in deck.cards" :key="index"
                         @on-drag-start="(event, cardRef) => $emit('onDragStart', event, cardRef, card)" :hidden-cards="deck.deckType === DeckType.DECK" />
             </div>
-            <div class="text-sm">{{ deck.deckName }}</div>
+            <div class="text-sm text-center">{{ deck.deckName }}</div>
+            <div v-if="deck.cards && deck.cards?.length > 0" class="text-primary text-sm">{{ deck.cards?.length }}</div>
         </Flex>
     </Flex>
 </template>

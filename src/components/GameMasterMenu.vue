@@ -20,9 +20,9 @@
             <!-- Pause -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition">
                 <button
-                    @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? $emit('updateTableGameStatus', TableStatus.PAUSE) : $emit('updateTableGameStatus', TableStatus.PLAYING)"
-                    :disabled="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING"
-                    :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed opacity-50' : ''">
+                    @click="playerStore.table?.status === TableStatus.PLAYING ? $emit('updateTableGameStatus', TableStatus.PAUSE) : $emit('updateTableGameStatus', TableStatus.PLAYING)"
+                    :disabled="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT"
+                    :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? 'cursor-not-allowed opacity-50' : ''">
                     <VTooltip distance="22">
                         <svg v-if="playerStore.table?.status !== TableStatus.PAUSE" xmlns="http://www.w3.org/2000/svg"
                             width="16" height="16" fill="currentColor" class="w-6 h-6 focus:outline-none"
@@ -96,7 +96,7 @@
             </Flex>
             <!-- Leave -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
-                @click="$emit('leaveGame')">
+                @click="$emit('exitTable')">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -112,8 +112,8 @@
         <Flex class="border-r h-full px-6" items="center" :gap="4">
             <!-- Previous Player -->
             <Flex :justify="'center'" :items="'center'"
-                @click="playerStore.table?.status === TableStatus.PLAYING ? $emit('setNextPlayer', false) : ''"
-                :class="playerStore.table?.status === TableStatus.PLAYING ? '' : 'cursor-not-allowed opacity-50'"
+                @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? $emit('setNextPlayer', false) : ''"
+                :class="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? '' : 'cursor-not-allowed opacity-50'"
                 class="hover:text-primary duration-300 transition">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -128,9 +128,9 @@
             </Flex>
             <!-- Next Player -->
             <Flex :justify="'center'" :items="'center'"
-                @click="playerStore.table?.status === TableStatus.PLAYING ? $emit('setNextPlayer', true) : ''"
+                @click="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? $emit('setNextPlayer', true) : ''"
                 class="hover:text-primary duration-300 transition"
-                :class="playerStore.table?.status === TableStatus.PLAYING ? '' : 'cursor-not-allowed opacity-50'">
+                :class="playerStore.table?.status === TableStatus.PLAYING || playerStore.table?.status === TableStatus.GAME_MASTER_EDIT ? '' : 'cursor-not-allowed opacity-50'">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -159,8 +159,8 @@
             </Flex>
             <!-- Shuffle click deck -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
-                :class="isAvailableShuffleDeck() ? 'cursor-not-allowed opacity-50' : ''"
-                @click="isAvailableShuffleDeck() ? '' : $emit('shuffleDeck')">
+                :class="isAvailableShuffleDeck() ? '' : 'cursor-not-allowed opacity-50'"
+                @click="isAvailableShuffleDeck() ? $emit('shuffleDeck') : ''">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
@@ -221,8 +221,9 @@
                 </VTooltip>
             </Flex>
             <!-- Edit Rank Table -->
-            <Flex :justify="'center'" :items="'center'" @click="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING  ? '' : $emit('openSettings', 3)"
-                :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING  ? 'cursor-not-allowed opacity-50' : ''"
+            <Flex :justify="'center'" :items="'center'"
+                @click="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING ? '' : $emit('openSettings', 3)"
+                :class="playerStore.table?.status === TableStatus.FINISH || playerStore.table?.status === TableStatus.WAITING ? 'cursor-not-allowed opacity-50' : ''"
                 class="hover:text-primary duration-300 transition">
                 <VTooltip distance="22">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -264,7 +265,7 @@ const playerStore = usePlayerStore();
 const emits = defineEmits([
     'openSettings',
     'stopGame',
-    'leaveGame',
+    'exitTable',
     'newGame',
     'updateTableGameStatus',
     'showAllCards',
@@ -275,19 +276,19 @@ const emits = defineEmits([
 
 const isAvailableShuffleDeck = () => {
     if (!playerStore.clickCardId) {
-        return true;
-    }
-
-    const tableDeckId = playerStore.cards?.find(card => card.id === playerStore.clickCardId)?.table_deck.id;
-    if (!tableDeckId || playerStore.table?.status !== TableStatus.PLAYING) {
-        return true;
-    }
-
-    if (tableDeckId === playerStore.getJunkTableDeckId) {
         return false;
     }
 
-    return !playerStore.dropZones.deck.some(deck => deck.tableDeckId === tableDeckId);
+    const tableDeckId = playerStore.cards?.find(card => card.id === playerStore.clickCardId)?.table_deck.id;
+    if (!tableDeckId || (playerStore.table?.status !== TableStatus.PLAYING && playerStore.table?.status !== TableStatus.GAME_MASTER_EDIT)) {
+        return false;
+    }
+
+    if (tableDeckId === playerStore.getJunkTableDeckId) {
+        return true;
+    }
+
+    return playerStore.dropZones.deck.some(deck => deck.tableDeckId === tableDeckId);
 };
 
 </script>
