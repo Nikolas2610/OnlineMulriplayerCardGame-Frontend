@@ -201,6 +201,12 @@ onBeforeMount(() => {
                     playerStore.deckReferences.user,
                     playerStore.deckReferences.table,
                 ];
+
+                // Set the max value of the z_index when the game is load again
+                playerStore.zIndex = playerStore.cards?.reduce((max, card) => {
+                    return card.z_index > max ? card.z_index : max;
+                }, 0) ?? 1;
+                playerStore.zIndex++;
             }
         }
 
@@ -251,8 +257,12 @@ onBeforeMount(() => {
 
     socket.on('getUpdateCard', (response: TableCard) => {
         if (response) {
-            playerStore.zIndex = response.z_index + 1;
             updateCard(response);
+            // Set the max value of the z_index
+            playerStore.zIndex = playerStore.cards?.reduce((max, card) => {
+                return card.z_index > max ? card.z_index : max;
+            }, 0) ?? 1;
+            playerStore.zIndex++;
         }
     });
 
