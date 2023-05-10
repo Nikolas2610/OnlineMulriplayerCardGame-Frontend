@@ -38,6 +38,13 @@
                         <CheckBoxField :title="'Private'" :input="gameStore.createGame.game.private" class="py-2"
                             @change="(e) => { gameStore.createGame.game.private = e; gameStore.stepFormChange() }" />
                     </GridColItem>
+                    <GridColItem :xs="2">
+                        <CheckBoxField
+                            title="Auto Next Player *"
+                            :input="gameStore.createGame.game.auto_turn" class="py-2"
+                            @change="(e) => { gameStore.createGame.game.auto_turn = e; gameStore.stepFormChange() }" />
+                        <div class="text-black text-sm">*Effortlessly transition between turns for a fluid and engaging gameplay experience.</div>
+                    </GridColItem>
                 </GridCol>
             </div>
             <div v-if="gameStore.stepForm.value === 2">
@@ -46,7 +53,8 @@
                     @update="(value, index) => { gameStore.createGame.roles[index].name = value; gameStore.stepFormChange() }"
                     @deleteItem="(index) => gameStore.deleteRole(index)" :disabled-items="true" />
                 <MoreItems :items="gameStore.createGame.extraDecks" :title="'Empty decks'" :button-title="'Add a Deck'"
-                    :message="'No empty decks'" @add-item="gameStore.addExtraDeck()" :itemsTitle="'Deck name'" :count-disabled-items="2" :disabled-items="true"
+                    :message="'No empty decks'" @add-item="gameStore.addExtraDeck()" :itemsTitle="'Deck name'"
+                    :count-disabled-items="2" :disabled-items="true"
                     @update="(value, index) => { gameStore.createGame.extraDecks[index].name = value; gameStore.stepFormChange() }"
                     @deleteItem="(index) => gameStore.deleteExtraDeck(index)" />
                 <MoreItems :items="gameStore.createGame.status" :title="'Status'" :button-title="'Add a Status'"

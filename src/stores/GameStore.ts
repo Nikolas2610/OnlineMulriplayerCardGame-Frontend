@@ -22,7 +22,7 @@ export const useGameStore = defineStore("GameStore", {
                 game: { ...defaultGame } as Game,
                 teams: [] as CreateTeam[],
                 status: [] as CreateStatus[],
-                roles: [{...defaultRole}] as CreateRole[],
+                roles: [{ ...defaultRole }] as CreateRole[],
                 hand_start_cards: [{ ...defaultHandStartCards }] as CreateHandStartCards[],
                 extraDecks: [...defaultExtraDecks] as Array<{ name: string }>,
                 selectedDecks: [] as Array<number>,
@@ -66,9 +66,9 @@ export const useGameStore = defineStore("GameStore", {
                 // If decks are empty redirect to deck form
                 if (decks.length === 0) {
                     toast.warning("First you have to create deck before create game");
-                    router.push({name: 'create-deck'})
-                } 
-                    
+                    router.push({ name: 'create-deck' })
+                }
+
                 this.$state.decks = decks;
                 this.$state.loading = false;
                 return decks;
@@ -97,6 +97,10 @@ export const useGameStore = defineStore("GameStore", {
                     this.$state.createGame.roles.push({ name: role });
                 }
             })
+            // If roles are empty set default roles
+            if (roles?.length === 0) {
+                this.$state.createGame.roles = [{ ...defaultRole }];
+            }
             // Initialize teams
             this.$state.createGame.teams = [];
             const teams = this.$state.createGame.game.teams?.map(team => team.name)
@@ -121,6 +125,10 @@ export const useGameStore = defineStore("GameStore", {
                     this.$state.createGame.extraDecks.push({ name: deck.name });
                 }
             })
+            // If extra decks are empty set default extra decks
+            if (extraDecks?.length === 0) {
+                this.$state.createGame.extraDecks = [...defaultExtraDecks];
+            }
             // Initialize hand start card rules
             this.$state.createGame.hand_start_cards = [];
             this.$state.createGame.game.hand_start_cards?.forEach(rule => {
@@ -137,6 +145,10 @@ export const useGameStore = defineStore("GameStore", {
                     });
                 }
             })
+            // If card rules are empty set default card rules
+            if (this.$state.createGame.game.hand_start_cards?.length === 0) {
+                this.$state.createGame.hand_start_cards = [{ ...defaultHandStartCards }];
+            }
         },
         addExtraDeck() {
             this.$state.createGame.extraDecks.push({ name: '' });
@@ -305,7 +317,8 @@ export const useGameStore = defineStore("GameStore", {
                         if (gameResponse.status === 200) {
                             this.$state.createGame.game = gameResponse.data;
                             this.$state.createGame.extraDecks = [...defaultExtraDecks];
-                            this.$state.createGame.roles = [{...defaultRole}];
+                            this.$state.createGame.roles = [{ ...defaultRole }];
+                            this.$state.createGame.hand_start_cards = gameResponse.data.hand_start_cards ?? [{ ...defaultHandStartCards }];
                             this.$state.stepForm.change[this.$state.stepForm.value - 1] = false;
                             this.$state.stepForm.change[this.$state.stepForm.value] = true;
                             this.$state.stepForm.submitted[this.$state.stepForm.value - 1] = true
@@ -390,7 +403,7 @@ export const useGameStore = defineStore("GameStore", {
         },
         clearFormData() {
             this.$state.createGame.game = { ...defaultGame };
-            this.$state.createGame.roles = [{...defaultRole}];
+            this.$state.createGame.roles = [{ ...defaultRole }];
             this.$state.createGame.hand_start_cards = [{ ...defaultHandStartCards }]
             this.$state.createGame.status = [];
             this.$state.createGame.extraDecks = [...defaultExtraDecks];

@@ -23,9 +23,7 @@ export const defaultExtraDecks = [
 export const defaultGame = {
     name: '',
     description: '',
-    extra_roles: false,
-    status_player: false,
-    extra_teams: false,
+    auto_turn: false,
     private: false,
     grid_rows: 1,
     grid_cols: 1,

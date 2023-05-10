@@ -25,12 +25,7 @@
 
         <!-- Submit button -->
         <div class="flex justify-center">
-            <button class="mt-4 btn-green" type="submit">
-                Submit
-            </button>
-            <button class="mt-4 ml-2 btn-grey" type="button" v-if="edit" @click="$emit('closeEditMode')">
-                Back
-            </button>
+            <PrimaryButton title="Submit" type="submit" />
         </div>
     </form>
 </template>
@@ -39,6 +34,7 @@
 import type CreateCard from '@/types/cards/CreateCard';
 import { ref, watch, onMounted } from 'vue';
 import { loadImage } from '@/utils/helpers';
+import PrimaryButton from '../buttons/PrimaryButton.vue';
 
 onMounted(() => {
     if (props.cardData) {
@@ -50,7 +46,7 @@ onMounted(() => {
     }
 })
 
-const emit = defineEmits(['sendData', 'closeEditMode']);
+const emit = defineEmits(['sendData']);
 const props = defineProps(['successResponse', 'cardData', 'imageFile', 'edit']);
 const imageScreen = ref();
 const card = ref<CreateCard>({

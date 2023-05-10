@@ -1,1 +1,0 @@
-import{_ as e,o as t,c}from"./index.6223a65c.js";const o={},s={class:"text-7xl text-center my-10"};function n(a,r){return t(),c("div",s," This is an about page ")}const i=e(o,[["render",n]]);export{i as default};

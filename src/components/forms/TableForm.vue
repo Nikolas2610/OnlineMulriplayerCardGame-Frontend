@@ -1,46 +1,43 @@
 <template>
     <form class="px-4 py-8" @submit.prevent="submit" v-if="!tableStore.loadingStatus">
-        <div class="grid grid-cols-2" v-if="table">
-            <div class="col-span-2 mb-3">
+        <GridCol :all="2" v-if="table" :gap="2">
+            <GridColItem :all="2">
                 <InputField :input="table.name" :title="'Name'" :errors="v$.name.$errors" @change="(e) => table.name = e" />
-            </div>
-            <div class="col-span-2">
+            </GridColItem>
+            <GridColItem :all="2">
                 <CheckBoxField :title="'Private'" :input="table.private" class="mb-3" @change="(e) => table.private = e" />
-            </div>
-            <div class="col-span-2" v-if="table.private">
+            </GridColItem>
+            <GridColItem v-if="table.private" :all="2">
                 <InputField :input="table.password ? table.password : ''" :type="'password'" :title="'Password'"
                     :errors="v$.password.$errors" @change="(e) => table.password = e" />
-            </div>
-            <div class="col-span-2 mb-3" v-if="tableStore.games">
+            </GridColItem>
+            <GridColItem v-if="tableStore.games" :all="2">
                 <SelectField :title="'Game'"
                     :input="tableStore.editTable ? { value: tableStore.edit.game?.id } : { value: tableStore.table.game }"
                     :options="tableStore.games.map((game) => ({ id: game.id, name: game.name }))"
                     @update="(value) => tableStore.updateSelectedGame(value)" :errors="v$.game.$errors" />
-            </div>
-            <div class="col-span-2 mb-3" v-if="tableStore.editTable">
+            </GridColItem>
+            <GridColItem v-if="tableStore.editTable" :all="2">
                 <SelectField :title="'Status'" :input="{ value: tableStore.edit.status }"
                     :options="StatusTable.map(value => ({ id: value.id, name: value.name }))"
                     @update="(value) => tableStore.edit.status = value" />
-            </div>
-        </div>
+            </GridColItem>
+        </GridCol>
         <div v-if="tableStore.editTable">
-            <button :title="'Delete Table Settings'" v-if="tableStore.role === 'admin'" class="text-red-500 cursor-pointer hover:text-red-700"
-                @click="tableStore._deleteTableDetails()">Delete table data (users, decks, cards) expect the table</button>
+            <button :title="'Delete Table Settings'" v-if="tableStore.role === 'admin'"
+                class="text-red-500 cursor-pointer hover:text-red-700" @click="tableStore._deleteTableDetails()">Delete
+                table data (users, decks, cards) expect the table</button>
             <div class="flex justify-center mt-8">
-                <button class="mr-2 btn-grey" type="button" @click="tableStore.editTable = false">Back</button>
-                <button class="btn-green" type="submit">Submit</button>
+                <PrimaryButton title="Submit" type="submit" />
             </div>
         </div>
         <Flex class="mt-8" v-else>
-            <button type="submit"
-                class="rounded-md w-full border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
-                Submit
-            </button>
-            <button type="button"
-                class="rounded-md w-full border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
-                @click="$emit('closeModal')">
+            <ModalSecondaryButton @click="$emit('closeModal')">
                 Close
-            </button>
+            </ModalSecondaryButton>
+            <ModalPrimaryButton type="submit">
+                Submit
+            </ModalPrimaryButton>
         </Flex>
     </form>
     <div v-else>
@@ -60,6 +57,10 @@ import PreLoader from '../PreLoader.vue';
 import PrimaryButton from '../buttons/PrimaryButton.vue';
 import { StatusTable } from '@/utils/StatusTable'
 import Flex from '../wrappers/Flex.vue';
+import GridCol from '../wrappers/GridCol.vue';
+import GridColItem from '../wrappers/GridColItem.vue';
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
+import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
 
 const tableStore = useTableStore();
 const table = computed(() => {

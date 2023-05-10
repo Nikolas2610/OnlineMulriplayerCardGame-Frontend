@@ -12,15 +12,12 @@
         </template>
 
         <template v-slot:modal_footer>
-            <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
-                @click="$emit('closeModal')">
+            <ModalSecondaryButton @click="$emit('closeModal')">
                 Close
-            </button>
-            <button @click="registerGuest()"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
+            </ModalSecondaryButton>
+            <ModalPrimaryButton  @click="registerGuest()">
                 Submit
-            </button>
+            </ModalPrimaryButton>
         </template>
     </Modal>
 </template>
@@ -32,6 +29,8 @@ import Flex from '../wrappers/Flex.vue';
 import InputField from '../ui/InputField.vue';
 import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
+import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
 
 const user = ref({
     username: ''

@@ -18,6 +18,18 @@ const toast = useToast();
 const successResponse = ref(-1);
 
 const saveDeck = async (deck: CreateDeck) => {
+    // Validate the form 
+    if (deck.name.length < 3) {
+        toast.error('The deck name must have at least 4 characters');
+        return;
+    }
+
+    if (deck.cards.length === 0) {
+        toast.error('You have to choose at least one card for the deck');
+        return;
+    }
+
+    // Send data
     try {
         const response: AxiosResponse = await axiosUser.post('deck', deck);
         if (response.status === 201) {

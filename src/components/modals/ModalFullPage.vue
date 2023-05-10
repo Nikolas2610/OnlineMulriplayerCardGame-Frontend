@@ -256,7 +256,7 @@ const selectedMenuItem = ref(1);
 
 
 const updateTurn = (event: any) => {
-    emit('updateTurnTableUsers');
+    emit('updateTurnTableUsers', event);
 }
 
 onClickOutside(modal, () => {

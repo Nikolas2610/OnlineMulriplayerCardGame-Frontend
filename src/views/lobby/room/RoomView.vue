@@ -8,8 +8,13 @@
             <!-- Table waiting status -->
             <Flex v-for="{ status, title, message } in tableStatusMessage" :key="status" items="center" justify="center"
                 v-else>
-                <TableStatusMessage :title="title" :message="message" v-if="playerStore.table?.status === status" />
+                <TableStatusMessage :title="title" :message="message" v-if="playerStore.table?.status === status"
+                    @open-info-modal="isInfoModalOpen = true" :leaver-users="leaverUsers" />
             </Flex>
+            <Info :game-description="playerStore.table?.game?.description" :modal-open="isInfoModalOpen"
+                @close-modal="isInfoModalOpen = false" @open-modal="isInfoModalOpen = true"
+                :game-designer="{ name: playerStore.table?.creator?.username }"
+                :game-master="{ name: playerStore.table?.game_master?.username }" />
             <RoomChat />
         </div>
 
@@ -28,7 +33,7 @@
     <ModalFullPage :table-users="playerStore.table?.table_users" v-if="playerStore.gameMaster"
         :table-status="{ status: playerStore.table?.status }" :table="playerStore.table || undefined"
         :modal-open="modalOpen" @close-modal="modalOpen = false"
-        @update-turn-table-users="playerStore._updateTurnTableUsers()"
+        @update-turn-table-users="(event) => playerStore._updateTurnTableUsers(event)"
         @update-role="(value, user) => playerStore._setRoleTableUser(value, user)"
         @update-status="(value, user) => playerStore._setStatusTableUser(value, user)"
         @update-team="(value, user) => playerStore._setTeamTableUser(value, user)" @stop-game="playerStore._stopGame()"
@@ -65,6 +70,8 @@ import RoomChat from '@/components/online-table/chat/RoomChat.vue';
 import TableStatusMessage from '@/components/online-table/TableStatusMessage.vue';
 import { useRankStore } from '@/stores/RankStore';
 import type { Rank } from '@/types/online-table/Rank';
+import Info from '@/components/online-table/info/Info.vue';
+import { SocketStatus } from '@/types/online-table/SocketStatus.enum';
 
 const route = useRoute();
 const playerStore = usePlayerStore();
@@ -72,9 +79,11 @@ const userStore = useUserStore();
 const modalOpen = ref(false)
 const modalOpenViewAllCards = ref(false);
 const modalFullPageMenuTabProp = ref(1);
+const isInfoModalOpen = ref(false);
 const toast = useToast();
 const rankStore = useRankStore();
 const forceQuit = ref(false);
+const leaverUsers = ref<(string | null)[]>([]);
 
 playerStore.room = route.params.id.toString();
 if (playerStore.table) {
@@ -111,6 +120,16 @@ onBeforeMount(() => {
     socket.on('getTableUsers', (tableGame: Table) => {
         if (tableGame.public_url === playerStore.room && tableGame.table_users) {
             playerStore.table = { ...tableGame };
+            // TODO: Add the usernames of the leavers to the screen
+            if (playerStore.table.status === TableStatus.PLAYER_DISCONNECTED || playerStore.table.status === TableStatus.PLAYER_LEAVE) {
+                leaverUsers.value = playerStore.table.table_users?.filter(user => user.socket_status === SocketStatus.LEAVE || user.socket_status === SocketStatus.DISCONNECT).map(user => user.user.username ?? null) ?? [];
+
+                console.log(leaverUsers.value);
+            }
+
+            if (playerStore.table.status === TableStatus.PLAYING) {
+                leaverUsers.value = [];
+            }
             const user = playerStore.table.table_users?.find(user => user.user.id === userStore.user.id);
             if (!user) {
                 toast.info(`Player ${userStore.user.username} has remove from Game Master`)
@@ -126,9 +145,16 @@ onBeforeMount(() => {
         }
         const user = playerStore.table?.table_users?.find(user => user.playing === true);
         if (user) {
-            toast.info(`Player ${user.user.username} is playing`, {
-                position: POSITION.TOP_CENTER, timeout: 3000
-            });
+            if (user.id === playerStore.getExistTableUser?.id) {
+                // Special message for the current user if is his turn
+                toast.success(`It's your turn`, {
+                    position: POSITION.TOP_CENTER
+                });
+            } else {
+                toast.info(`Player ${user.user.username} is playing`, {
+                    position: POSITION.TOP_CENTER, timeout: 3000
+                });
+            }
         }
     })
 
@@ -152,7 +178,9 @@ onBeforeMount(() => {
         if (response) {
             // Catch previous status of the table
             const isPreviousWaitingTable = playerStore.table?.status === TableStatus.WAITING;
-            playerStore.table = { ...response };
+
+            // Save the response
+            playerStore.table = response;
             extractTableDecksDetails();
 
             // Catch the new status of the table

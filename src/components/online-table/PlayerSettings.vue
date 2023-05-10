@@ -1,7 +1,8 @@
 <template>
     <div ref="el" :style="style" style="position: fixed;" :class="playerStore.clickCardId ? 'snooze' : ''"
         class="z-[2147483644]">
-        <Flex class="bg-dark rounded-2xl px-4 border border-white" :gap="2">
+        <Flex class="rounded-2xl px-4 border border-white transition duration-500" :gap="2"
+            :class="playerStore.getExistPlayerPlayingStatus ? 'bg-primary' : 'bg-dark'">
             <div class="py-3 pr-4 border-r cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-6 h-6"
                     viewBox="0 0 16 16">
@@ -36,8 +37,8 @@
             <div class="py-1">
                 <VTooltip>
                     <div class="p-2 rounded-3xl group transition duration-300"
-                        @click="isCardAvailableForAction() ? playerStore.toggleCardVisibility() : ''"
-                        :class="[isCardAvailableForAction() ? 'hover:bg-white cursor-pointer' : 'cursor-not-allowed']">
+                        @click="isCardAvailableForAction() || playerStore.gameMaster ? playerStore.toggleCardVisibility() : ''"
+                        :class="[isCardAvailableForAction() || playerStore.gameMaster ? 'hover:bg-white cursor-pointer' : 'cursor-not-allowed']">
                         <svg v-if="playerStore.isCardHidden()" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                             fill="currentColor"
                             :class="[isCardAvailableForAction() ? 'group-hover:text-dark' : 'opacity-50']"
@@ -48,7 +49,7 @@
                                 d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829l-2.83-2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12-.708.708z" />
                         </svg>
                         <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class="[playerStore.clickCardId ? 'group-hover:text-dark' : 'opacity-50']"
+                            :class="[isCardAvailableForAction() ? 'group-hover:text-dark' : 'opacity-50']"
                             class="w-6 h-6 transition duration-300 " viewBox="0 0 16 16">
                             <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
                             <path
@@ -64,10 +65,10 @@
             <div class="py-1">
                 <VTooltip>
                     <div class="p-2 rounded-3xl group transition duration-300"
-                        :class="[isCardAvailableForAction() ? 'hover:bg-white cursor-pointer hover:rotate-90' : 'cursor-not-allowed']"
-                        @click="isCardAvailableForAction() ? playerStore.rotateCard(MovementRotateCard.RIGHT) : ''">
+                        :class="[isCardAvailableForAction() || playerStore.gameMaster ? 'hover:bg-white cursor-pointer hover:rotate-90' : 'cursor-not-allowed']"
+                        @click="isCardAvailableForAction() || playerStore.gameMaster ? playerStore.rotateCard(MovementRotateCard.RIGHT) : ''">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class="[isCardAvailableForAction() ? 'group-hover:text-dark' : 'opacity-50']"
+                            :class="[isCardAvailableForAction() || playerStore.gameMaster ? 'group-hover:text-dark' : 'opacity-50']"
                             class="w-6 h-6 transition duration-300 " viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
                             <path
@@ -83,10 +84,10 @@
             <div class="py-1">
                 <VTooltip>
                     <div class="p-2 rounded-3xl group transition duration-300"
-                        :class="[isCardAvailableForAction() ? 'hover:bg-white cursor-pointer hover:-rotate-90' : 'cursor-not-allowed']"
-                        @click="isCardAvailableForAction() ? playerStore.rotateCard(MovementRotateCard.LEFT) : ''">
+                        :class="[isCardAvailableForAction() || playerStore.gameMaster ? 'hover:bg-white cursor-pointer hover:-rotate-90' : 'cursor-not-allowed']"
+                        @click="isCardAvailableForAction() || playerStore.gameMaster ? playerStore.rotateCard(MovementRotateCard.LEFT) : ''">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class="[isCardAvailableForAction() ? 'group-hover:text-dark' : 'opacity-50']"
+                            :class="[isCardAvailableForAction() || playerStore.gameMaster ? 'group-hover:text-dark' : 'opacity-50']"
                             class="w-6 h-6 transition duration-300 " viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z" />
                             <path
@@ -181,12 +182,12 @@
                     <button class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative"
                         @click="playerStore.rank.isRankModalOpen = true; playerStore.rank.notification = false;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class=" [gamePlaying ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed'] "
+                            :class="[gamePlaying ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed']"
                             class="w-6 h-6 transition duration-300" viewBox="0 0 16 16">
                             <path
                                 d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z" />
                         </svg>
-                        <div v-if=" playerStore.rank.notification "
+                        <div v-if="playerStore.rank.notification"
                             class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -right-2 dark:border-gray-900">
                             !
                         </div>
@@ -199,10 +200,10 @@
             <!-- Get cards from deck -->
             <div class="py-1">
                 <VMenu placement="top">
-                    <div class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative">
+                    <div class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative ">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class=" [playerStore.getExistTableUser?.playing || playerStore.gameMaster ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed'] "
-                            class="w-6 h-6 transition duration-300" viewBox="0 0 16 16">
+                            :class="[playerStore.getExistTableUser?.playing || playerStore.gameMaster ? '' : 'opacity-50 cursor-not-allowed']"
+                            class="w-6 h-6 transition duration-300 group-hover:text-dark" viewBox="0 0 16 16">
                             <path
                                 d="M8.5 1.75v2.716l.047-.002c.312-.012.742-.016 1.051.046.28.056.543.18.738.288.273.152.456.385.56.642l.132-.012c.312-.024.794-.038 1.158.108.37.148.689.487.88.716.075.09.141.175.195.248h.582a2 2 0 0 1 1.99 2.199l-.272 2.715a3.5 3.5 0 0 1-.444 1.389l-1.395 2.441A1.5 1.5 0 0 1 12.42 16H6.118a1.5 1.5 0 0 1-1.342-.83l-1.215-2.43L1.07 8.589a1.517 1.517 0 0 1 2.373-1.852L5 8.293V1.75a1.75 1.75 0 0 1 3.5 0z" />
                         </svg>
@@ -213,10 +214,11 @@
                                 Get all cards from:
                             </div>
                             <div class="p-2 mt-2 cursor-pointer hover:bg-white hover:text-black transition duration-300"
+                            :class="playerStore.getExistTableUser?.playing || playerStore.gameMaster ? 'cursor-pointer' : 'cursor-not-allowed'"
                                 v-for="       deck        in        playerStore.table?.table_decks?.filter(deck => deck.type !== TableDeckType.USER)       "
-                                :key=" deck.id "
-                                @click=" playerStore.getExistTableUser?.playing || playerStore.gameMaster ? playerStore.cardsToDeck(deck.id, playerStore.table?.table_decks?.find(deck => deck.id === playerStore.getExistPlayerTableDeckId)) : '' ">
-                                <Flex :justify=" 'between' " :items=" 'center' ">
+                                :key="deck.id"
+                                @click=" playerStore.getExistTableUser?.playing || playerStore.gameMaster ? playerStore.cardsToDeck(deck.id, playerStore.table?.table_decks?.find(deck => deck.id === playerStore.getExistPlayerTableDeckId)) : ''">
+                                <Flex :justify="'between'" :items="'center'">
                                     <div>
                                         {{ deck.deck?.name }}
                                     </div>
@@ -231,8 +233,8 @@
                 <VMenu placement="top">
                     <div class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            :class=" [playerStore.getExistTableUser?.playing || playerStore.gameMaster ? 'group-hover:text-dark' : 'opacity-50 cursor-not-allowed'] "
-                            class="w-6 h-6 transition duration-300" viewBox="0 0 56 56">
+                            :class="[playerStore.getExistTableUser?.playing || playerStore.gameMaster ? '' : 'opacity-50 cursor-not-allowed']"
+                            class="w-6 h-6 transition duration-300 group-hover:text-dark" viewBox="0 0 56 56">
                             <path
                                 d="M57.832,26.926l-8-12c-0.186-0.278-0.498-0.445-0.832-0.445H9c-0.335,0-0.646,0.167-0.832,0.445l-8,12
         		c-0.205,0.307-0.224,0.701-0.05,1.026C0.292,28.278,0.631,28.481,1,28.481h6v15.038h2V28.481h5v6h2v-6h27v6h2v-6h5v15.038h2V28.481
@@ -246,8 +248,9 @@
                             </div>
                             <div class="p-2 mt-2 cursor-pointer hover:bg-white hover:text-black transition duration-300"
                                 v-for=" deck  in  playerStore.table?.table_decks?.filter(deck => deck.type === TableDeckType.JUNK || deck.type === TableDeckType.DECK) "
-                                :key=" deck.id "
-                                @click=" playerStore.getExistTableUser?.playing || playerStore.gameMaster ? playerStore.cardsToDeck(playerStore.getTableDeckId, deck) : '' ">
+                                :class="playerStore.getExistTableUser?.playing || playerStore.gameMaster ? 'cursor-pointer' : 'cursor-not-allowed'"
+                                :key="deck.id"
+                                @click=" playerStore.getExistTableUser?.playing || playerStore.gameMaster ? playerStore.cardsToDeck(playerStore.getTableDeckId, deck) : ''">
                                 {{ deck.deck?.name }}
                             </div>
                         </div>
@@ -255,12 +258,12 @@
                 </VMenu>
             </div>
             <!-- Card to player -->
-            <div class="py-1" v-if=" playerStore.table?.game?.status ">
+            <div class="py-1" v-if="playerStore.table?.game?.status">
                 <VMenu placement="top">
-                    <button class="p-2 rounded-3xl cursor-pointer hover:bg-white group transition duration-300 relative">
+                    <button class="p-2 rounded-3xl hover:bg-white group transition duration-300 relative">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                            :class=" [(playerStore.clickCardId && playerStore.getExistTableUser?.playing) || playerStore.gameMaster ? 'group-hover:text-dark' : 'opacity-50'] "
-                            class="w-6 h-6 transition duration-300" viewBox="0 0 16 16">
+                            :class="[(playerStore.clickCardId && playerStore.getExistTableUser?.playing) || playerStore.gameMaster ? '' : 'opacity-50 cursor-not-allowed']"
+                            class="w-6 h-6 transition duration-300 group-hover:text-dark" viewBox="0 0 16 16">
                             <path
                                 d="M11.5 12.5a3.493 3.493 0 0 1-2.684-1.254 19.92 19.92 0 0 0 1.582 2.907c.231.35-.02.847-.438.847H6.04c-.419 0-.67-.497-.438-.847a19.919 19.919 0 0 0 1.582-2.907 3.5 3.5 0 1 1-2.538-5.743 3.5 3.5 0 1 1 6.708 0A3.5 3.5 0 1 1 11.5 12.5z" />
                         </svg>
@@ -270,10 +273,11 @@
                             <div class="border-b p-2">
                                 Give card to player:
                             </div>
-                            <div class="p-2 mt-2 cursor-pointer hover:bg-white hover:text-black transition duration-300"
+                            <div class="p-2 mt-2 hover:bg-white hover:text-black transition duration-300"
+                            :class="playerStore.getExistTableUser?.playing || playerStore.gameMaster ? 'cursor-pointer' : 'cursor-not-allowed'"
                                 v-for="  deck  in  playerStore.table?.table_decks?.filter(deck => deck.type === TableDeckType.USER && deck.id !== playerStore.getExistPlayerTableDeckId) "
-                                :key=" deck.id "
-                                @click=" (playerStore.clickCardId && playerStore.getExistTableUser?.playing) || playerStore.gameMaster ? playerStore.cardToPlayer(deck.id) : '' ">
+                                :key="deck.id"
+                                @click=" (playerStore.clickCardId && playerStore.getExistTableUser?.playing) || playerStore.gameMaster ? playerStore.cardToPlayer(deck.id) : ''">
                                 {{ deck.user?.username }}
                             </div>
                         </div>

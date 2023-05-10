@@ -78,11 +78,9 @@
         </template>
 
         <template v-slot:modal_footer>
-            <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
-                @click="playerStore.isCardDetailsModalOpen = false">
+            <ModalSecondaryButton @click="playerStore.isCardDetailsModalOpen = false">
                 Close
-            </button>
+            </ModalSecondaryButton>
         </template>
     </Modal>
 
@@ -126,6 +124,7 @@ import DarkTable from '../table/DarkTable.vue';
 import DarkTableRow from '../table/DarkTableRow.vue';
 import DarkTableCell from '../table/DarkTableCell.vue';
 import { loadImage } from '@/utils/helpers';
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
 
 const playerStore = usePlayerStore();
 const height = ref(import.meta.env.VITE_GAME_HEIGHT);

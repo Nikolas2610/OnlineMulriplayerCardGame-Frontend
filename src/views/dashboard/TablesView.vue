@@ -42,7 +42,8 @@
                                                 {{ formattedDate(table.created_at) }}
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                                <button class="text-blue-500 hover:underline" @click="tableStore.toggleEditTable(index)">
+                                                <button class="text-blue-500 hover:underline"
+                                                    @click="tableStore.toggleEditTable(index)">
                                                     View Details
                                                 </button>
                                                 <button class="text-red-500 hover:underline ml-2"
@@ -63,7 +64,10 @@
         </div>
 
         <div v-else>
-            <MyTitle>Edit Table</MyTitle>
+            <Flex justify="between">
+                <MyTitle>Edit Table</MyTitle>
+                <BackButton title="Back to Tables" @click="tableStore.editTable = false"></BackButton>
+            </Flex>
             <TableForm @submit="() => tableStore._update()" />
         </div>
 
@@ -78,14 +82,12 @@
                 </div>
             </template>
             <template v-slot:modal_footer>
-                <button @click="deleteTable()"
-                    class="flex w-full items-center justify-center rounded-md border border-transparent bg-red-500 text-white px-8 py-3 text-base font-medium hover:bg-red-600 hover:text-white md:py-3 md:px-10 md:text-lg">
+                <ModalSecondaryButton @click="deactivateDeleteModal">
+                    Close
+                </ModalSecondaryButton>
+                <ModalPrimaryButton @click="deleteTable()" :deleteButton="true">
                     Delete
-                </button>
-                <button @click="deactivateDeleteModal" class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 
-font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
-                    Cancel
-                </button>
+                </ModalPrimaryButton>
             </template>
         </Modal>
     </div>
@@ -99,6 +101,10 @@ import { useTableStore } from '@/stores/TableStore';
 import TableForm from '@/components/forms/TableForm.vue';
 import PreLoader from '@/components/PreLoader.vue';
 import { useRoute } from 'vue-router';
+import BackButton from '@/components/buttons/BackButton.vue';
+import Flex from '@/components/wrappers/Flex.vue';
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
+import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
 
 const route = useRoute();
 const tableStore = useTableStore();
@@ -107,7 +113,7 @@ const tables = computed(() => tableStore.tables)
 const tablesFields = ref([
     'No', 'NAME', 'PRIVATE', 'STATUS', 'GAME', 'CREATED AT'
 ]);
-route.meta.admin ? tableStore.setUserRole('admin') :tableStore.setUserRole('user');
+route.meta.admin ? tableStore.setUserRole('admin') : tableStore.setUserRole('user');
 
 const deactivateDeleteModal = () => {
     isDeleteModalOpen.value = false;

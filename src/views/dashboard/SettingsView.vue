@@ -25,7 +25,7 @@
                     </span>
                 </div>
                 <div class="mt-4 flex">
-                    <button @click="activeteChangeUsernameModal"
+                    <button @click="activateChangeUsernameModal"
                         class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-2 md:px-10">
                         Change Username
                     </button>
@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <Modal :modalOpen="changeUsernameModal" @closeModal="deactiveteChangeUsernameModal">
+    <Modal :modalOpen="changeUsernameModal" @closeModal="deactivateChangeUsernameModal">
         <template v-slot:modal_header>
             Change Username
         </template>
@@ -56,18 +56,16 @@
             </div>
         </template>
         <template v-slot:modal_footer>
-            <button @click="updateUsername"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
+            <ModalSecondaryButton @click="changeUsernameModal = false">
+                Close
+            </ModalSecondaryButton>
+            <ModalPrimaryButton @click="updateUsername">
                 Update Username
-            </button>
-            <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
-                Cancel
-            </button>
+            </ModalPrimaryButton>
         </template>
     </Modal>
 
-    <Modal :modalOpen="changePasswordModal" @closeModal="deactiveteChangePasswordModal">
+    <Modal :modalOpen="changePasswordModal" @closeModal="deactivateChangePasswordModal">
         <template v-slot:modal_header>
             Change Password
         </template>
@@ -107,14 +105,12 @@
             </div>
         </template>
         <template v-slot:modal_footer>
-            <button @click="updatePassword"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
+            <ModalSecondaryButton @click="changePasswordModal = false">
+                Close
+            </ModalSecondaryButton>
+            <ModalPrimaryButton @click="updatePassword">
                 Update Password
-            </button>
-            <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
-                Cancel
-            </button>
+            </ModalPrimaryButton>
         </template>
     </Modal>
 </template>
@@ -129,6 +125,8 @@ import useVuelidate from '@vuelidate/core';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { useToast } from "vue-toastification";
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
+import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
 
 const toast = useToast();
 const changeUsernameModal = ref(false);
@@ -144,11 +142,11 @@ const changePassword = ref({
     confirm_password: ''
 })
 
-const deactiveteChangeUsernameModal = () => {
+const deactivateChangeUsernameModal = () => {
     changeUsernameModal.value = false;
 }
 
-const activeteChangeUsernameModal = () => {
+const activateChangeUsernameModal = () => {
     tempUsername.value.username = user.value.username;
     changeUsernameModal.value = true;
 }
@@ -163,7 +161,7 @@ const updateUsername = async () => {
             if (response.status === 200) {
                 userStore.decodeToken(response.data.token);
                 toast.success('Username updated successfully');
-                deactiveteChangeUsernameModal();
+                deactivateChangeUsernameModal();
                 return
             }
             toast.error('Something went wrong.');
@@ -175,7 +173,7 @@ const updateUsername = async () => {
 
 // Change Password Section
 
-const deactiveteChangePasswordModal = () => {
+const deactivateChangePasswordModal = () => {
     resetPassword();
     changePasswordModal.value = false;
 }
@@ -225,7 +223,7 @@ const updatePassword = async () => {
         } catch (err: any) {
             toast.error(err.response.data.error)
         }
-        deactiveteChangePasswordModal()
+        deactivateChangePasswordModal()
     }
 }
 
@@ -237,6 +235,4 @@ const resetPassword = () => {
 
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

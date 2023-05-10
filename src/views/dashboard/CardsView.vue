@@ -56,14 +56,17 @@
             <!-- End Table -->
         </div>
         <div v-else>
-            <MyTitle>Edit Card</MyTitle>
+            <Flex justify="between">
+                <MyTitle>Edit Card</MyTitle>
+                <BackButton title="Back to Cards" @click="editCard = false"></BackButton>
+            </Flex>
             <CardForm @sendData="saveCardChanges" :successResponse="successResponse" :cardData="modalCard"
-                :imageFile="imageFile" :edit="true" @closeEditMode="deactiveteCard" />
+                :imageFile="imageFile" :edit="true" />
         </div>
     </div>
 
     <!-- Confirmation Delete Modal -->
-    <Modal :modalOpen="isDeleteModalOpen" @closeModal="deactiveteDeleteModal">
+    <Modal :modalOpen="isDeleteModalOpen" @closeModal="deactivateDeleteModal">
         <template v-slot:modal_header>
             Are you sure?
         </template>
@@ -73,14 +76,12 @@
             </div>
         </template>
         <template v-slot:modal_footer>
-            <button @click="deleteCard"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-red-500 text-white px-8 py-3 text-base font-medium hover:bg-red-600 hover:text-white md:py-3 md:px-10 md:text-lg">
+            <ModalSecondaryButton @click="deactivateDeleteModal">
+                Close
+            </ModalSecondaryButton>
+            <ModalPrimaryButton @click="deleteCard" :deleteButton="true">
                 Delete
-            </button>
-            <button @click="deactiveteDeleteModal"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
-                Cancel
-            </button>
+            </ModalPrimaryButton>
         </template>
     </Modal>
 </template>
@@ -98,6 +99,10 @@ import type CreateCard from '@/types/cards/CreateCard';
 import { useUserStore } from '@/stores/UserStore';
 import { useRoute } from 'vue-router';
 import { loadImage } from '@/utils/helpers';
+import Flex from '@/components/wrappers/Flex.vue';
+import BackButton from '@/components/buttons/BackButton.vue';
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
+import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
 
 const userStore = useUserStore();
 const route = useRoute()
@@ -122,12 +127,8 @@ onMounted(async () => {
     }
     getCardsList();
 })
-// Close view details card
-const deactiveteCard = () => {
-    editCard.value = false;
-}
 // Close delete modal
-const deactiveteDeleteModal = () => {
+const deactivateDeleteModal = () => {
     isDeleteModalOpen.value = false;
 }
 // Axios call to get game list data
