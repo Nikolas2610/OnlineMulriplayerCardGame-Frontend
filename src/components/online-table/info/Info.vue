@@ -10,7 +10,7 @@
     </div>
 
     <!-- Info Modal -->
-    <Modal :modalOpen="modalOpen" @closeModal="$emit('closeModal')" class="text-black">
+    <Modal :modalOpen="modalOpen" @closeModal="$emit('closeModal')" class="text-black z-[2147483640]">
         <template v-slot:modal_header>
             Info
         </template>
