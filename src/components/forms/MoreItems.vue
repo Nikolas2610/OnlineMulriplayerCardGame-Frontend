@@ -6,8 +6,8 @@
         </template>
     </SubTitle>
 
-    <Flex :items="'center'" :justify="'center'" :gap="2" v-for="(item, index) in items" :key="index"
-        v-if="items.length > 0">
+    <Flex items="end" justify="center" :gap="4" v-for="(item, index) in items" :key="index"
+        v-if="items.length > 0" class="mb-3">
         <div class="w-11/12">
             <InputField :title="itemsTitle" :input="item.name" :disabled="disableItem(index)"
                 @change="(value) => $emit('update', value, index)" />

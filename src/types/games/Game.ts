@@ -12,9 +12,7 @@ export default interface Game {
     grid_cols: number;
     max_players: number;
     private: boolean;
-    status_player: boolean;
-    extra_roles: boolean;
-    extra_teams: boolean;
+    auto_turn: boolean;
     created_at: Date | null;
     updated_at: Date | null;
     deck: Deck[] | null;

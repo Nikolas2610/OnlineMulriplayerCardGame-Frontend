@@ -123,13 +123,30 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 }
             })
         },
-        _updateTurnTableUsers() {
-            this.$state.table?.table_users?.forEach((user, index) => {
-                user.turn = index + 1;
-            })
-            socket.emit('setTurnTableUsers', {
-                table_users: this.$state.table?.table_users, room: this.$state.room
-            });
+        _updateTurnTableUsers(event: any) {
+            if (this.$state.table?.table_users) {
+                const newOrder = [...this.$state.table?.table_users];
+                const movedItem = newOrder.splice(event.moved.oldIndex, 1)[0];
+                newOrder.splice(event.moved.newIndex, 0, movedItem);
+
+                // If newIndex is smaller than oldIndex, it means the item was moved up.
+                if (event.moved.newIndex < event.moved.oldIndex) {
+                    newOrder[event.moved.newIndex].turn = 1;
+                    newOrder[event.moved.oldIndex].turn -= 1;
+                } else {
+                    // If newIndex is greater than oldIndex, it means the item was moved down.
+                    newOrder[event.moved.newIndex].turn = newOrder[event.moved.oldIndex].turn + 1;
+                    newOrder[event.moved.oldIndex].turn += 1;
+                }
+
+                newOrder.forEach((user, index) => {
+                    user.turn = index + 1;
+                })
+
+                socket.emit('setTurnTableUsers', {
+                    table_users: newOrder, room: this.$state.room
+                });
+            }
         },
         _setRoleTableUser(roleId: number, table_user: TableUsers) {
             const role = this.$state.table?.game?.roles?.find(role => role.id === roleId);
@@ -219,16 +236,17 @@ export const usePlayerStore = defineStore('PlayerStore', {
                             // Update the z-index of the card
                             dragCard.z_index = this.$state.zIndex;
 
-                            // Update the card's table deck type
-                            dragCard.table_deck.type = type as TableDeckType;
-
                             // Update card visibility based on the table deck type
                             if (type === TableDeckType.JUNK) {
                                 dragCard.hidden = false;
                             } else if (type === TableDeckType.USER) {
-                                const userDeck = this.$state.dropZones.deck.find(deck => deck.tableDeckId === dragCard.table_deck.id);
-                                dragCard.hidden = !!userDeck;
+                                if (dragCard.table_deck.type !== TableDeckType.USER) {
+                                    dragCard.hidden = true;
+                                }
                             }
+
+                            // Update the card's table deck type
+                            dragCard.table_deck.type = type as TableDeckType;
 
                             // Update the card's table deck ID if it has changed
                             if (tableDeckId && card.table_deck.id !== tableDeckId) {
@@ -338,14 +356,33 @@ export const usePlayerStore = defineStore('PlayerStore', {
             })
         },
         setPlayingPlayer() {
+            // Retrieve the current player's playing status or set to false if not found
             const playingStatus = this.getExistPlayerPlayingStatus ? this.getExistPlayerPlayingStatus : false;
-            this.$state.table?.table_users?.forEach(user => {
-                if (user.user.id === userStore.user.id) {
-                    user.playing = !user.playing;
-                } else {
-                    user.playing = false
-                }
-            })
+
+            // Find the index of the current user in the table_users array
+            const userIndex = this.table?.table_users?.map(user => user.user.id).indexOf(userStore.user?.id ?? -1);
+
+            // Check if the table, table_users array, and userIndex are valid
+            if (this.$state.table && this.$state.table.table_users && userIndex !== undefined && userIndex !== -1) {
+                // Calculate the next player's index (wrap around to 0 if at the end of the array)
+                const nextPlayer = userIndex + 1 >= this.$state.table?.table_users?.length ? 0 : userIndex + 1
+
+                // Update the playing status of each user in the table_users array
+                this.$state.table?.table_users?.forEach((user, index) => {
+                    if (index === userIndex) {
+                        // Toggle the current player's playing status
+                        user.playing = !user.playing;
+                    } else if (nextPlayer === index && playingStatus && this.$state.table?.game?.auto_turn) {
+                        // Set the next player as the active player if auto_turn is enabled
+                        user.playing = true;
+                    } else {
+                        // Set other players' playing status to false
+                        user.playing = false
+                    }
+                })
+            }
+
+            // Emit a 'setPlayerPlaying' event to the server with the updated table_users array and room
             socket.emit('setPlayerPlaying', {
                 table_users: this.$state.table?.table_users, room: this.$state.room
             })

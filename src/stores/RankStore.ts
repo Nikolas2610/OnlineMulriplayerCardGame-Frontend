@@ -101,7 +101,7 @@ export const useRankStore = defineStore('RankStore', {
             this.$state.form.showStoreForm = true;
         },
         addTableUsers(tableUsers: TableUsers[]) {
-            this.$state.tableUsers = tableUsers.sort((a, b) => a.id - b.id);
+            this.$state.tableUsers = tableUsers.sort((a, b) => a.turn - b.turn);
             this.$state.tableHeaders = ['Round']
             this.$state.tableUsers.forEach(user => {
                 if (user.user.username) {

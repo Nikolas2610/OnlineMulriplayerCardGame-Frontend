@@ -1,1 +1,0 @@
-import{_ as e,o as s,c as t,i as c}from"./index.6223a65c.js";const o="/assets/loader.ba67f5cb.gif",r={},n={class:"flex items-center justify-center",style:{height:"93.3vh"}},a=c("img",{src:o,alt:"loading"},null,-1),_=[a];function i(l,d){return s(),t("div",n,_)}const h=e(r,[["render",i]]);export{h as P};

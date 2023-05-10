@@ -3,7 +3,7 @@
         <Flex :column="true" :justify="'between'" class="h-[96%]">
             <div>
                 <div class="text-2xl border-b border-primary pb-2">Users</div>
-                <GameUserItem v-for="(user, index) in playerStore.table?.table_users" :key="index"
+                <GameUserItem v-for="(user, index) in playerStore.table?.table_users?.sort((a,b) => a.turn - b.turn)" :key="index"
                     class="mt-3 w-2xl bg-primary" :playing="user.playing">
                     <Flex :items="'center'" :justify="playerStore.cards ? 'center' : 'between'" :gap="2">
                         <div class="w-3/6">{{ user.user?.username }}</div>
@@ -43,7 +43,7 @@
                         <Flex :gap="2" class="flex-wrap" :justify="'start'">
                             <img :src="card.hidden ? backCardImage : loadImage(card.card.image)" alt="" srcset=""
                                 v-for="(card, index) in playerStore.getCards(playerStore.getTableDeckIdOfUser(user.user.id))"
-                                :key="`user-card-${index}`" class="w-10 h-12">
+                                :key="`user-card-${index}`" class="w-10 h-12 hover:scale-150 transition duration-500">
                         </Flex>
                     </div>
                 </GameUserItem>

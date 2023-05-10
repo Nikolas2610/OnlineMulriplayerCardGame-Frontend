@@ -83,14 +83,12 @@
             </div>
         </template>
         <template v-slot:modal_footer>
-            <button @click="deleteGame()"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-red-500 text-white px-8 py-3 text-base font-medium hover:bg-red-600 hover:text-white md:py-3 md:px-10 md:text-lg">
+            <ModalSecondaryButton @click="deactivateDeleteModal">
+                Close
+            </ModalSecondaryButton>
+            <ModalPrimaryButton @click="deleteGame()" :deleteButton="true">
                 Delete
-            </button>
-            <button @click="deactivateDeleteModal" class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 
-    font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
-                Cancel
-            </button>
+            </ModalPrimaryButton>
         </template>
     </Modal>
 </template>
@@ -106,6 +104,8 @@ import PreLoader from '@/components/PreLoader.vue';
 import GameForm from '@/components/forms/GameForm.vue';
 import Flex from '@/components/wrappers/Flex.vue';
 import BackButton from '@/components/buttons/BackButton.vue'
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
+import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
 
 const gameStore = useGameStore();
 const route = useRoute()

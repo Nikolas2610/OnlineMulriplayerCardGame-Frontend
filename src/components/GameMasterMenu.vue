@@ -1,7 +1,8 @@
 <template>
     <Flex
-        class="border text-white fixed bottom-32 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer -translate-x-[685px] hover:-translate-x-[20px] z-[2147483639]"
-        items="center" justify="center">
+        class="border text-white fixed bottom-32 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer z-[2147483639]"
+        :class="openMenu ? '-translate-x-[20px]' : '-translate-x-[685px] hover:-translate-x-[20px]'" items="center"
+        justify="center">
         <Flex class="border-r h-full px-6 pl-10" items="center" :gap="4">
             <!-- Play -->
             <Flex :justify="'center'" :items="'center'" class="hover:text-primary duration-300 transition"
@@ -238,17 +239,17 @@
             </Flex>
         </Flex>
         <!-- Settings -->
-        <Flex :justify="'center'" :items="'center'" class="px-8" @click="$emit('openSettings', 1)">
+        <Flex :justify="'center'" :items="'center'" class="px-8" @click="openMenu = !openMenu">
             <VTooltip distance="18">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" viewBox="0 0 16 16"
-                    class="hover:fill-primary transition duration-300 group-hover:animate-spin h-8 w-8 focus:outline-none">
+                    class="hover:fill-primary transition duration-300 h-8 w-8 focus:outline-none" :class="openMenu ? 'animate-spin fill-primary' : ''">
                     <path
                         d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" />
                     <path
                         d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" />
                 </svg>
                 <template #popper>
-                    Open Game Master Settings
+                    Click to keep the menu bar open or close
                 </template>
             </VTooltip>
         </Flex>
@@ -260,7 +261,9 @@ import { usePlayerStore } from '@/stores/PlayerStore';
 import { TableStatus } from '@/types/tables/TableStatus.enum';
 import Flex from './wrappers/Flex.vue';
 import { HistoryMovement } from '@/types/online-table/HIstoryMovement.enum'
+import { ref } from 'vue';
 
+const openMenu = ref(false);
 const playerStore = usePlayerStore();
 const emits = defineEmits([
     'openSettings',

@@ -10,7 +10,7 @@ export interface TableUsers {
     playing: boolean;
     status: Status | null;
     team: Team | null;
-    turn: number | null;
+    turn: number;
     created_at: Date;
     updated_at: Date;
     table: Table | null;

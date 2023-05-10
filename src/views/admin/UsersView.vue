@@ -67,7 +67,7 @@
     </div>
 
     <!-- Modal Edit User -->
-    <Modal :modalOpen="isModalOpen" @closeModal="deactiveteModal">
+    <Modal :modalOpen="isModalOpen" @closeModal="deactivateModal">
         <template v-slot:modal_header>
             Edit User
         </template>
@@ -104,20 +104,17 @@
         </template>
 
         <template v-slot:modal_footer>
-            <button @click="updateUser"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-primary text-white px-8 py-3 text-base font-medium hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg">
-                Save Changes
-            </button>
-            <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
-                @click="deactiveteModal">
+            <ModalSecondaryButton @click="deactivateModal">
                 Close
-            </button>
+            </ModalSecondaryButton>
+            <ModalPrimaryButton @click="updateUser">
+                Save Changes
+            </ModalPrimaryButton>
         </template>
 
     </Modal>
     <!-- Confirmation Delete Modal -->
-    <Modal :modalOpen="isDeleteModalOpen" @closeModal="deactiveteDeleteModal">
+    <Modal :modalOpen="isDeleteModalOpen" @closeModal="deactivateDeleteModal">
         <template v-slot:modal_header>
             Are you sure?
         </template>
@@ -127,14 +124,12 @@
             </div>
         </template>
         <template v-slot:modal_footer>
-            <button @click="deleteUser"
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-red-500 text-white px-8 py-3 text-base font-medium hover:bg-red-600 hover:text-white md:py-3 md:px-10 md:text-lg">
+            <ModalSecondaryButton @click="deactivateDeleteModal">
+                Close
+            </ModalSecondaryButton>
+            <ModalPrimaryButton @click="deleteUser" :deleteButton="true">
                 Delete
-            </button>
-            <button @click="deactiveteDeleteModal" class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 
-font-medium text-white hover:bg-gray-600 hover:text-white md:py-3 md:px-10 md:text-lg ml-2">
-                Cancel
-            </button>
+            </ModalPrimaryButton>
         </template>
     </Modal>
 </template>
@@ -147,6 +142,8 @@ import type User from '@/types/User';
 import type { AxiosResponse } from 'axios';
 import { onMounted, ref } from 'vue';
 import { useToast } from "vue-toastification";
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
+import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
 
 const toast = useToast();
 const users = ref<User[]>([]);
@@ -163,10 +160,10 @@ onMounted(() => {
 })
 
 // Close Modals
-const deactiveteModal = () => {
+const deactivateModal = () => {
     isModalOpen.value = false;
 }
-const deactiveteDeleteModal = () => {
+const deactivateDeleteModal = () => {
     isDeleteModalOpen.value = false;
 }
 
@@ -203,14 +200,14 @@ const deleteUser = async () => {
         });
         if (response.data.affected === 1) {
             toast.success('User deleted successfully');
-            deactiveteDeleteModal();
+            deactivateDeleteModal();
             getUsersList();
             return
         }
         toast.error('Something went wrong. Please try again later');
     } catch (error: any) {
         toast.error(`Something went wrong. Please try again later. \n${error.response.data.message}`);
-        deactiveteDeleteModal();
+        deactivateDeleteModal();
     }
 }
 
@@ -225,14 +222,14 @@ const updateUser = async () => {
         });
         if (response.data.affected === 1) {
             toast.success('User updated successfully');
-            deactiveteModal();
+            deactivateModal();
             getUsersList();
             return
         }
         toast.error('Something went wrong. Please try again later');
     } catch (error: any) {
         toast.error('Something went wrong. Please try again later', error);
-        deactiveteModal();
+        deactivateModal();
     }
 }
 </script>

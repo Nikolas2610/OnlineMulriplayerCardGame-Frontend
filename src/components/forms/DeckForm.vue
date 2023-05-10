@@ -13,11 +13,10 @@
             <input id="private" type="checkbox" v-model="deck.private" class="" />
         </div>
 
-        <div class="flex justify-center">
-            <button class="mt-4 mr-2 btn-grey" type="button" v-if="edit" @click="$emit('closeEditMode')">Back</button>
-            <button class="mt-4 btn-outline-green" @click="openModal" type="button">Add or Remove Cards</button>
-            <button class="mt-4 ml-2 btn-green" type="submit">Submit</button>
-        </div>
+        <Flex justify="center" :gap="4">
+            <SecondaryButton title="Edit cards deck" @click="openModal" />
+            <PrimaryButton title="Submit" type="submit" />
+        </Flex>
         <h1 class="mt-4 text-lg font-medium">Card List:</h1>
         <div class="mt-4 grid grid-cols-8 gap-2 px-4 py-8 border rounded-lg shadow-lg">
             <div class="col-span-1 flex justify-center items-center flex-col gap-2" v-for="card in deck.cards"
@@ -53,11 +52,9 @@
             </div>
         </template>
         <template v-slot:modal_footer>
-            <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
-                @click="deactivateModal">
+            <ModalSecondaryButton @click="deactivateModal">
                 Close
-            </button>
+            </ModalSecondaryButton>
         </template>
     </Modal>
 </template>
@@ -65,18 +62,22 @@
 <script setup lang="ts">
 import type CreateDeck from '@/types/decks/CreateDeck'
 import Modal from '@/components/Modal.vue';
-import { ref, watch, onMounted, onBeforeMount } from 'vue';
+import { ref, watch, onBeforeMount } from 'vue';
 import type Card from '@/types/cards/Card';
 import axiosUser from '@/plugins/axiosUser';
 import type { AxiosResponse } from 'axios';
 import { loadImage } from '@/utils/helpers';
 import { useToast } from 'vue-toastification';
+import PrimaryButton from '../buttons/PrimaryButton.vue';
+import SecondaryButton from '../buttons/SecondaryButton.vue';
+import Flex from '../wrappers/Flex.vue';
+import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
 
 const cardsPublic = ref('user');
 const isModalOpen = ref<Boolean>(false);
 const cards = ref<Card[]>();
 const selectedCards = ref<number[]>([]);
-const emit = defineEmits(['sendData', 'closeEditMode']);
+const emit = defineEmits(['sendData']);
 const props = defineProps(['successResponse', 'deckData', 'edit']);
 const toast = useToast();
 

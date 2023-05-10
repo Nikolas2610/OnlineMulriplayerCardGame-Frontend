@@ -22,11 +22,9 @@
         </template>
 
         <template v-slot:modal_footer>
-            <button
-                class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-400 px-8 py-3 text-base font-medium text-white hover:bg-secondary hover:text-white md:py-3 md:px-10 md:text-lg ml-2"
-                @click="$emit('closeModal')">
+            <ModalSecondaryButton @click="$emit('closeModal')">
                 Close
-            </button>
+            </ModalSecondaryButton>
         </template>
 
     </Modal>
@@ -40,6 +38,7 @@ import type { TableCard } from '@/types/tables/TableCard';
 import Flex from '../wrappers/Flex.vue';
 import { loadImage } from '@/utils/helpers';
 import { TableDeckType } from '@/types/tables/TableDeckType';
+import ModalSecondaryButton from '../buttons/ModalSecondaryButton.vue';
 
 const props = defineProps({
     isModalOpen: { type: Boolean, required: true },

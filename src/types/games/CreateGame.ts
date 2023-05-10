@@ -1,9 +1,7 @@
 export default interface CreateGame {
     name: string;
     description: string;
-    extra_roles: boolean;
-    status_player: boolean;
-    extra_teams: boolean;
+    auto_turn: boolean;
     private: boolean;
     grid_rows: number;
     grid_cols: number;

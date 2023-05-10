@@ -232,6 +232,17 @@ const uploadMultipleCards = async () => {
 
 // Upload single card
 const saveCard = async (card: CreateCard, image: any) => {
+    // Validate the form 
+    if (card.name.length < 3) {
+        toast.error('The card name must have at least 4 characters');
+        return;
+    }
+
+    if (!image.file) {
+        toast.error('You have to choose an image to upload');
+        return;
+    }
+
     // Create a new FormData object to store the image data and card details
     const formData = new FormData();
     formData.append('image', image.file, image.name);
