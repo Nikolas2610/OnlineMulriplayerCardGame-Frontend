@@ -15,7 +15,7 @@
                 Previous game: <span class="text-primary font-bold">{{ playerStore.leaverPlayer.table.name }}</span>
             </div>
             <div>
-                <PrimaryButton title="Resume Game" @click="joinRoom(playerStore.leaverPlayer.table)" />
+                <PrimaryButton title="Resume Game" @click="joinRoom(playerStore.leaverPlayer.table as Table)" v-if="playerStore.leaverPlayer && playerStore.leaverPlayer.table" />
             </div>
         </Flex>
 
