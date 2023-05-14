@@ -81,7 +81,7 @@ export const useUserStore = defineStore("UserStore", {
                 }
                 return null;
             } catch (error) {
-                console.log(error);
+                process.env.NODE_ENV === 'development' ? console.log(error) : ''
             }
         },
         async forgotPassword(user: UserForgotPassword) {

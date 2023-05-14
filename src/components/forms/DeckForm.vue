@@ -72,6 +72,7 @@ import PrimaryButton from '../buttons/PrimaryButton.vue';
 import SecondaryButton from '../buttons/SecondaryButton.vue';
 import Flex from '../wrappers/Flex.vue';
 import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
+import router from '@/router';
 
 const cardsPublic = ref('user');
 const isModalOpen = ref<Boolean>(false);
@@ -114,10 +115,12 @@ const getCards = async () => {
         const response: AxiosResponse = await axiosUser.get(`card/${cardsPublic.value}`);
         cards.value = response.data;
         if (cards.value?.length === 0) {
-            toast.warning('First you have to create card before choose cards for the deck')
+            toast.warning('First you have to create card before choose cards for the deck');
+            isModalOpen.value = false;
+            router.push({ name: 'create-card' })
         }
     } catch (error) {
-        console.log(error);
+        process.env.NODE_ENV === 'development' ? console.log(error) : ''
     }
 }
 
@@ -164,6 +167,4 @@ watch(() => props.successResponse,
 );
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -39,11 +39,10 @@
                             @change="(e) => { gameStore.createGame.game.private = e; gameStore.stepFormChange() }" />
                     </GridColItem>
                     <GridColItem :xs="2">
-                        <CheckBoxField
-                            title="Auto Next Player *"
-                            :input="gameStore.createGame.game.auto_turn" class="py-2"
+                        <CheckBoxField title="Auto Next Player *" :input="gameStore.createGame.game.auto_turn" class="py-2"
                             @change="(e) => { gameStore.createGame.game.auto_turn = e; gameStore.stepFormChange() }" />
-                        <div class="text-black text-sm">*Effortlessly transition between turns for a fluid and engaging gameplay experience.</div>
+                        <div class="text-black text-sm">*Effortlessly transition between turns for a fluid and engaging
+                            gameplay experience.</div>
                     </GridColItem>
                 </GridCol>
             </div>
@@ -140,8 +139,10 @@ const submit = async () => {
 }
 
 gameStore.fetchDecks().then(decks => {
-    userDecks.value = decks.filter((deck: DeckReturn) => deck.creator === userStore.user.username);
-    publicDecks.value = decks.filter((deck: DeckReturn) => deck.creator !== userStore.user.username);
+    if (decks) {
+        userDecks.value = decks.filter((deck: DeckReturn) => deck.creator === userStore.user.username);
+        publicDecks.value = decks.filter((deck: DeckReturn) => deck.creator !== userStore.user.username);
+    }
 })
 
 onUnmounted(() => {

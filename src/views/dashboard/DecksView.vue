@@ -131,7 +131,7 @@ const getDecksList = async () => {
         const response: AxiosResponse = await axiosUser.get(`${role.value}/decks`);
         decks.value = response.data;
     } catch (error) {
-        console.log(error);
+        process.env.NODE_ENV === 'development' ? console.log(error) : ''
     }
 }
 // Open view details modal

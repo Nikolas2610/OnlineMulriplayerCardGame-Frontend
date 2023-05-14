@@ -56,7 +56,7 @@ export const useGameStore = defineStore("GameStore", {
                 this.$state.games = games;
                 this.$state.loading = false;
             } catch (error) {
-                console.log(error)
+                process.env.NODE_ENV === 'development' ? console.log(error) : ''
             }
         },
         async fetchDecks() {
@@ -73,7 +73,12 @@ export const useGameStore = defineStore("GameStore", {
                 this.$state.loading = false;
                 return decks;
             } catch (error: any) {
-                console.log(error)
+                this.$state.loading = false;
+                if (error?.response?.data?.message === 'Error occurred while fetching decks') {
+                    toast.warning("First you have to create deck before create game");
+                    router.push({ name: 'create-deck' })
+                }
+                process.env.NODE_ENV  === 'development' ? console.log(error) : ''
             }
         },
         toggleEditGame(index: number) {

@@ -55,11 +55,7 @@ const getData = async () => {
         const response: AxiosResponse = await axiosUser.get(`${role.value}/dashboard`);
         data.value = response.data;
     } catch (error) {
-        console.log(error);
+        process.env.NODE_ENV === 'development' ? console.log(error) : ''
     }
 }
 </script>
-
-<style scoped>
-
-</style>

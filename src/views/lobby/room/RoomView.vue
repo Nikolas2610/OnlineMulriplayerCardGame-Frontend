@@ -30,7 +30,7 @@
         @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)"
         @shuffle-deck="playerStore._shuffleDeck()"
         @history-movement="(movement) => playerStore.historyMovement(movement)" />
-    <ModalFullPage :table-users="playerStore.table?.table_users" v-if="playerStore.gameMaster"
+    <ModalFullPage :table-users="playerStore.table?.table_users" v-if="playerStore.gameMaster && playerStore.table?.table_users"
         :table-status="{ status: playerStore.table?.status }" :table="playerStore.table || undefined"
         :modal-open="modalOpen" @close-modal="modalOpen = false"
         @update-turn-table-users="(event) => playerStore._updateTurnTableUsers(event)"
@@ -123,8 +123,6 @@ onBeforeMount(() => {
             // TODO: Add the usernames of the leavers to the screen
             if (playerStore.table.status === TableStatus.PLAYER_DISCONNECTED || playerStore.table.status === TableStatus.PLAYER_LEAVE) {
                 leaverUsers.value = playerStore.table.table_users?.filter(user => user.socket_status === SocketStatus.LEAVE || user.socket_status === SocketStatus.DISCONNECT).map(user => user.user.username ?? null) ?? [];
-
-                console.log(leaverUsers.value);
             }
 
             if (playerStore.table.status === TableStatus.PLAYING) {

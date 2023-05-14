@@ -15,7 +15,8 @@
                 Previous game: <span class="text-primary font-bold">{{ playerStore.leaverPlayer.table.name }}</span>
             </div>
             <div>
-                <PrimaryButton title="Resume Game" @click="joinRoom(playerStore.leaverPlayer.table as Table)" v-if="playerStore.leaverPlayer && playerStore.leaverPlayer.table" />
+                <PrimaryButton title="Resume Game" @click="joinRoom(playerStore.leaverPlayer.table as Table)"
+                    v-if="playerStore.leaverPlayer && playerStore.leaverPlayer.table" />
             </div>
         </Flex>
 
@@ -62,7 +63,8 @@
             :actions="true">
             <DarkTableRow v-for="(table, i) in filterTables" :key="`lobby-row-${table.id}`"
                 class="cursor-pointer transition duration-1000" @click="handleSelectTable(i, table)"
-                :class="[selectTable === i ? 'bg-gray-700' : '',table.creator?.id === userStore.user.id ? 'bg-[#222]' : '']" @mouseover="hoverItem = i" @mouseleave="hoverItem = -1">
+                :class="[selectTable === i ? 'bg-gray-700' : '', table.creator?.id === userStore.user.id ? 'bg-[#222]' : '']"
+                @mouseover="hoverItem = i" @mouseleave="hoverItem = -1">
                 <DarkTableCell class="w-2/12">
                     {{ table.name }}
                 </DarkTableCell>
@@ -110,7 +112,7 @@
                             </template>
                         </VTooltip>
                         <VTooltip v-if="hoverItem === i && table.creator?.id === userStore.user.id">
-                            <RemoveButton @click="playerStore._removeTable()"  />
+                            <RemoveButton @click="playerStore._removeTable()" />
                             <template #popper>
                                 Remove Table
                             </template>
@@ -205,8 +207,8 @@ onBeforeMount(() => {
         isOpenModalSetGuestUsername.value = true;
     }
     // Get active tables
-    socket.emit('getAllOnlineTable', {}, (response: { tables: Table[], countUsers: CountUsers }) => {
-        tables.value = filterTables.value = response.tables;
+    socket.emit('getAllOnlineTable', {}, (response: { tables: Table[] | [], countUsers: CountUsers }) => {
+        tables.value = filterTables.value = response.tables ?? [];
         usersOnline.value = response.countUsers;
     });
 

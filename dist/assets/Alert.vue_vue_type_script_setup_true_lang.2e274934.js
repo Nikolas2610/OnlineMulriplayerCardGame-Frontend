@@ -1,1 +1,0 @@
-import{_ as t}from"./Flex.vue_vue_type_script_setup_true_lang.84cb6120.js";import{d as o,o as s,L as a,l as r,i as l,M as n}from"./index.542ccea8.js";const _={class:"bg-info w-full px-8 py-3 text-white italic rounded-lg"},f=o({__name:"Alert",setup(i){return(e,c)=>(s(),a(t,null,{default:r(()=>[l("div",_,[n(e.$slots,"default")])]),_:3}))}});export{f as _};
