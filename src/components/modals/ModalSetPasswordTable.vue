@@ -7,7 +7,7 @@
         <template v-slot:body>
             <Flex>
                 <InputField title="Table Password" :input="table.password" @change="(value) => table.password = value"
-                    :errors="v$.password.$errors" />
+                    :errors="v$.password.$errors" @keyup.enter="setPasswordTable()" />
             </Flex>
         </template>
 

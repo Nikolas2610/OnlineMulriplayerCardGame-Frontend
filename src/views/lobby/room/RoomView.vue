@@ -347,6 +347,7 @@ onUnmounted(() => {
     playerStore.cards = null;
     playerStore.refUndoHistory = [];
     playerStore.refRedoHistory = [];
+    playerStore.leaverPlayer.table = null;
     if (!forceQuit.value) {
         playerStore._leaveTable();
     }

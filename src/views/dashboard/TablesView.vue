@@ -32,8 +32,14 @@
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                                 {{ table.private ? 'YES' : 'NO' }}
                                             </td>
-                                            <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
-                                                {{ table.status }}
+                                            <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white" :class="[
+                                                table.status === TableStatus.WAITING ? 'text-blue-500' : '',
+                                                table.status === TableStatus.PLAYING || table.status === TableStatus.FINISH ? 'text-primary' : '',
+                                                table.status === TableStatus.PLAYER_DISCONNECTED || table.status === TableStatus.PLAYER_LEAVE ? 'text-red-500' : '',
+                                                table.status === TableStatus.PAUSE || table.status === TableStatus.GAME_MASTER_EDIT ? 'text-orange-500' : '',
+                                            ]">
+                                                {{ (StatusTable.find(item => item.id === table.status)?.name) || 'Unknown'
+                                                }}
                                             </td>
                                             <td class="py-4 px-6 text-sm font-medium whitespace-nowrap text-white">
                                                 {{ table.game?.name }}
@@ -105,6 +111,8 @@ import BackButton from '@/components/buttons/BackButton.vue';
 import Flex from '@/components/wrappers/Flex.vue';
 import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
 import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
+import { StatusTable } from '@/utils/StatusTable';
+import { TableStatus } from '@/types/tables/TableStatus.enum';
 
 const route = useRoute();
 const tableStore = useTableStore();

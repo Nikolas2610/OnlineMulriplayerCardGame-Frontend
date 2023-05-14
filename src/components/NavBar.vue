@@ -2,7 +2,8 @@
     <nav class="bg-dark border-gray-200 px-2 sm:px-4 py-2.5" style="height: 3.8rem;">
         <div class="container flex flex-wrap justify-between items-center mx-auto">
             <RouterLink :to="{ name: 'home' }" class="flex items-center">
-                <span class="self-center text-xl font-semibold whitespace-nowrap text-white hover:text-primary">OMCD</span>
+                <span
+                    class="self-center text-xl font-semibold whitespace-nowrap text-white hover:text-primary transition duration-300">OMCD</span>
             </RouterLink>
             <div class="flex lg:order-2">
                 <RouterLink :to="{ name: 'login' }" type="button" v-if="!userStore.isUser"
@@ -39,15 +40,17 @@
                     class="flex flex-col my-4 lg:my-0 rounded-lg lg:flex-row lg:space-x-8 lg:mt-0 lg:text-sm lg:font-medium lg:border-0">
                     <li v-for="{ id, title, path, registerUser } in navbar_items" :key="id" class="cursor-pointer">
                         <RouterLink :to="{ name: path }" v-if="registerUser ? (userStore.authToken ? true : false) : true"
-                            class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0"
-                            aria-current="page">
+                            class="block py-2 pr-4 pl-3 text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0 transition duration-300"
+                            aria-current="page"
+                            :class="route.matched.slice(0, -1)[0]?.name === path ? 'text-primary' : 'text-white'">
                             {{ title }}
                         </RouterLink>
                     </li>
                     <li class="cursor-pointer">
                         <RouterLink :to="{ name: 'admin' }" v-if="userStore.isAdmin"
-                            class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0"
-                            aria-current="page">
+                            class="block py-2 pr-4 pl-3 text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0 transition duration-300"
+                            aria-current="page"
+                            :class="route.matched.slice(0, -1)[0]?.name === 'admin' ? 'text-primary' : 'text-white'">
                             Admin
                         </RouterLink>
                     </li>
@@ -62,15 +65,15 @@
             <li v-for="{ id, title, path, registerUser } in navbar_items" :key="id" class="cursor-pointer"
                 @click="closeNavbar()">
                 <RouterLink :to="{ name: path }" v-if="registerUser ? (userStore.authToken ? true : false) : true"
-                    class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0"
-                    aria-current="page">
+                    class="block py-2 pr-4 pl-3 text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0"
+                    aria-current="page" :class="route.matched.slice(0, -1)[0]?.name === path ? 'text-primary' : 'text-white'">
                     {{ title }}
                 </RouterLink>
             </li>
             <li class="cursor-pointer" @click="closeNavbar()">
                 <RouterLink :to="{ name: 'admin' }" v-if="userStore.isAdmin"
-                    class="block py-2 pr-4 pl-3 text-white text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0"
-                    aria-current="page">
+                    class="block py-2 pr-4 pl-3 text-base hover:text-primary hover:bg-white lg:hover:bg-transparent bg-dark rounded lg:bg-transparent lg:p-0"
+                    aria-current="page" :class="route.matched.slice(0, -1)[0]?.name === 'admin' ? 'text-primary' : 'text-white'">
                     Admin
                 </RouterLink>
             </li>
@@ -81,7 +84,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/UserStore'
+import { useRoute } from 'vue-router';
+
 const userStore = useUserStore();
+const route = useRoute();
 
 const navbar_items = ref([
     // { id: 1, title: 'About', path: 'about', registerUser: false },
