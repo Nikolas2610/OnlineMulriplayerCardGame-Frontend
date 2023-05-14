@@ -2,23 +2,23 @@
     <form class="px-4 py-8" @submit.prevent="submit" v-if="!tableStore.loadingStatus">
         <GridCol :all="2" v-if="table" :gap="2">
             <GridColItem :all="2">
-                <InputField :input="table.name" :title="'Name'" :errors="v$.name.$errors" @change="(e) => table.name = e" />
+                <InputField :input="table.name" title="Name" :errors="v$.name.$errors" @change="(e) => table.name = e" />
             </GridColItem>
             <GridColItem :all="2">
                 <CheckBoxField :title="'Private'" :input="table.private" class="mb-3" @change="(e) => table.private = e" />
             </GridColItem>
             <GridColItem v-if="table.private" :all="2">
-                <InputField :input="table.password ? table.password : ''" :type="'password'" :title="'Password'"
+                <InputField :input="table.password ? table.password : ''" title="Password"
                     :errors="v$.password.$errors" @change="(e) => table.password = e" />
             </GridColItem>
             <GridColItem v-if="tableStore.games" :all="2">
-                <SelectField :title="'Game'"
+                <SelectField title="Game"
                     :input="tableStore.editTable ? { value: tableStore.edit.game?.id } : { value: tableStore.table.game }"
                     :options="tableStore.games.map((game) => ({ id: game.id, name: game.name }))"
                     @update="(value) => tableStore.updateSelectedGame(value)" :errors="v$.game.$errors" />
             </GridColItem>
             <GridColItem v-if="tableStore.editTable" :all="2">
-                <SelectField :title="'Status'" :input="{ value: tableStore.edit.status }"
+                <SelectField title="Status" :input="{ value: tableStore.edit.status }"
                     :options="StatusTable.map(value => ({ id: value.id, name: value.name }))"
                     @update="(value) => tableStore.edit.status = value" />
             </GridColItem>

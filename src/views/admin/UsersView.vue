@@ -226,9 +226,8 @@ const updateUser = async () => {
             getUsersList();
             return
         }
-        toast.error('Something went wrong. Please try again later');
     } catch (error: any) {
-        toast.error('Something went wrong. Please try again later', error);
+        toast.error(error.response?.data?.message ? error.response.data.message : 'Something went wrong. Please try again later');
         deactivateModal();
     }
 }

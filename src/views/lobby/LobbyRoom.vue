@@ -15,7 +15,7 @@
                 Previous game: <span class="text-primary font-bold">{{ playerStore.leaverPlayer.table.name }}</span>
             </div>
             <div>
-                <PrimaryButton title="Resume Game" @click="joinRoom()" />
+                <PrimaryButton title="Resume Game" @click="joinRoom(playerStore.leaverPlayer.table)" />
             </div>
         </Flex>
 
@@ -51,29 +51,28 @@
             <!-- Table Actions -->
             <GridColItem :all="1">
                 <Flex justify="end" :gap="2">
-                    <RemoveButton v-if="playerStore.table?.creator?.id === userStore.user.id"
-                        @click="playerStore._removeTable()" />
                     <PrimaryButton :title="'Create Table'" @click="openCreateTableModal()"
                         v-if="userStore.user.role !== Roles.guest"></PrimaryButton>
-                    <PrimaryButton :title="'Join Table'" :disable="selectTable === -1" @click="joinRoom()"></PrimaryButton>
                 </Flex>
             </GridColItem>
         </GridCol>
 
         <!-- Online tables -->
-        <DarkTable :table-headers="tablesFields" v-if="filterTables.length > 0" class="max-h-[490px] overflow-x-auto">
+        <DarkTable :table-headers="tablesFields" v-if="filterTables.length > 0" class="max-h-[490px] overflow-x-auto"
+            :actions="true">
             <DarkTableRow v-for="(table, i) in filterTables" :key="`lobby-row-${table.id}`"
-                @click="handleSelectTable(i, table)" :class="selectTable === i ? 'bg-gray-700' : ''">
-                <DarkTableCell>
+                class="cursor-pointer transition duration-1000" @click="handleSelectTable(i, table)"
+                :class="[selectTable === i ? 'bg-gray-700' : '',table.creator?.id === userStore.user.id ? 'bg-[#222]' : '']" @mouseover="hoverItem = i" @mouseleave="hoverItem = -1">
+                <DarkTableCell class="w-2/12">
                     {{ table.name }}
                 </DarkTableCell>
-                <DarkTableCell>
+                <DarkTableCell class="w-2/12">
                     {{ table.game?.name }}
                 </DarkTableCell>
-                <DarkTableCell>
+                <DarkTableCell class="w-1/12">
                     {{ table.table_users?.length ? table.table_users.length : 0 }} / {{ table.game?.max_players }}
                 </DarkTableCell>
-                <DarkTableCell>
+                <DarkTableCell class="w-1/12">
                     <Flex>
                         <div v-if="table.private">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -91,19 +90,39 @@
                         </div>
                     </Flex>
                 </DarkTableCell>
-                <DarkTableCell>
+                <DarkTableCell class="w-2/12" :class="table.creator?.id === userStore.user.id ? 'text-primary' : ''">
                     {{ table.creator?.username }}
                 </DarkTableCell>
-                <DarkTableCell :class="[
+                <DarkTableCell class="w-2/12 capitalize" :class="[
                     table.status === TableStatus.WAITING ? 'text-blue-500' : '',
                     table.status === TableStatus.PLAYING ? 'text-primary' : '',
                     table.status === TableStatus.PLAYER_DISCONNECTED || table.status === TableStatus.PLAYER_LEAVE ? 'text-red-500' : '',
                     table.status === TableStatus.PAUSE || table.status === TableStatus.GAME_MASTER_EDIT ? 'text-orange-500' : '',
-                ]" class="capitalize">
+                ]">
                     {{ (StatusTable.find(item => item.id === table.status)?.name) || 'Unknown' }}
+                </DarkTableCell>
+                <DarkTableCell class="w-2/2">
+                    <Flex :gap="2" class="w-full" justify="center">
+                        <VTooltip>
+                            <JoinButton @click="joinRoom(table)" />
+                            <template #popper>
+                                Join Table
+                            </template>
+                        </VTooltip>
+                        <VTooltip v-if="hoverItem === i && table.creator?.id === userStore.user.id">
+                            <RemoveButton @click="playerStore._removeTable()"  />
+                            <template #popper>
+                                Remove Table
+                            </template>
+                        </VTooltip>
+                    </Flex>
                 </DarkTableCell>
             </DarkTableRow>
         </DarkTable>
+
+        <Alert v-else class="mt-10">
+            No available tables to join. Create a table to start a game!
+        </Alert>
     </Container>
 
     <!-- Message for smaller devices -->
@@ -156,6 +175,8 @@ import { setOnlineSocketUser } from '@/utils/sockets/helpers';
 import { useTableStore } from '@/stores/TableStore';
 import { StatusTable } from '@/utils/StatusTable';
 import Footer from '@/components/Footer.vue';
+import JoinButton from '@/components/buttons/JoinButton.vue'
+import Alert from '@/components/ui/Alert.vue';
 
 const { width, height } = useWindowSize();
 const gameHeight = ref(parseInt(import.meta.env.VITE_GAME_HEIGHT));
@@ -163,6 +184,7 @@ const gameWidth = ref(parseInt(import.meta.env.VITE_GAME_WIDTH));
 
 const isOpenModalSetGuestUsername = ref(false);
 const isOpenModalSetTablePassword = ref(false);
+const hoverItem = ref(0);
 
 const router = useRouter()
 const userStore = useUserStore();
@@ -243,7 +265,8 @@ onBeforeMount(() => {
     })
 })
 
-const joinRoom = () => {
+const joinRoom = (table: Table) => {
+    playerStore.table = table;
     if (playerStore.table) {
         // Check if there is a user before join the room
         if (!userStore.user.id) {

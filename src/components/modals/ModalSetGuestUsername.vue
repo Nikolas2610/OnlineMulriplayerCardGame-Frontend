@@ -7,7 +7,7 @@
         <template v-slot:body>
             <Flex>
                 <InputField title="Nickname" :input="user.username" @change="(value) => user.username = value"
-                    :errors="v$.username.$errors" />
+                    :errors="v$.username.$errors" @keyup.enter="registerGuest()" />
             </Flex>
         </template>
 
