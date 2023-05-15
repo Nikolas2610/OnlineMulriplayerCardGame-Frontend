@@ -25,8 +25,6 @@
                 <div>{{ card.name }}</div>
             </div>
         </div>
-
-
     </form>
 
     <Modal :modalOpen="isModalOpen" @closeModal="deactivateModal">
@@ -36,13 +34,13 @@
         <template v-slot:body>
             <div>
                 <label for="role" class="block text-sm font-medium">Role</label>
-                <select id="role" v-model="cardsPublic"
+                <select id="role" v-model="typeCards"
                     class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-secondary focus:outline-none sm:text-sm">
                     <option value="user">User</option>
                     <option value="public">Public</option>
                 </select>
             </div>
-            <div class="grid grid-cols-4 mt-4 gap-2 max-h-96 overflow-y-scroll" v-if="cards">
+            <div class="grid grid-cols-4 mt-4 gap-2 max-h-96 overflow-y-scroll" v-if="cards && cards?.length > 0">
                 <div class="col-span-1 flex justify-center items-center flex-col cursor-pointer hover:bg-secondary hover:text-white rounded-lg p-2  transition duration-300"
                     @click="addSelectedCards(card)" :class="isSelectedCard(card.id) ? 'bg-primary' : ''"
                     v-for="card in cards" :key="card.id">
@@ -50,6 +48,7 @@
                     <div class="pt-2" :class="isSelectedCard(card.id) ? 'text-white' : ''">{{ card.name }}</div>
                 </div>
             </div>
+            <Alert v-else class="my-4">No available cards</Alert>
         </template>
         <template v-slot:modal_footer>
             <ModalSecondaryButton @click="deactivateModal">
@@ -73,14 +72,17 @@ import SecondaryButton from '../buttons/SecondaryButton.vue';
 import Flex from '../wrappers/Flex.vue';
 import ModalSecondaryButton from '@/components/buttons/ModalSecondaryButton.vue';
 import router from '@/router';
+import Alert from '../ui/Alert.vue';
 
-const cardsPublic = ref('user');
+const typeCards = ref('user');
 const isModalOpen = ref<Boolean>(false);
 const cards = ref<Card[]>();
 const selectedCards = ref<number[]>([]);
 const emit = defineEmits(['sendData']);
 const props = defineProps(['successResponse', 'deckData', 'edit']);
 const toast = useToast();
+const publicCards = ref<Card[]>([]);
+const userCards = ref<Card[]>([]);
 
 const deck = ref<CreateDeck>({
     name: '',
@@ -88,7 +90,11 @@ const deck = ref<CreateDeck>({
     cards: []
 })
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
+    // Fetch user cards and public cards
+    await getCards();
+    
+    // Fetch deck data for the edit deck
     if (props.deckData) {
         deck.value = { ...props.deckData };
         deck.value.cards = [...props.deckData.cards];
@@ -100,27 +106,45 @@ onBeforeMount(() => {
     }
 })
 
-// Close view details modal
+// Close edit cards modal
 const deactivateModal = () => {
     isModalOpen.value = false;
 }
 
+// Open edit cards modal
 const openModal = async () => {
-    await getCards();
-    isModalOpen.value = true;
+    if (userCards.value.length === 0 && publicCards.value.length === 0) {
+        toast.warning('First you have to create card before choose cards for the deck');
+        router.push({ name: 'create-card' })
+    } else {
+        isModalOpen.value = true;
+    }
 }
 
 const getCards = async () => {
     try {
-        const response: AxiosResponse = await axiosUser.get(`card/${cardsPublic.value}`);
-        cards.value = response.data;
-        if (cards.value?.length === 0) {
-            toast.warning('First you have to create card before choose cards for the deck');
-            isModalOpen.value = false;
-            router.push({ name: 'create-card' })
+        const response: AxiosResponse = await axiosUser.get(`card`);
+
+        if (response.status === 200) {
+            // Assign userCards.value and publicCards.value, defaulting to empty arrays if the properties are missing in response.data
+            userCards.value = response.data.userCards ?? [];
+            publicCards.value = response.data.publicCards ?? [];
+
+            if (userCards.value.length > 0) {
+                // If userCards have values, assign them to cards.value and return
+                cards.value = userCards.value;
+                return;
+            }
+
+            if (publicCards.value.length > 0) {
+                // If publicCards have values, set typeCards.value to 'public' and return
+                typeCards.value = 'public';
+                return;
+            }
         }
     } catch (error) {
-        process.env.NODE_ENV === 'development' ? console.log(error) : ''
+        toast.error('Failed to load the cards');
+        process.env.NODE_ENV === 'development' && console.log(error);
     }
 }
 
@@ -152,9 +176,13 @@ const resetDeck = () => {
     selectedCards.value = [];
 }
 
-watch(() => cardsPublic.value,
+watch(() => typeCards.value,
     (newVal) => {
-        getCards();
+        if (newVal === 'user') {
+            cards.value = userCards.value ?? []
+        } else {
+            cards.value = publicCards.value ?? []
+        }
     }
 );
 
@@ -166,5 +194,3 @@ watch(() => props.successResponse,
     }
 );
 </script>
-
-<style scoped></style>
