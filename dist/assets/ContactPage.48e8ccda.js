@@ -1,1 +1,0 @@
-import{_ as t}from"./_plugin-vue_export-helper.cdc0426e.js";import{o as e,c}from"./index.d3f9d735.js";const o={},s={class:"text-7xl text-center my-10"};function a(n,r){return e(),c("div",s," This is a contact page ")}const f=t(o,[["render",a]]);export{f as default};
