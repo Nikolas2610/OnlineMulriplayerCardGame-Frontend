@@ -114,7 +114,7 @@ const login = async () => {
     if (!v$.value.$error) {
         // Success Form
         const response: string = await userStore.login();
-        // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error
+        // ***Possible errors: The email does not exist | Wrong Password | Confirm your email first | Bad Request(Wrong fields) | Server Error   
         if (response === 'success') {
             setOnlineSocketUser(userStore.user.id);
             resetLoginForm();

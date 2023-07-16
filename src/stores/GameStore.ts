@@ -57,6 +57,8 @@ export const useGameStore = defineStore("GameStore", {
                 this.$state.loading = false;
             } catch (error) {
                 process.env.NODE_ENV === 'development' ? console.log(error) : ''
+            } finally {
+                this.$state.loading = false;
             }
         },
         async fetchDecks() {

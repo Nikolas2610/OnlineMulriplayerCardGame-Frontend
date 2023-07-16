@@ -105,14 +105,14 @@
                 </DarkTableCell>
                 <DarkTableCell class="w-2/2">
                     <Flex :gap="2" class="w-full" justify="center">
-                        <VTooltip>
+                        <VTooltip v-if="table.status === TableStatus.WAITING">
                             <JoinButton @click="joinRoom(table)" />
                             <template #popper>
                                 Join Table
                             </template>
                         </VTooltip>
-                        <VTooltip v-if="hoverItem === i && table.creator?.id === userStore.user.id">
-                            <RemoveButton @click="playerStore._removeTable()" />
+                        <VTooltip v-if="hoverItem === i && table.creator?.id === userStore.user.id && table.status === TableStatus.WAITING">
+                            <RemoveButton @click="playerStore._removeTable(table?.id)" />
                             <template #popper>
                                 Remove Table
                             </template>
@@ -269,28 +269,42 @@ onBeforeMount(() => {
 
 const joinRoom = (table: Table) => {
     playerStore.table = table;
-    if (playerStore.table) {
-        // Check if there is a user before join the room
-        if (!userStore.user.id) {
-            isOpenModalSetGuestUsername.value = true;
-            return
-        }
-        // Check if the table is private
-        if (playerStore.table.private) {
-            isOpenModalSetTablePassword.value = true;
-        } else {
-            if (playerStore.table.game?.max_players && playerStore.table?.table_users) {
-                if (playerStore.table?.table_users?.length < playerStore.table.game?.max_players) {
-                    // Remove previous table if exists
-                    playerStore.leaverPlayer.table = null;
-                    router.push({ name: 'room', params: { id: playerStore.table.public_url } })
-                } else {
-                    toast.error('The table is full')
-                };
-            }
+
+    if (!playerStore.table) {
+        return;
+    }
+
+    if (!userStore.user.id) {
+        isOpenModalSetGuestUsername.value = true;
+        return;
+    }
+
+    if (playerStore.table.private) {
+        isOpenModalSetTablePassword.value = true;
+        return;
+    }
+
+    if (!playerStore.table.game?.max_players || !playerStore.table?.table_users) {
+        return;
+    }
+
+    if (playerStore.table?.table_users?.length < playerStore.table.game?.max_players) {
+        playerStore.leaverPlayer.table = null;
+        router.push({ name: 'room', params: { id: playerStore.table.public_url } });
+        return;
+    }
+
+    if (playerStore.leaverPlayer?.table && table?.table_users) {
+        const user = table?.table_users.find(user => user.user.id === userStore.user.id);
+        if (user) {
+            playerStore.leaverPlayer.table = null;
+            router.push({ name: 'room', params: { id: playerStore.table.public_url } });
+            return;
         }
     }
-}
+
+    toast.error('The table is full');
+};
 
 const validatePassword = async (password: string) => {
     await playerStore._validateTablePassword(password).then((response) => {

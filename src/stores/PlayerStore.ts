@@ -42,7 +42,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
             },
             refUndoHistory: [] as TableCard[],
             refRedoHistory: [] as TableCard[],
-            refHistoryCapacity: 10 as number,
+            refHistoryCapacity: 30 as number,
             rank: {
                 notification: false,
                 isRankModalOpen: false
@@ -102,7 +102,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 userId, tableId: this.$state.table?.id, publicUrl: this.$state.table?.public_url
             }, (response: TableUsers | any) => {
                 if (response.socket_status === SocketStatus.LEAVE) {
-                    this.$state.leaverPlayer.table = response.table;
+                    this.$state.leaverPlayer.table = this.$state.table;
                 }
                 // Catch the error
                 if (response.error) {
@@ -111,9 +111,9 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 }
             });
         },
-        _removeTable() {
+        _removeTable(tableId: number) {
             socket.emit('removeTable', {
-                tableId: this.$state.table?.id
+                tableId
             }, (response: any) => {
                 if (response.affected === 1) {
                     toast.success(`Table ${this.$state.table?.name} deleted successfully`);
@@ -287,6 +287,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 let width = 50;
                 this.$state.cards?.forEach(card => {
                     if (card.table_deck.id === previousDeck) {
+
+                        // Create a deep copy of the card's state before modifications
+                        const previousCardState = JSON.parse(JSON.stringify(card));
+
                         card.table_deck.id = newDeck.id;
                         if (newDeck.type === TableDeckType.DECK || newDeck.type === TableDeckType.JUNK) {
                             // For the decks set position to 0
@@ -299,6 +303,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
                             card.position_y = width;
                             width += 50;
                         }
+                        this.updateUndoHistory(previousCardState); // Pass the previous state to updateUndoHistory
                         this._updateCard(card);
                     }
                 })
@@ -495,17 +500,27 @@ export const usePlayerStore = defineStore('PlayerStore', {
         },
         cardToPlayer(deckId: number) {
             if (this.$state.clickCardId && this.isCardAvailableForAction()) {
-                const card = this.$state.cards?.find(c => c.id === this.$state.clickCardId);
+                let card: typeof this.$state.cards[0] | undefined; // Declare card with a type
+                this.$state.cards?.forEach(c => {
+                    if (c.id === this.$state.clickCardId) {
+                        card = c; // If match is found, assign c to card
+                    }
+                });
+
                 if (card && card.table_deck) {
                     if (card.table_deck.id !== undefined) {
                         this.$state.clickCardId = null;
-                        // Set zero values at card position
+
+                        // Create a deep copy of the card's state before modifications
+                        const previousCardState = JSON.parse(JSON.stringify(card));
+
+                        // Now, changes to card will not affect previousCardState
                         if (card.table_deck.type === TableDeckType.TABLE) {
                             card.position_x = 0;
                             card.position_y = 0;
                         }
                         card.table_deck.id = deckId;
-                        this.updateUndoHistory({ ...card });
+                        this.updateUndoHistory(previousCardState); // Pass the previous state to updateUndoHistory
                         this._updateCard(card);
                     }
                 }

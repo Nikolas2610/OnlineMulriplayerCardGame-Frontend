@@ -190,17 +190,32 @@
                                                 </div>
                                                 <div
                                                     class="w-1/6 text-red-500 cursor-pointer hover:text-red-600 transition duration-300 text-lg">
-                                                    <button @click="$emit('removePlayer', user.user.id)">Remove
+                                                    <button @click="$emit('removePlayer', user.user.id)"
+                                                        v-if="table?.status !== TableStatus.PLAYING">Remove
                                                         User</button>
                                                 </div>
                                             </Flex>
                                         </transition-group>
                                     </VueDraggableNext>
                                 </Flex>
+                                <div class="text-red-500 my-4" v-if="table?.status === TableStatus.PLAYING">*Note: You can
+                                    remove a user when then table is not in a playing mode</div>
                             </div>
 
                             <div v-if="selectedMenuItem === 3">
                                 <RankTable />
+                            </div>
+
+                            <div v-if="selectedMenuItem === 4 && table?.table_users">
+                                <Flex class="text-2xl underline underline-offset-4 mb-6 w-full" justify="between">
+                                    <div>
+                                        Winner
+                                    </div>
+                                </Flex>
+                                <SelectField
+                                    :options="table?.table_users?.map(user => ({ id: user.id, name: user.user.username || '' }))"
+                                    :dark="true"
+                                    title="Set the winner:" />
                             </div>
                         </div>
                     </Flex>
@@ -251,6 +266,7 @@ const menuItems = ref([
     { id: 1, name: 'Game' },
     { id: 2, name: 'Players' },
     { id: 3, name: 'Rank Table' },
+    { id: 4, name: 'Winner' },
 ])
 const selectedMenuItem = ref(1);
 

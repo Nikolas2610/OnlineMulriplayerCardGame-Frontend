@@ -8,7 +8,6 @@ import { useToast } from "vue-toastification";
 import { useUserStore } from "./UserStore";
 import socket from "@/plugins/socket";
 import router from "@/router";
-import type { LobbyTable } from "@/types/lobby/LobbyTable";
 import { usePlayerStore } from "./PlayerStore";
 const userStore = useUserStore();
 const toast = useToast();
@@ -40,8 +39,12 @@ export const useTableStore = defineStore('TableStore', {
         setUserRole(role: string) {
             this.$state.role = role;
         },
-        toggleLoading() {
-            this.$state.loading = !this.$state.loading;
+        toggleLoading(value: boolean | null) {
+            if (value) {
+                this.$state.loading = value;
+            } else {
+                this.$state.loading = !this.$state.loading;
+            }
         },
         updateSelectedGame(value: number) {
             this.$state.editTable ? this.$state.gameSelected = value : this.$state.table.game = value
@@ -53,16 +56,22 @@ export const useTableStore = defineStore('TableStore', {
             this.$state.table.password = ''
         },
         async fetchGames() {
-            this.toggleLoading();
-            const { data: games } = await axiosUser.get(this.$state.role === 'user' ? "game/private-public" : "admin/games");
-            this.$state.games = games;
-            this.toggleLoading();
+            try {
+                const { data: games } = await axiosUser.get(this.$state.role === 'user' ? "game/private-public" : "admin/games");
+                this.$state.games = games;
+            } catch (error) {
+                process.env.NODE_ENV === 'development' ? console.log(error) : ''
+            }
         },
-        async fetchTables() {
-            this.toggleLoading();
-            const response: AxiosResponse = await axiosUser.get(`${this.$state.role}/tables`);
-            this.$state.tables = response.data
-            this.toggleLoading();
+        async fetchTables() { 
+            this.toggleLoading(true);
+            try {
+                const response: AxiosResponse = await axiosUser.get(`${this.$state.role}/tables`);
+                this.$state.tables = response.data
+            } catch (error) {
+                process.env.NODE_ENV === 'development' ? console.log(error) : ''
+            }
+            this.toggleLoading(false);
         },
         async _submit() {
             const user_id = userStore.user.id;
@@ -83,7 +92,7 @@ export const useTableStore = defineStore('TableStore', {
         },
         async _update() {
             try {
-                this.toggleLoading();
+                this.toggleLoading(null);
                 this.$state.games.forEach(game => {
                     if (game.id === this.$state.gameSelected) {
                         this.$state.edit.game = game;
@@ -94,42 +103,42 @@ export const useTableStore = defineStore('TableStore', {
                     { table: this.$state.edit }
                 );
                 if (response.status === 200) {
-                    this.toggleLoading();
+                    this.toggleLoading(null);
                     toast.success(response.data.message);
                     this.$state.editTable = false;
                     this.fetchTables();
                 }
             } catch (error: any) {
-                this.toggleLoading();
+                this.toggleLoading(null);
                 toast.error(error)
             }
         },
         async _delete() {
             try {
-                this.toggleLoading();
+                this.toggleLoading(null);
                 const response: AxiosResponse = await axiosUser.delete(`${this.$state.role}/table`,
                     { data: { id: this.$state.selectedTableId } });
                 if (response.status === 200) {
                     toast.success(response.data.message);
-                    this.toggleLoading();
+                    this.toggleLoading(null);
                     this.fetchTables();
                 }
             } catch (error: any) {
-                this.toggleLoading();
+                this.toggleLoading(null);
                 toast.error(error)
             }
         },
         async _deleteTableDetails() {
             try {
-                this.toggleLoading();
+                this.toggleLoading(null);
                 const response: AxiosResponse = await axiosUser.delete(`${this.$state.role}/table/users`,
                     { data: { id: this.$state.edit.id } });
                 if (response.status === 200) {
                     toast.success('Table users has been successfully deleted');
-                    this.toggleLoading();
+                    this.toggleLoading(null);
                 }
             } catch (error: any) {
-                this.toggleLoading();
+                this.toggleLoading(null);
                 toast.error(error)
             }
         },

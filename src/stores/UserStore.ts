@@ -63,7 +63,7 @@ export const useUserStore = defineStore("UserStore", {
                 }
                 return 'success';
             } catch (err: any) {
-                return err.response ? err.response.data.error : err.message;
+                return err.response ? err.response?.data?.error : err.message;
             }
         },
         async logout() {

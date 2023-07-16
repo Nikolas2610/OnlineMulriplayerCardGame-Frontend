@@ -1,7 +1,7 @@
 <template>
     <Flex
         class="border text-white fixed bottom-32 rounded-3xl h-14 bg-dark py-0 transition duration-1000 group cursor-pointer z-[2147483639]"
-        :class="openMenu ? '-translate-x-[20px]' : '-translate-x-[685px] hover:-translate-x-[20px]'" items="center"
+        :class="openMenu ? '-translate-x-[20px]' : '-translate-x-[720px] hover:-translate-x-[20px]'" items="center"
         justify="center">
         <Flex class="border-r h-full px-6 pl-10" items="center" :gap="4">
             <!-- Play -->
@@ -237,12 +237,31 @@
                     </template>
                 </VTooltip>
             </Flex>
+
+            <!-- Set winner player -->
+            <Flex :justify="'center'" :items="'center'"
+                @click="playerStore.table?.status !== TableStatus.PLAYING ? '' : $emit('openSettings', 3)"
+                :class="playerStore.table?.status !== TableStatus.PLAYING ? 'cursor-not-allowed opacity-50' : ''"
+                class="hover:text-primary duration-300 transition">
+                <VTooltip distance="22">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="w-6 h-6 focus:outline-none" viewBox="0 0 16 16">
+                        <path
+                            d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935z" />
+                    </svg>
+
+                    <template #popper>
+                        Set the winner player
+                    </template>
+                </VTooltip>
+            </Flex>
         </Flex>
         <!-- Settings -->
         <Flex :justify="'center'" :items="'center'" class="px-8" @click="openMenu = !openMenu">
             <VTooltip distance="18">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" viewBox="0 0 16 16"
-                    class="hover:fill-primary transition duration-300 h-8 w-8 focus:outline-none" :class="openMenu ? 'animate-spin fill-primary' : ''">
+                    class="hover:fill-primary transition duration-300 h-8 w-8 focus:outline-none"
+                    :class="openMenu ? 'animate-spin fill-primary' : ''">
                     <path
                         d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" />
                     <path
