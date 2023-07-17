@@ -219,7 +219,7 @@ onBeforeMount(() => {
         playerStore.room = null;
         playerStore.gameMaster = false;
         playerStore.table = null;
-        playerStore.cards = null;
+        playerStore.cards = [];
         forceQuit.value = true;
         toast.info('Game master has remove you from the table')
         router.push({ name: 'lobby' })
@@ -351,7 +351,7 @@ const tableStatusMessage = ref([
 onUnmounted(() => {
     playerStore.room = null;
     playerStore.gameMaster = false;
-    playerStore.cards = null;
+    playerStore.cards = [];
     playerStore.refUndoHistory = [];
     playerStore.refRedoHistory = [];
     playerStore.leaverPlayer.table = null;

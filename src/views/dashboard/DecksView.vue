@@ -102,7 +102,7 @@ import ModalPrimaryButton from '@/components/buttons/ModalPrimaryButton.vue';
 const userStore = useUserStore();
 const route = useRoute()
 const toast = useToast();
-const isDeleteModalOpen = ref<Boolean>(false);
+const isDeleteModalOpen = ref<boolean>(false);
 const decks = ref<Deck[]>([]);
 const modalDeck = ref<Deck>();
 const selectedDeckId = ref<number | null>(null)

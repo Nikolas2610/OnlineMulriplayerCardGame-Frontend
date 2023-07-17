@@ -26,7 +26,7 @@ export const usePlayerStore = defineStore('PlayerStore', {
             table: null as Table | null,
             gameMaster: false,
             room: null as string | null,
-            cards: null as TableCard[] | null,
+            cards: [] as TableCard[],
             dropZones: {
                 table: [],
                 deck: [],
@@ -505,11 +505,13 @@ export const usePlayerStore = defineStore('PlayerStore', {
         cardToPlayer(deckId: number) {
             if (this.$state.clickCardId && this.isCardAvailableForAction()) {
                 let card: typeof this.$state.cards[0] | undefined; // Declare card with a type
-                this.$state.cards?.forEach(c => {
+                if (Array.isArray(this.$state.cards) && this.$state.cards.length > 0) {
+                  this.$state.cards.forEach(c => {
                     if (c.id === this.$state.clickCardId) {
-                        card = c; // If match is found, assign c to card
+                      card = c; // If match is found, assign c to card
                     }
-                });
+                  });
+                }
 
                 if (card && card.table_deck) {
                     if (card.table_deck.id !== undefined) {

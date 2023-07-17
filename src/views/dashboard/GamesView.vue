@@ -111,7 +111,7 @@ const gameStore = useGameStore();
 const route = useRoute()
 const userStore = useUserStore();
 const role = ref<string | null>('user');
-const isDeleteModalOpen = ref<Boolean>(false);
+const isDeleteModalOpen = ref<boolean>(false);
 const selectedGameId = ref<number | null>(null)
 const tablesFields = ref([
     'No', 'NAME', 'MAX PLAYERS', 'GRID', 'PRIVATE'

@@ -85,7 +85,7 @@ import router from '@/router';
 import Alert from '../ui/Alert.vue';
 
 const typeCards = ref('user');
-const isModalOpen = ref<Boolean>(false);
+const isModalOpen = ref<boolean>(false);
 const cards = ref<Card[]>();
 const selectedCards = ref<number[]>([]);
 const emit = defineEmits(['sendData']);
