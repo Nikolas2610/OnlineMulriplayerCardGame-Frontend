@@ -240,7 +240,7 @@
 
             <!-- Set winner player -->
             <Flex :justify="'center'" :items="'center'"
-                @click="playerStore.table?.status !== TableStatus.PLAYING ? '' : $emit('openSettings', 3)"
+                @click="playerStore.table?.status !== TableStatus.PLAYING ? '' : $emit('openSettings', 4)"
                 :class="playerStore.table?.status !== TableStatus.PLAYING ? 'cursor-not-allowed opacity-50' : ''"
                 class="hover:text-primary duration-300 transition">
                 <VTooltip distance="22">

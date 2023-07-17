@@ -63,7 +63,7 @@
     <PlayerSettings />
 
     <!-- Modal Zoom Card -->
-    <Modal :modal-open="playerStore.isCardDetailsModalOpen" @close-modal="playerStore.isCardDetailsModalOpen = false">
+    <Modal :buttonBlack="true" :modal-open="playerStore.isCardDetailsModalOpen" @close-modal="playerStore.isCardDetailsModalOpen = false">
         <template v-slot:modal_header>
             <div class="text-black">
                 Card Details
@@ -84,8 +84,30 @@
         </template>
     </Modal>
 
+    <!-- Modal Winner -->
+    <Modal :buttonBlack="true" :modal-open="playerStore.winner.isModalOpen"
+        @close-modal="playerStore.winner.isModalOpen = false; playerStore.winner.winnerPlayer = null">
+        <template v-slot:modal_header>
+            <div class="text-black">
+                Winner
+            </div>
+        </template>
+
+        <template v-slot:body>
+            <Flex justify="center" class="text-black text-5xl py-20">
+                Winner is <span class="text-primary font-semibold ml-3"> {{ playerStore.winner.winnerPlayer }}</span>
+            </Flex>
+        </template>
+
+        <template v-slot:modal_footer>
+            <ModalSecondaryButton @click="playerStore.winner.isModalOpen = false; playerStore.winner.winnerPlayer = null">
+                Close
+            </ModalSecondaryButton>
+        </template>
+    </Modal>
+
     <!-- Modal View Player Rank -->
-    <Modal :modal-open="playerStore.rank.isRankModalOpen" @close-modal="playerStore.rank.isRankModalOpen = false"
+    <Modal :buttonBlack="true" :modal-open="playerStore.rank.isRankModalOpen" @close-modal="playerStore.rank.isRankModalOpen = false"
         class="z-[2147483641]">
         <template v-slot:modal_header>
             <div class="text-black">

@@ -212,10 +212,17 @@
                                         Winner
                                     </div>
                                 </Flex>
-                                <SelectField
-                                    :options="table?.table_users?.map(user => ({ id: user.id, name: user.user.username || '' }))"
-                                    :dark="true"
-                                    title="Set the winner:" />
+                                <form
+                                    @submit.prevent="$emit('setWinnerPlayer', selectedWinnerPlayer); $emit('closeModal'); selectedWinnerPlayer = null">
+                                    <SelectField
+                                        :options="table?.table_users?.map(user => ({ id: user.id, name: user.user.username || '' }))"
+                                        :dark="true" title="Set the winner:"
+                                        @update="(value) => selectedWinnerPlayer = value" />
+                                    <Flex justify="center" class="my-6">
+                                        <PrimaryButton type="submit" title="Confirm"
+                                            :disable="selectedWinnerPlayer === null" />
+                                    </Flex>
+                                </form>
                             </div>
                         </div>
                     </Flex>
@@ -236,6 +243,7 @@ import type { Table } from '@/types/tables/Table'
 import { TableStatus } from '@/types/tables/TableStatus.enum';
 import CheckBoxField from '../ui/CheckBoxField.vue';
 import RankTable from '../game-master/RankTable.vue';
+import PrimaryButton from '../buttons/PrimaryButton.vue';
 
 const emit = defineEmits([
     'closeModal',
@@ -249,7 +257,8 @@ const emit = defineEmits([
     'updateTableGameStatus',
     'showAllCards',
     'removePlayer',
-    'setNextPlayer'
+    'setNextPlayer',
+    'setWinnerPlayer'
 ]);
 const props = defineProps({
     modalOpen: { type: Boolean },
@@ -269,6 +278,7 @@ const menuItems = ref([
     { id: 4, name: 'Winner' },
 ])
 const selectedMenuItem = ref(1);
+const selectedWinnerPlayer = ref<number | null>(null);
 
 
 const updateTurn = (event: any) => {

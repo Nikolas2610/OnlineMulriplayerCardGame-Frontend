@@ -52,6 +52,10 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 loading: false,
             },
             isCardDetailsModalOpen: false,
+            winner: {
+                winnerPlayer: 'Nikolas' as string | null,
+                isModalOpen: false,
+            }
         }
     },
     getters: {
@@ -542,6 +546,15 @@ export const usePlayerStore = defineStore('PlayerStore', {
                 return true;
             }
             return false;
+        },
+        _setWinnerPlayer(selectedWinnerPlayer: number) {
+            const user = this.$state.table?.table_users?.find(user => user.id === selectedWinnerPlayer);
+            const username = user?.user?.username;
+            if (username) {   
+                socket.emit('setPlayerWinner', {
+                    username, room: this.$state.room
+                });
+            }
         }
     },
 })

@@ -30,7 +30,8 @@
         @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)"
         @shuffle-deck="playerStore._shuffleDeck()"
         @history-movement="(movement) => playerStore.historyMovement(movement)" />
-    <ModalFullPage :table-users="playerStore.table?.table_users" v-if="playerStore.gameMaster && playerStore.table?.table_users"
+    <ModalFullPage :table-users="playerStore.table?.table_users"
+        v-if="playerStore.gameMaster && playerStore.table?.table_users"
         :table-status="{ status: playerStore.table?.status }" :table="playerStore.table || undefined"
         :modal-open="modalOpen" @close-modal="modalOpen = false"
         @update-turn-table-users="(event) => playerStore._updateTurnTableUsers(event)"
@@ -41,7 +42,8 @@
         @update-table-game-status="(status) => playerStore._updateTableGameStatus(status)"
         @show-all-cards="playerStore._showAllCards()" :menu-tab="modalFullPageMenuTabProp"
         @remove-player="(userId) => playerStore._removePlayer(userId)"
-        @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)" />
+        @set-next-player="(nextPlayer: boolean) => playerStore._setNextPlayer(nextPlayer)"
+        @set-winner-player="(selectedWinnerPlayer: number) => playerStore._setWinnerPlayer(selectedWinnerPlayer)" />
     <ModalViewAllCards :is-modal-open="modalOpenViewAllCards" :cards="playerStore.cards"
         :table-decks="playerStore.table?.table_decks" @close-modal="modalOpenViewAllCards = false"
         v-if="playerStore.cards && playerStore.table?.table_decks" />
@@ -293,6 +295,13 @@ onBeforeMount(() => {
 
         // Show to the user notification for the rank
         playerStore.rank.notification = true;
+    });
+
+    socket.on('showWinnerModal', (response: string) => {
+        if (response) {
+            playerStore.winner.winnerPlayer = response;
+            playerStore.winner.isModalOpen = true;
+        }
     })
 });
 

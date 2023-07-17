@@ -23,8 +23,8 @@ export const useUserStore = defineStore("UserStore", {
                 role: null
             } as UserState,
             userLogin: {
-                email: process.env.NODE_ENV  === 'development' ? 'admin@omcg.com' : '',
-                password: process.env.NODE_ENV  === 'development' ? 'CardGame-0' : '',
+                email: process.env.NODE_ENV === 'development' ? 'admin@omcg.com' : '',
+                password: process.env.NODE_ENV === 'development' ? 'CardGame-0' : '',
             } as UserLogin,
             userRegister: {
                 username: '',
@@ -39,8 +39,8 @@ export const useUserStore = defineStore("UserStore", {
         authToken: (state) => state.user.token === null ? false : true,
         isAdmin: (state) => state.user.role === 'admin',
         getToken: (state) => state.user.token,
-        userLoginCredentials: (state) => state.userLogin, 
-        isUser: (state) => state.user.role === 'admin' || state.user.role === 'user', 
+        userLoginCredentials: (state) => state.userLogin,
+        isUser: (state) => state.user.role === 'admin' || state.user.role === 'user',
         getSocketId: (state) => state.socket_id,
         isGuest: (state) => state.user.role === 'guest',
     },

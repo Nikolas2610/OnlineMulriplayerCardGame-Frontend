@@ -72,7 +72,7 @@
                     {{ table.game?.name }}
                 </DarkTableCell>
                 <DarkTableCell class="w-1/12">
-                    {{ table.table_users?.length ? table.table_users.length : 0 }} / {{ table.game?.max_players }}
+                    <span :class="table.table_users?.length && table.table_users.length > 0 ? 'text-primary' : ''">{{ table.table_users?.length ? table.table_users.length : 0 }}</span> / {{ table.game?.max_players }}
                 </DarkTableCell>
                 <DarkTableCell class="w-1/12">
                     <Flex>

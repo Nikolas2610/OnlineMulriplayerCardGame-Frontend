@@ -9,6 +9,7 @@
                             <slot name="modal_header"></slot>
                             <button
                                 class="cursor-pointer transition duration-300 hover:text-white rounded-3xl hover:bg-black"
+                                :class="buttonBlack ? 'text-black' : ''"
                                 @click="$emit('closeModal')">
                                 <svg fill="currentColor" class="w-7 h-7" viewBox="0 0 16 16">
                                     <path
@@ -36,9 +37,10 @@ import Flex from './wrappers/Flex.vue';
 
 const emit = defineEmits(['closeModal']);
 
-const props = defineProps<{
-    modalOpen: Boolean
-}>()
+const props = defineProps({
+    modalOpen: { type: Boolean, default: false },
+    buttonBlack: { type: Boolean, default: false },
+})
 
 const modal = ref(null)
 

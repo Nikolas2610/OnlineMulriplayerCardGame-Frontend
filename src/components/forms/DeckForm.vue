@@ -40,6 +40,16 @@
                     <option value="public">Public</option>
                 </select>
             </div>
+            <Flex :gap="4">
+                <div @click="selectAllCards"
+                    class="underline py-2 cursor-pointer hover:text-primary transition duration-300">
+                    Select All
+                </div>
+                <div @click="removeAllCards"
+                    class="underline py-2 cursor-pointer hover:text-primary transition duration-300">
+                    Remove All
+                </div>
+            </Flex>
             <div class="grid grid-cols-4 mt-4 gap-2 max-h-96 overflow-y-scroll" v-if="cards && cards?.length > 0">
                 <div class="col-span-1 flex justify-center items-center flex-col cursor-pointer hover:bg-secondary hover:text-white rounded-lg p-2  transition duration-300"
                     @click="addSelectedCards(card)" :class="isSelectedCard(card.id) ? 'bg-primary' : ''"
@@ -93,7 +103,7 @@ const deck = ref<CreateDeck>({
 onBeforeMount(async () => {
     // Fetch user cards and public cards
     await getCards();
-    
+
     // Fetch deck data for the edit deck
     if (props.deckData) {
         deck.value = { ...props.deckData };
@@ -172,6 +182,21 @@ const saveDeck = () => {
 const resetDeck = () => {
     deck.value.name = '';
     deck.value.private = false;
+    deck.value.cards = [];
+    selectedCards.value = [];
+}
+
+const selectAllCards = () => {
+    if (typeCards.value === "user") {
+        selectedCards.value = userCards.value.map(card => card.id);
+        deck.value.cards = userCards.value;
+    } else {
+        selectedCards.value = publicCards.value.map(card => card.id);
+        deck.value.cards = publicCards.value;
+    }
+}
+
+const removeAllCards = () => {
     deck.value.cards = [];
     selectedCards.value = [];
 }
