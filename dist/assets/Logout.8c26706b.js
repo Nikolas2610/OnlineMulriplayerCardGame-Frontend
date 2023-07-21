@@ -1,1 +1,0 @@
-import{d as s,a as t,p as r,e as a}from"./index.ecc95ab6.js";import{a as n}from"./helpers.39175911.js";const i=s({__name:"Logout",setup(u){const o=t();return r(async()=>{const e=await o.logout();e&&n(e),a.push({name:"login"})}),()=>{}}});export{i as default};
