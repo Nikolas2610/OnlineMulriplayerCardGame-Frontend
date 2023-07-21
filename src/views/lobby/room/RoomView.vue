@@ -166,8 +166,10 @@ onBeforeMount(() => {
                     (!playerStore.table.table_users![index]?.status && response?.status)
                     || (playerStore.table.table_users![index].status?.id !== response?.status?.id)) {
                     const message = response.status?.name ? `${response.user.username} update his status to "${response.status?.name}"`
-                        : `${response.user.username} has remove his status`
-                    toast.info(message);
+                        : `${response.user.username} has remove his status`;
+                    if (response.status?.name) {
+                        toast.info(message);
+                    }
                 }
                 playerStore.table.table_users![index] = response;
             }
